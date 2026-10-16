@@ -1,0 +1,403 @@
+/* Erlass Competition 2026 - Styling System */
+:root {
+  --ink-primary: #1e293b;
+  --ink-muted: #64748b;
+  --orange-erlass: #ea580c;
+  --orange-light: #fff7ed;
+  --gold-erlass: #d97706;
+  --gold-light: #fef3c7;
+  --paper: #fffdfa;
+  --card-bg: #ffffff;
+  --line: #fed7aa;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', 'DM Sans', sans-serif;
+  color: var(--ink-primary);
+  background-color: #faf8f5;
+  scroll-behavior: smooth;
+}
+
+.display-font {
+  font-family: 'Fredoka', 'Plus Jakarta Sans', sans-serif;
+}
+
+.hero-pattern {
+  background-image: radial-gradient(rgba(249, 115, 22, 0.15) 1.5px, transparent 1.5px);
+  background-size: 20px 20px;
+}
+
+.dot-pattern {
+  background-image: radial-gradient(#f8c85d 1.5px, transparent 1.5px);
+  background-size: 18px 18px;
+}
+
+.glass-nav {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(254, 215, 170, 0.5);
+}
+
+.form-card {
+  box-shadow: 0 20px 50px -10px rgba(180, 83, 9, 0.12), 0 0 1px 1px rgba(251, 191, 36, 0.15);
+}
+
+.field-input, .field-select, .field-textarea {
+  width: 100%;
+  border: 1.5px solid #fed7aa;
+  border-radius: 12px;
+  background: #ffffff;
+  padding: 0.75rem 1rem;
+  color: var(--ink-primary);
+  font-size: 0.95rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.field-input:focus, .field-select:focus, .field-textarea:focus {
+  border-color: var(--orange-erlass);
+  box-shadow: 0 0 0 4px rgba(234, 88, 12, 0.15);
+  background: #fff;
+}
+
+.choice-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border: 1.5px solid #fed7aa;
+  border-radius: 14px;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.choice-option:hover {
+  transform: translateY(-2px);
+  border-color: #f97316;
+  background: #fffaf0;
+  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.08);
+}
+
+.choice-option input[type="radio"] {
+  accent-color: var(--orange-erlass);
+  margin-top: 0.2rem;
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.step-pane {
+  display: none;
+}
+
+.step-pane.active {
+  display: block;
+  animation: slideFadeIn 0.35s ease both;
+}
+
+.progress-dot {
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.88rem;
+  transition: all 0.3s ease;
+}
+
+.progress-dot.active {
+  background: var(--orange-erlass);
+  color: #fff;
+  box-shadow: 0 0 0 4px rgba(234, 88, 12, 0.2);
+}
+
+.progress-dot.done {
+  background: #10b981;
+  color: #fff;
+}
+
+.progress-dot.inactive {
+  background: #f1f5f9;
+  color: #94a3b8;
+}
+
+.upload-box {
+  border: 2px dashed #f59e0b;
+  border-radius: 16px;
+  padding: 1.5rem;
+  background: #fffdf5;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.upload-box:hover, .upload-box.dragover {
+  border-color: var(--orange-erlass);
+  background: #fff7ed;
+}
+
+/* Badge & E-Ticket Card */
+.participant-card {
+  background: linear-gradient(135deg, #ffffff 0%, #fffbf2 100%);
+  border: 2px solid #fed7aa;
+  position: relative;
+  overflow: hidden;
+}
+
+.participant-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, #ea580c, #f59e0b);
+}
+
+@keyframes slideFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Print Styling for E-Badge */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printable-card, #printable-card * {
+    visibility: visible;
+  }
+  #printable-card {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 20px;
+    box-shadow: none;
+    border: 2px solid #ea580c;
+  }
+}
+
+/* ========================================================
+   CARTOON MOVIE ANIMATIONS & INTERACTION SYSTEM
+   ======================================================== */
+
+/* 1. Cartoon Logo Hover Effect (Membesar & Membal Playful) */
+.cartoon-logo-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  perspective: 600px;
+}
+
+.cartoon-logo-img {
+  transition: transform 0.45s cubic-bezier(0.34, 1.8, 0.64, 1), filter 0.35s ease;
+  transform-origin: center center;
+  will-change: transform;
+}
+
+.cartoon-logo-btn:hover .cartoon-logo-img {
+  transform: scale(1.22) rotate(-3deg);
+  filter: drop-shadow(0 10px 18px rgba(234, 88, 12, 0.3));
+}
+
+.cartoon-logo-btn:active .cartoon-logo-img {
+  transform: scale(0.95) rotate(1deg);
+}
+
+.cartoon-logo-text {
+  transition: transform 0.35s cubic-bezier(0.34, 1.6, 0.64, 1);
+}
+
+.cartoon-logo-btn:hover .cartoon-logo-text {
+  transform: translateX(4px);
+}
+
+/* 2. Cartoon Movie Intro / Init Animations */
+@keyframes cartoonDropIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-50px) scale(0.7) rotate(-4deg);
+  }
+  65% {
+    opacity: 1;
+    transform: translateY(8px) scale(1.08) rotate(1.5deg);
+  }
+  85% {
+    transform: translateY(-3px) scale(0.97) rotate(-0.5deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+}
+
+@keyframes cartoonPopTitle {
+  0% {
+    opacity: 0;
+    transform: scale(0.7) translateY(40px);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.06) translateY(-8px);
+  }
+  80% {
+    transform: scale(0.98) translateY(3px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes cartoonFadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(28px) scale(0.94);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(-4px) scale(1.03);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes cartoonFloatBob {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(1.5deg);
+  }
+}
+
+/* Entrance utility classes */
+.anim-cartoon-badge {
+  animation: cartoonDropIn 0.85s cubic-bezier(0.34, 1.6, 0.64, 1) both;
+}
+
+.anim-cartoon-title {
+  animation: cartoonPopTitle 0.95s 0.15s cubic-bezier(0.34, 1.6, 0.64, 1) both;
+}
+
+.anim-cartoon-subtitle {
+  animation: cartoonFadeUp 0.85s 0.3s cubic-bezier(0.34, 1.6, 0.64, 1) both;
+}
+
+.anim-cartoon-cta {
+  animation: cartoonFadeUp 0.85s 0.45s cubic-bezier(0.34, 1.6, 0.64, 1) both;
+}
+
+.anim-cartoon-banner {
+  animation: cartoonPopTitle 1.1s 0.25s cubic-bezier(0.34, 1.6, 0.64, 1) both;
+}
+
+.anim-cartoon-float {
+  animation: cartoonFloatBob 4s ease-in-out infinite;
+}
+
+/* 3. Cartoon Scroll Reveal (Smooth & Bouncy Cartoon Physics) */
+.cartoon-reveal {
+  opacity: 0;
+  transform: translateY(35px) scale(0.94);
+  transition: opacity 0.65s cubic-bezier(0.34, 1.56, 0.64, 1), 
+              transform 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: opacity, transform;
+}
+
+.cartoon-reveal.revealed {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* Playful cartoon interactive cards & buttons */
+.cartoon-card {
+  transition: transform 0.35s cubic-bezier(0.34, 1.6, 0.64, 1),
+              box-shadow 0.35s ease,
+              border-color 0.3s ease;
+}
+
+.cartoon-card:hover {
+  transform: translateY(-7px) scale(1.025);
+  box-shadow: 0 18px 36px -8px rgba(234, 88, 12, 0.18);
+}
+
+.cartoon-card:active {
+  transform: translateY(-2px) scale(0.99);
+}
+
+.cartoon-btn {
+  transition: transform 0.28s cubic-bezier(0.34, 1.7, 0.64, 1),
+              box-shadow 0.28s ease,
+              background-color 0.2s ease;
+}
+
+.cartoon-btn:hover {
+  transform: translateY(-3px) scale(1.04);
+}
+
+.cartoon-btn:active {
+  transform: translateY(1px) scale(0.95);
+}
+
+/* Autocomplete Search & Recommendation Box */
+.school-search-container {
+  position: relative;
+}
+
+.school-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  max-height: 340px;
+  overflow-y: auto;
+  background: #ffffff;
+  border: 1.5px solid #fed7aa;
+  border-radius: 16px;
+  box-shadow: 0 12px 32px -4px rgba(180, 83, 9, 0.16), 0 4px 12px rgba(0, 0, 0, 0.05);
+  z-index: 50;
+  scrollbar-width: thin;
+  scrollbar-color: #f97316 #fed7aa;
+}
+
+.school-item {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.school-item:last-child {
+  border-bottom: none;
+}
+
+.school-item:hover, .school-item.active {
+  background-color: #fff7ed;
+  border-left: 4px solid #ea580c;
+  padding-left: calc(1rem - 4px);
+}
+
+.school-selected-card {
+  background: linear-gradient(135deg, #fffaf5 0%, #fff7ed 100%);
+  border: 2px solid #fdba74;
+  border-radius: 16px;
+  padding: 1rem 1.25rem;
+}

@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Erlass Competition 2026 - Technology for a Better Today</title>
+  <meta name="description" content="Erlass Competition 2026: Technology for a Better Today. Create, Code, and Innovate for a Better Future. Ajang kompetisi Scratch Coding, Micro:bit, dan Erboblox Robotics untuk pelajar SD dan SMP se-Indonesia.">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS & Lucide Icons -->
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.577.0/dist/umd/lucide.min.js"></script>
+  
+  <!-- Custom Styling -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Navigation Bar -->
+  <nav class="sticky top-0 z-50 glass-nav transition-all">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-18 py-3 flex items-center justify-between">
+      <a href="#" class="cartoon-logo-btn group" title="Erlass Academy Competition">
+        <img src="img/logoerlassacademy.png" alt="Erlass Academy" class="cartoon-logo-img h-9 sm:h-11 w-auto object-contain" onerror="this.src='img/logo_erlass.png'">
+        <div class="cartoon-logo-text border-l-2 border-orange-200 pl-3">
+          <span class="display-font font-bold text-orange-600 text-lg sm:text-xl tracking-tight leading-none block">COMPETITION</span>
+          <span class="text-[10px] sm:text-xs text-slate-500 font-semibold tracking-wider uppercase block">Portal Resmi</span>
+        </div>
+      </a>
+      <div class="hidden md:flex items-center gap-6 text-sm font-semibold text-slate-700">
+        <a href="#tentang" class="hover:text-orange-600 transition">Tentang</a>
+        <a href="#cabang" class="hover:text-orange-600 transition">Cabang Lomba</a>
+        <a href="#jadwal" class="hover:text-orange-600 transition">Jadwal</a>
+        <a href="#daftar" class="text-orange-600 font-bold hover:text-orange-700 transition">Pendaftaran</a>
+        <a href="#cek-status" class="hover:text-orange-600 transition">Cek Status</a>
+      </div>
+      <div class="flex items-center gap-2">
+        <a href="#daftar" class="cartoon-btn inline-flex items-center gap-1.5 px-4 py-2 text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-700 hover:to-amber-600 rounded-xl shadow-md hover:shadow-lg transition">
+          <i data-lucide="sparkles" class="w-4 h-4"></i>
+          <span>Daftar Sekarang</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Header Banner -->
+  <header id="tentang" class="relative overflow-hidden bg-gradient-to-br from-orange-600 via-orange-500 to-amber-500 text-white">
+    <div class="absolute inset-0 opacity-15 dot-pattern pointer-events-none"></div>
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 pt-6 sm:pt-8 pb-14 relative z-10">
+      
+      <!-- Main Master Banner Showcase (Landscape) -->
+      <div class="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white/90 bg-slate-900 cartoon-reveal mb-6 sm:mb-8 group">
+        <picture>
+          <source srcset="img/herobanner.webp?v=20261014" type="image/webp">
+          <img id="hero-banner-img" src="img/herobanner.jpeg?v=20261014" alt="Kids & Youth Robotics & Coding Competition - Erlass Competition 2026" class="w-full h-auto aspect-[7/4] object-cover transition-transform duration-500 group-hover:scale-[1.015]">
+        </picture>
+      </div>
+
+      <!-- Hero Summary & Action Bar -->
+      <div class="bg-white/10 backdrop-blur-md rounded-2xl p-5 sm:p-6 border border-white/20 flex flex-col md:flex-row items-center justify-between gap-6 shadow-lg">
+        <div class="text-left w-full md:w-auto">
+          <div class="inline-flex items-center gap-2 rounded-full px-3.5 py-1 text-xs font-extrabold bg-amber-300 text-amber-950 mb-2 anim-cartoon-badge shadow-sm">
+            <i data-lucide="award" class="w-4 h-4 text-orange-800"></i>
+            <span id="badge-title">Erlass Competition 2026 • Open Registration</span>
+          </div>
+          <h1 id="hero-title" class="display-font text-2xl sm:text-3xl font-extrabold text-white tracking-tight drop-shadow-sm anim-cartoon-title">
+            Technology for a Better Today
+          </h1>
+          <p id="hero-theme" class="text-orange-100 text-sm sm:text-base font-medium mt-1 anim-cartoon-subtitle">
+            Create, Code, and Innovate for a Better Future
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3 shrink-0 w-full md:w-auto justify-start md:justify-end anim-cartoon-cta">
+          <a href="#daftar" class="cartoon-btn inline-flex items-center gap-2 px-6 py-3.5 bg-white text-orange-600 font-extrabold text-sm rounded-2xl shadow-xl hover:bg-orange-50 transition">
+            <i data-lucide="edit-3" class="w-5 h-5"></i>
+            <span>Daftar Sekarang</span>
+          </a>
+          <a href="#cek-status" class="cartoon-btn inline-flex items-center gap-2 px-5 py-3.5 bg-orange-700/70 hover:bg-orange-700/90 text-white font-bold text-sm rounded-2xl border border-white/25 backdrop-blur transition">
+            <i data-lucide="search" class="w-5 h-5"></i>
+            <span>Cek Status Peserta</span>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Timeline / Jadwal Section -->
+  <section id="jadwal" class="max-w-6xl mx-auto px-4 sm:px-6 -mt-6 relative z-20">
+    <div class="bg-white rounded-2xl border border-amber-200/80 shadow-lg p-5 sm:p-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-4 cartoon-reveal">
+      <!-- Tahap 1: Pendaftaran Peserta -->
+      <div class="flex items-start gap-3.5 border-b sm:border-b-0 sm:border-r border-amber-100 pb-3 sm:pb-0 sm:pr-4">
+        <div class="w-10 h-10 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center shrink-0">
+          <i data-lucide="calendar" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <span class="text-xs font-bold text-orange-600 uppercase tracking-wide">Tahap 1</span>
+          <h4 class="font-extrabold text-slate-800 text-sm">Pendaftaran Peserta</h4>
+          <p id="schedule-reg-text" class="text-xs text-slate-500 font-medium mt-0.5">15 – 31 Oktober 2026</p>
+        </div>
+      </div>
+      <!-- Tahap 2: Periode Penjurian -->
+      <div class="flex items-start gap-3.5 border-b sm:border-b-0 lg:border-r border-amber-100 pb-3 sm:pb-0 sm:pr-4">
+        <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+          <i data-lucide="file-check-2" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <span class="text-xs font-bold text-amber-600 uppercase tracking-wide">Tahap 2</span>
+          <h4 class="font-extrabold text-slate-800 text-sm">Periode Penjurian</h4>
+          <p id="schedule-judge1-text" class="text-xs text-slate-500 font-medium mt-0.5">9 – 21 November 2026</p>
+        </div>
+      </div>
+      <!-- Tahap 3: Penjurian Final / Penentuan Juara -->
+      <div class="flex items-start gap-3.5 border-b sm:border-b-0 sm:border-r border-amber-100 pb-3 sm:pb-0 sm:pr-4">
+        <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
+          <i data-lucide="award" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <span class="text-xs font-bold text-blue-600 uppercase tracking-wide">Tahap 3</span>
+          <h4 class="font-extrabold text-slate-800 text-sm">Penjurian Final</h4>
+          <p id="schedule-judge2-text" class="text-xs text-slate-500 font-medium mt-0.5">22 – 28 November 2026</p>
+        </div>
+      </div>
+      <!-- Tahap 4: Pengumuman Pemenang -->
+      <div class="flex items-start gap-3.5">
+        <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+          <i data-lucide="trophy" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <span class="text-xs font-bold text-emerald-600 uppercase tracking-wide">Tahap 4</span>
+          <h4 class="font-extrabold text-slate-800 text-sm">Pengumuman Pemenang</h4>
+          <p id="schedule-ann-text" class="text-xs text-slate-500 font-medium mt-0.5">5 Desember 2026</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Cabang Lomba Section -->
+  <section id="cabang" class="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
+    <div class="text-center max-w-2xl mx-auto mb-10">
+      <span class="text-xs font-extrabold text-orange-600 uppercase tracking-widest bg-orange-100 px-3 py-1 rounded-full">Kategori Kompetisi</span>
+      <h2 class="display-font text-2xl sm:text-3xl font-extrabold text-slate-900 mt-2">Pilih Cabang Lomba Favoritmu</h2>
+      <p class="text-slate-600 text-sm sm:text-base mt-2">Disediakan 3 cabang kompetisi bergengsi yang dapat diikuti oleh siswa SD dan SMP sesuai jenjang minat bakat.</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-6">
+      <!-- Card 1: Scratch -->
+      <div class="bg-white rounded-2xl border-2 border-orange-100 hover:border-orange-400 p-6 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group cartoon-card cartoon-reveal">
+        <div>
+          <div class="w-12 h-12 rounded-2xl bg-orange-500 text-white flex items-center justify-center mb-4 group-hover:scale-115 group-hover:rotate-6 transition-transform">
+            <i data-lucide="gamepad-2" class="w-6 h-6"></i>
+          </div>
+          <span class="inline-block text-[11px] font-bold text-orange-700 bg-orange-50 px-2.5 py-1 rounded-md mb-2">SD Kelas 1 - 6</span>
+          <h3 class="display-font text-xl font-bold text-slate-900">Scratch Coding</h3>
+          <p class="text-slate-600 text-sm mt-2 leading-relaxed">
+            Merancang game interaktif, animasi kreatif, atau simulasi cerita edukatif dengan visual programming Scratch.
+          </p>
+        </div>
+        <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+          <span class="text-xs font-semibold text-slate-500">Karya Mandiri</span>
+          <button onclick="selectBranch('Scratch Coding')" class="text-xs font-bold text-orange-600 hover:text-orange-700 flex items-center gap-1">
+            Daftar Cabang Ini <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Card 2: Micro:bit -->
+      <div class="bg-white rounded-2xl border-2 border-amber-100 hover:border-amber-400 p-6 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group cartoon-card cartoon-reveal">
+        <div>
+          <div class="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center mb-4 group-hover:scale-115 group-hover:rotate-6 transition-transform">
+            <i data-lucide="microchip" class="w-6 h-6"></i>
+          </div>
+          <span class="inline-block text-[11px] font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-md mb-2">SD 4-6 & SMP 7-9</span>
+          <h3 class="display-font text-xl font-bold text-slate-900">Micro:bit IoT</h3>
+          <p class="text-slate-600 text-sm mt-2 leading-relaxed">
+            Eksplorasi sensor cerdas, display LED, dan prototype Internet of Things (IoT) berbasis microcontroller BBC Micro:bit.
+          </p>
+        </div>
+        <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+          <span class="text-xs font-semibold text-slate-500">Inovasi Hardware</span>
+          <button onclick="selectBranch('Micro:bit')" class="text-xs font-bold text-amber-600 hover:text-amber-700 flex items-center gap-1">
+            Daftar Cabang Ini <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Card 3: Erboblox Robotics -->
+      <div class="bg-white rounded-2xl border-2 border-orange-100 hover:border-orange-400 p-6 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group cartoon-card cartoon-reveal">
+        <div>
+          <div class="w-12 h-12 rounded-2xl bg-orange-600 text-white flex items-center justify-center mb-4 group-hover:scale-115 group-hover:rotate-6 transition-transform">
+            <i data-lucide="bot" class="w-6 h-6"></i>
+          </div>
+          <span class="inline-block text-[11px] font-bold text-orange-700 bg-orange-50 px-2.5 py-1 rounded-md mb-2">SD 4-6 & SMP 7-9</span>
+          <h3 class="display-font text-xl font-bold text-slate-900">Erboblox Robotics</h3>
+          <p class="text-slate-600 text-sm mt-2 leading-relaxed">
+            Perakitan robot modular mekanis, pemrograman motor servo presisi, dan uji misi ketangkasan robotika terpadu.
+          </p>
+        </div>
+        <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+          <span class="text-xs font-semibold text-slate-500">Mekanik & Koding</span>
+          <button onclick="selectBranch('Erboblox Robotics')" class="text-xs font-bold text-orange-600 hover:text-orange-700 flex items-center gap-1">
+            Daftar Cabang Ini <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FORMULIR PENDAFTARAN WIZARD SECTION -->
+  <section id="daftar" class="w-full bg-gradient-to-b from-amber-50/50 to-orange-50/30 py-12 sm:py-16 border-y border-amber-200/50">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6">
+      
+      <!-- Heading Pendaftaran -->
+      <div class="text-center mb-8">
+        <span class="text-xs font-extrabold text-orange-600 uppercase tracking-widest bg-orange-100 px-3 py-1 rounded-full">Formulir Resmi</span>
+        <h2 class="display-font text-2xl sm:text-4xl font-extrabold text-slate-900 mt-2">Registrasi Peserta Lomba</h2>
+        <p class="text-slate-600 text-sm sm:text-base mt-2 max-w-xl mx-auto">
+          Silakan isi formulir di bawah ini dengan lengkap dan teliti untuk mendaftarkan siswa pada ajang Erlass Competition 2026.
+        </p>
+      </div>
+
+      <!-- Step Indicator -->
+      <div class="mb-8 bg-white rounded-2xl p-4 sm:p-5 border border-amber-200/80 shadow-sm" aria-label="Tahapan pendaftaran">
+        <div class="flex items-center justify-between gap-1 sm:gap-3">
+          <div class="flex items-center gap-2">
+            <span id="dot-1" class="progress-dot active">1</span>
+            <span class="hidden sm:inline text-xs font-bold text-slate-700">Data Peserta</span>
+          </div>
+          <div class="h-1 flex-1 bg-amber-200 rounded"></div>
+          <div class="flex items-center gap-2">
+            <span id="dot-2" class="progress-dot inactive">2</span>
+            <span class="hidden sm:inline text-xs font-bold text-slate-700">Kategori & Sekolah</span>
+          </div>
+          <div class="h-1 flex-1 bg-amber-200 rounded"></div>
+          <div class="flex items-center gap-2">
+            <span id="dot-3" class="progress-dot inactive">3</span>
+            <span class="hidden sm:inline text-xs font-bold text-slate-700">Pembayaran</span>
+          </div>
+          <div class="h-1 flex-1 bg-amber-200 rounded"></div>
+          <div class="flex items-center gap-2">
+            <span id="dot-4" class="progress-dot inactive">4</span>
+            <span class="hidden sm:inline text-xs font-bold text-slate-700">Selesai & Kartu</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Form Card -->
+      <form id="registration-form" class="form-card bg-white border border-amber-100 rounded-3xl p-6 sm:p-10 cartoon-reveal" novalidate>
+        <div id="form-message" class="hidden mb-6 items-center gap-2 rounded-xl p-4 text-sm font-semibold"></div>
+
+        <!-- STEP 1: DATA PESERTA -->
+        <section class="step-pane active" data-step="1">
+          <div class="mb-6">
+            <span class="inline-block text-xs font-extrabold text-orange-700 bg-orange-100 px-3 py-1 rounded-full">Langkah 1 dari 4</span>
+            <h3 class="display-font text-xl sm:text-2xl font-bold text-slate-900 mt-2">Identitas & Data Peserta</h3>
+            <p class="text-slate-500 text-sm mt-1">Lengkapi informasi pribadi siswa calon peserta lomba dengan data sebenarnya.</p>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-5">
+            <div>
+              <label class="block mb-1.5 text-xs font-bold text-slate-700" for="nama_lengkap">Nama Lengkap Siswa <span class="text-red-500">*</span></label>
+              <input id="nama_lengkap" name="nama_lengkap" type="text" placeholder="Contoh: Muhammad Bintang Pratama" class="field-input" required>
+            </div>
+            
+            <fieldset>
+              <legend class="block mb-1.5 text-xs font-bold text-slate-700">Jenis Kelamin <span class="text-red-500">*</span></legend>
+              <div class="grid grid-cols-2 gap-3">
+                <label class="choice-option">
+                  <input type="radio" name="jenis_kelamin" value="Laki-laki" required>
+                  <span class="text-sm font-semibold text-slate-700">Laki-laki</span>
+                </label>
+                <label class="choice-option">
+                  <input type="radio" name="jenis_kelamin" value="Perempuan" required>
+                  <span class="text-sm font-semibold text-slate-700">Perempuan</span>
+                </label>
+              </div>
+            </fieldset>
+
+            <div>
+              <label class="block mb-1.5 text-xs font-bold text-slate-700" for="tanggal_lahir">Tanggal Lahir <span class="text-red-500">*</span></label>
+              <input id="tanggal_lahir" name="tanggal_lahir" type="date" class="field-input" required>
+            </div>
+
+            <div>
+              <label class="block mb-1.5 text-xs font-bold text-slate-700" for="usia">Usia (Tahun) <span class="text-red-500">*</span></label>
+              <input id="usia" name="usia" type="number" min="5" max="18" placeholder="Contoh: 11" class="field-input" required>
+            </div>
+
+            <div>
+              <label class="block mb-1.5 text-xs font-bold text-slate-700" for="kelas">Jenjang Kelas <span class="text-red-500">*</span></label>
+              <select id="kelas" name="kelas" class="field-select" required>
+                <option value="">-- Pilih Jenjang Kelas --</option>
+                <optgroup label="Tingkat Sekolah Dasar (SD)">
+                  <option value="Kelas 1">Kelas 1 SD</option>
+                  <option value="Kelas 2">Kelas 2 SD</option>
+                  <option value="Kelas 3">Kelas 3 SD</option>
+                  <option value="Kelas 4">Kelas 4 SD</option>
+                  <option value="Kelas 5">Kelas 5 SD</option>
+                  <option value="Kelas 6">Kelas 6 SD</option>
+                </optgroup>
+                <optgroup label="Tingkat SMP">
+                  <option value="Kelas 7">Kelas 7 SMP</option>
+                  <option value="Kelas 8">Kelas 8 SMP</option>
+                  <option value="Kelas 9">Kelas 9 SMP</option>
+                </optgroup>
+              </select>
+            </div>
+
+            <div>
+              <label class="block mb-1.5 text-xs font-bold text-slate-700" for="nomor_telepon">No. WhatsApp / HP (Siswa / Orang Tua) <span class="text-red-500">*</span></label>
+              <input id="nomor_telepon" name="nomor_telepon" type="tel" placeholder="Contoh: 081234567890" class="field-input" required>
+              <p class="text-[11px] text-slate-500 mt-1">Nomor ini akan digunakan untuk konfirmasi status dan link grup WhatsApp.</p>
+            </div>
+
+            <div class="md:col-span-2">
+              <label class="block mb-1.5 text-xs font-bold text-slate-700" for="alamat">Alamat Lengkap Tempat Tinggal <span class="text-red-500">*</span></label>
+              <textarea id="alamat" name="alamat" rows="2" placeholder="Masukkan alamat lengkap (jalan, kelurahan, kota/kabupaten)" class="field-textarea" required></textarea>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 2: KATEGORI & CABANG KOMPETISI & PENCARIAN SEKOLAH -->
+        <section class="step-pane" data-step="2">
+          <div class="mb-6">
+            <span class="inline-block text-xs font-extrabold text-orange-700 bg-orange-100 px-3 py-1 rounded-full">Langkah 2 dari 4</span>
+            <h3 class="display-font text-xl sm:text-2xl font-bold text-slate-900 mt-2">Cabang Lomba & Asal Sekolah</h3>
+            <p class="text-slate-500 text-sm mt-1">Pilih cabang kompetisi dan temukan sekolah asal siswa (SD & SMP se-Indonesia).</p>
+          </div>
+
+          <div class="space-y-6">
+            <!-- Pilihan Cabang Kompetisi -->
+            <fieldset>
+              <legend class="block mb-2 text-xs font-bold text-slate-700">Cabang Kompetisi yang Diikuti <span class="text-red-500">*</span></legend>
+              <div class="grid sm:grid-cols-3 gap-3">
+                <label class="choice-option cursor-pointer">
+                  <input type="radio" name="cabang_kompetisi" value="Scratch Coding" required>
+                  <div>
+                    <span class="text-sm font-bold text-slate-800 block">Scratch Coding</span>
+                    <span class="text-[11px] text-slate-500">SD Kelas 1 - 6</span>
+                  </div>
+                </label>
+                <label class="choice-option cursor-pointer">
+                  <input type="radio" name="cabang_kompetisi" value="Micro:bit" required>
+                  <div>
+                    <span class="text-sm font-bold text-slate-800 block">Micro:bit</span>
+                    <span class="text-[11px] text-slate-500">SD 4-6 & SMP 7-9</span>
+                  </div>
+                </label>
+                <label class="choice-option cursor-pointer">
+                  <input type="radio" name="cabang_kompetisi" value="Erboblox Robotics" required>
+                  <div>
+                    <span class="text-sm font-bold text-slate-800 block">Erboblox Robotics</span>
+                    <span class="text-[11px] text-slate-500">SD 4-6 & SMP 7-9</span>
+                  </div>
+                </label>
+              </div>
+            </fieldset>
+
+            <!-- Pencarian Sekolah Asal (NPSN & Nama Sekolah Instan) -->
+            <div class="space-y-3">
+              <label class="block text-xs font-bold text-slate-700" for="school-search-input">
+                Pencarian Sekolah Asal (SD / SMP) <span class="text-red-500">*</span>
+              </label>
+
+              <!-- Search Input & Autocomplete Container -->
+              <div class="school-search-container">
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <i data-lucide="search" class="w-5 h-5"></i>
+                  </div>
+                  <input
+                    id="school-search-input"
+                    type="text"
+                    autocomplete="off"
+                    placeholder="Ketik NPSN atau Nama Sekolah (contoh: 20102743 / SDIT AL ITTIHAAD / SDN PASEBAN)..."
+                    class="field-input pl-11 pr-10 text-sm"
+                  >
+                  <button
+                    type="button"
+                    id="clear-search-btn"
+                    class="hidden absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
+                    title="Hapus pencarian"
+                  >
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                  </button>
+                </div>
+
+                <!-- Live Recommendation Dropdown -->
+                <div id="school-dropdown" class="school-dropdown hidden">
+                  <!-- Diisi otomatis oleh JavaScript -->
+                </div>
+              </div>
+
+              <!-- Selected School Card Display -->
+              <div id="school-selected-card" class="hidden school-selected-card">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="space-y-1.5">
+                    <div class="flex items-center gap-2">
+                      <span id="selected-school-jenjang" class="inline-flex items-center px-2.5 py-0.5 rounded text-[11px] font-bold bg-amber-100 text-amber-900">SD</span>
+                      <span id="selected-school-npsn" class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-slate-100 text-slate-700">NPSN: -</span>
+                    </div>
+                    <h4 id="selected-school-name" class="text-base font-bold text-slate-900">Nama Sekolah Terpilih</h4>
+                    <p id="selected-school-location" class="text-xs text-slate-600 flex items-center gap-1">
+                      <i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-400"></i>
+                      <span>Kota / Wilayah</span>
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    id="change-school-btn"
+                    class="shrink-0 text-xs font-bold text-orange-600 hover:text-orange-700 bg-white hover:bg-orange-50 border border-orange-200 px-3 py-1.5 rounded-xl transition shadow-sm"
+                  >
+                    Ganti Sekolah
+                  </button>
+                </div>
+              </div>
+
+              <!-- Fallback Manual Input -->
+              <div class="pt-1 flex items-center justify-between text-xs">
+                <span class="text-slate-500">Mencakup lebih dari 224.000 SD & SMP se-Indonesia.</span>
+                <button
+                  type="button"
+                  id="toggle-manual-school-btn"
+                  class="text-orange-600 hover:text-orange-700 hover:underline font-semibold"
+                >
+                  Sekolah tidak ditemukan? Ketik manual
+                </button>
+              </div>
+
+              <!-- Manual School Input Container (Initially Hidden) -->
+              <div id="manual-school-container" class="hidden p-4 rounded-2xl bg-amber-50/60 border border-amber-200 space-y-3 mt-3">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-amber-900">Input Manual Data Sekolah</span>
+                  <button type="button" id="close-manual-school-btn" class="text-xs text-slate-500 hover:text-slate-700">Tutup</button>
+                </div>
+                <div class="grid md:grid-cols-3 gap-3">
+                  <div>
+                    <label class="block mb-1 text-[11px] font-bold text-slate-700" for="manual-jenjang">Jenjang *</label>
+                    <select id="manual-jenjang" class="field-select text-xs">
+                      <option value="SD">SD / MI</option>
+                      <option value="SMP">SMP / MTs</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block mb-1 text-[11px] font-bold text-slate-700" for="manual-npsn">NPSN (Bila ada)</label>
+                    <input id="manual-npsn" type="text" placeholder="8 digit NPSN" class="field-input text-xs font-mono">
+                  </div>
+                  <div>
+                    <label class="block mb-1 text-[11px] font-bold text-slate-700" for="manual-city">Kota / Kabupaten *</label>
+                    <input id="manual-city" type="text" placeholder="Contoh: JAKARTA PUSAT" class="field-input text-xs uppercase" style="text-transform: uppercase;">
+                  </div>
+                </div>
+                <div>
+                  <label class="block mb-1 text-[11px] font-bold text-slate-700" for="manual-name">Nama Lengkap Sekolah *</label>
+                  <input id="manual-name" type="text" placeholder="Contoh: SD BINTANG HARAPAN" class="field-input text-xs uppercase" style="text-transform: uppercase;">
+                </div>
+                <button type="button" id="apply-manual-school-btn" class="w-full py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl transition">
+                  Gunakan Sekolah Ini
+                </button>
+              </div>
+
+              <!-- Hidden form inputs for submission -->
+              <input type="hidden" id="selected_school_npsn_val" name="npsn" value="">
+              <input type="hidden" id="selected_school_name_val" name="nama_sekolah" value="">
+              <input type="hidden" id="selected_school_city_val" name="wilayah" value="">
+              <input type="hidden" id="selected_school_jenjang_val" name="jenjang_sekolah" value="">
+              <input type="hidden" id="selected_school_is_partner_val" name="is_partner" value="0">
+              <input type="hidden" id="selected_school_partnership_val" name="status_kemitraan" value="Non-Pelanggan Erlass (UMUM)">
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 3: ASAL SEKOLAH & PEMBAYARAN -->
+        <section class="step-pane" data-step="3">
+          <div class="space-y-6">
+            <div class="mb-6">
+              <span class="inline-block text-xs font-extrabold text-orange-700 bg-orange-100 px-3 py-1 rounded-full">Langkah 3 dari 4 • Pembayaran</span>
+              <h3 class="display-font text-xl sm:text-2xl font-bold text-slate-900 mt-2">Pembayaran Transfer Mandiri</h3>
+              <p class="text-slate-500 text-sm mt-1">Lakukan transfer biaya pendaftaran sesuai petunjuk resmi di bawah, lalu unggah bukti transfer.</p>
+            </div>
+
+            <!-- Ringkasan Asal Sekolah -->
+            <div class="rounded-2xl bg-amber-50/70 border border-amber-200 p-3.5 flex items-center justify-between text-xs">
+              <div class="flex items-center gap-2">
+                <i data-lucide="school" class="w-4 h-4 text-orange-600"></i>
+                <span class="text-slate-600">Sekolah:</span>
+                <strong id="step3-school-summary" class="text-slate-800">-</strong>
+              </div>
+              <span class="font-bold text-orange-700 bg-orange-100 px-2.5 py-1 rounded-full">Biaya: Rp 75.000</span>
+            </div>
+
+            <!-- Card Rekening Bank Mandiri -->
+            <div class="bg-gradient-to-br from-amber-500 via-orange-600 to-amber-600 rounded-3xl p-5 sm:p-6 text-white shadow-lg relative overflow-hidden">
+              <div class="flex items-start justify-between gap-4 relative z-10">
+                <div class="space-y-1">
+                  <span class="text-[10px] font-extrabold uppercase tracking-widest text-amber-200 bg-white/10 px-2.5 py-1 rounded-full inline-block backdrop-blur-sm">Rekening Resmi Panitia</span>
+                  <h4 class="text-xl sm:text-2xl font-black mt-1">Bank Mandiri</h4>
+                  <p class="text-xs text-amber-100 font-semibold">a/n PT. Erlass Prokreatif Indonesia</p>
+                  
+                  <div class="pt-3">
+                    <span class="text-[11px] text-amber-100 uppercase tracking-wider block font-semibold">Nomor Rekening:</span>
+                    <div class="flex items-center gap-2 mt-0.5">
+                      <span id="bank-account-text" class="text-xl sm:text-3xl font-mono font-black tracking-wider text-white">129-000-742-767-3</span>
+                      <button type="button" onclick="copyBankAccount('1290007427673')" class="text-xs font-bold text-orange-700 bg-white hover:bg-amber-50 px-3 py-1.5 rounded-xl shadow transition">Salin</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="text-right shrink-0">
+                  <span class="text-[11px] text-amber-200 uppercase tracking-wider block font-bold">Biaya Pendaftaran</span>
+                  <span class="text-2xl sm:text-3xl font-black text-amber-200">Rp 75.000</span>
+                  <span class="text-[10px] text-amber-100 block">/ peserta</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- PERINGATAN BERITA TRANSFER WAJIB (MENCOLOK & TIDAK SAH JIKA TIDAK ADA) -->
+            <div class="rounded-2xl bg-red-50 border-2 border-red-500 p-4 sm:p-5 shadow-sm text-red-950">
+              <div class="flex items-start gap-3">
+                <div class="w-10 h-10 rounded-xl bg-red-600 text-white flex items-center justify-center shrink-0">
+                  <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+                </div>
+                <div class="w-full">
+                  <span class="text-[10px] font-black uppercase tracking-widest bg-red-600 text-white px-2.5 py-0.5 rounded-full inline-block mb-1">Syarat Mutlak Pembayaran</span>
+                  <h4 class="font-extrabold text-sm sm:text-base text-red-900">WAJIB MENYERTAKAN BERITA TRANSFER SAAT TRANSAKSI:</h4>
+                  
+                  <!-- Box Berita Transfer yang Harus Disalin -->
+                  <div class="mt-2 p-3 rounded-xl bg-white border border-red-300 flex items-center justify-between gap-2">
+                    <div>
+                      <span class="text-[10px] text-slate-500 font-bold block uppercase tracking-wider">Teks Berita Transfer:</span>
+                      <strong id="transfer-note-text" class="text-sm sm:text-base font-mono font-black text-red-600">Lomba Erlass 2026</strong>
+                    </div>
+                    <button type="button" onclick="copyTransferNote()" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-lg shadow-sm transition">
+                      <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                      <span>Salin Berita</span>
+                    </button>
+                  </div>
+
+                  <p class="text-xs text-red-800 font-bold mt-2 leading-relaxed">
+                    ⚠️ CATATAN: Pembayaran TIDAK SAH jika tidak menyertakan berita transfer <span class="underline">"Lomba Erlass 2026"</span>. Pastikan Anda mengisi kolom berita transfer saat melakukan transaksi sebelum mengunggah bukti bayar.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Upload Dropzone Bukti Transfer -->
+            <div class="space-y-3">
+              <label class="block text-xs font-bold text-slate-700" for="bukti_transfer">Unggah Foto / Screenshot Bukti Transfer (Nominal Rp 75.000) <span class="text-red-500">*</span></label>
+              <div id="dropzone" class="upload-box text-center">
+                <input id="bukti_transfer" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" class="hidden">
+                <div id="upload-prompt" class="flex flex-col items-center justify-center py-4">
+                  <div class="w-12 h-12 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center mb-2">
+                    <i data-lucide="upload-cloud" class="w-6 h-6"></i>
+                  </div>
+                  <p class="text-sm font-bold text-slate-700">Klik untuk memilih berkas atau geser file ke sini</p>
+                  <p class="text-xs text-slate-400 mt-1">Mendukung format JPG, PNG, WEBP, atau PDF (Maks. 8MB)</p>
+                </div>
+                <div id="file-preview-container" class="hidden mt-3 text-center">
+                  <img id="image-preview" src="#" alt="Preview Bukti" class="max-h-48 mx-auto rounded-lg border border-slate-200 mb-2 object-contain">
+                  <p id="transfer-file-name" class="text-sm font-bold text-emerald-700"></p>
+                  <button type="button" onclick="resetFile()" class="text-xs text-red-600 font-semibold hover:underline mt-1">Ganti Berkas</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 4: KONFIRMASI & SELESAI -->
+        <section class="step-pane" data-step="4">
+          <div class="text-center py-4">
+            <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 mx-auto flex items-center justify-center mb-3">
+              <i data-lucide="check-circle-2" class="w-10 h-10"></i>
+            </div>
+            <span class="inline-block text-xs font-extrabold text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full mb-2">Pendaftaran Terkirim</span>
+            <h3 class="display-font text-2xl font-bold text-slate-900">Selamat, Formulir Siap Dikirim!</h3>
+            <p class="text-slate-600 text-sm max-w-md mx-auto mt-2">
+              Periksa kembali data Anda sebelum menekan tombol <strong class="text-orange-600">"Kirim Pendaftaran Sekarang"</strong> di bawah.
+            </p>
+          </div>
+
+          <div class="mt-6 bg-slate-50 rounded-2xl p-5 border border-slate-200 text-sm space-y-2 max-w-lg mx-auto">
+            <div class="flex justify-between border-b border-slate-200 pb-2">
+              <span class="text-slate-500 font-medium">Nama Peserta:</span>
+              <span id="review-name" class="font-bold text-slate-800">-</span>
+            </div>
+            <div class="flex justify-between border-b border-slate-200 pb-2">
+              <span class="text-slate-500 font-medium">Cabang Lomba:</span>
+              <span id="review-branch" class="font-bold text-orange-600">-</span>
+            </div>
+            <div class="flex justify-between border-b border-slate-200 pb-2">
+              <span class="text-slate-500 font-medium">Kategori:</span>
+              <span id="review-category" class="font-bold text-slate-800">-</span>
+            </div>
+            <div class="flex justify-between border-b border-slate-200 pb-2">
+              <span class="text-slate-500 font-medium">Sekolah:</span>
+              <span id="review-school" class="font-bold text-slate-800 text-right">-</span>
+            </div>
+            <div class="flex justify-between pt-1">
+              <span class="text-slate-500 font-medium">Status Pembayaran:</span>
+              <span id="review-payment" class="font-bold text-emerald-600">-</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- FORM BUTTON ACTIONS -->
+        <div id="wizard-actions" class="flex items-center justify-between gap-4 border-t border-slate-100 mt-8 pt-6">
+          <button id="back-button" type="button" class="hidden inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+            <span>Kembali</span>
+          </button>
+          <div class="ml-auto flex items-center gap-3">
+            <button id="next-button" type="button" class="inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-bold text-white bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-700 hover:to-amber-600 shadow-md hover:shadow-lg transition">
+              <span>Lanjutkan</span>
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+            <button id="submit-button" type="submit" class="hidden inline-flex items-center gap-2 rounded-xl px-7 py-3 text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-lg hover:shadow-xl transition">
+              <i data-lucide="check" class="w-4 h-4"></i>
+              <span>Kirim Pendaftaran Sekarang</span>
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <!-- SUCCESS CONFIRMATION & E-BADGE CARD -->
+      <div id="success-screen" class="hidden bg-white border border-amber-200 rounded-3xl p-6 sm:p-10 shadow-xl text-center">
+        <!-- WARNING BANNER MENCOLOK (PASTIKAN SUDAH SIMPAN & GABUNG WA AGAR TIDAK HILANG) -->
+        <div class="mb-6 p-4 sm:p-5 rounded-2xl bg-amber-50 border-2 border-amber-500 text-amber-950 text-left flex items-start gap-3 shadow-md">
+          <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 mt-0.5">
+            <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <h4 class="font-black text-sm sm:text-base text-amber-900 uppercase tracking-wide">⚠️ PERHATIAN PENTING: JANGAN TUTUP HALAMAN INI SEBELUM MENCETAK KARTU & GABUNG GRUP WA!</h4>
+            <p class="text-xs sm:text-sm text-amber-800 mt-1 leading-relaxed">
+              1. Wajib <strong>Cetak / Simpan Kartu Peserta</strong> Anda sekarang agar tidak kehilangan Nomor Kode Registrasi resmi.<br>
+              2. Segera klik tombol hijau <strong>"Gabung Grup WhatsApp Peserta"</strong> di bawah untuk mendapatkan link technical meeting, jadwal lomba, dan pengumuman panitia.
+            </p>
+          </div>
+        </div>
+
+        <div class="w-20 h-20 rounded-full bg-emerald-100 text-emerald-600 mx-auto flex items-center justify-center mb-4">
+          <i data-lucide="award" class="w-10 h-10"></i>
+        </div>
+        <h3 class="display-font text-2xl sm:text-3xl font-extrabold text-slate-900">Pendaftaran Berhasil Dikirim!</h3>
+        <p class="text-slate-600 text-sm mt-2 max-w-lg mx-auto">
+          Terima kasih telah mendaftar di ajang Erlass Competition 2026. Simpan atau cetak kartu registrasi resmi di bawah ini.
+        </p>
+
+        <!-- Printable E-Badge Card -->
+        <div id="printable-card" class="participant-card rounded-2xl p-6 sm:p-8 max-w-md mx-auto my-6 text-left shadow-md">
+          <div class="flex items-center justify-between border-b border-orange-100 pb-3 mb-4">
+            <div class="flex items-center gap-2">
+              <img src="img/logoerlassacademy.png" alt="Erlass Logo" class="h-7 w-auto" onerror="this.src='img/logo_erlass.png'">
+              <span class="text-xs font-extrabold text-orange-600 uppercase tracking-wider">Erlass Competition 2026</span>
+            </div>
+            <span id="card-badge-status" class="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">TERKONFIRMASI</span>
+          </div>
+
+          <div class="text-center py-2 border-b border-orange-100 pb-4">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Nomor Kode Registrasi</span>
+            <span id="card-reg-code" class="display-font text-2xl sm:text-3xl font-black text-orange-600 tracking-wider">E-1026-0001</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 pt-4 text-xs">
+            <div>
+              <span class="text-slate-400 block font-semibold">Nama Peserta</span>
+              <span id="card-name" class="font-bold text-slate-800 block text-sm">-</span>
+            </div>
+            <div>
+              <span class="text-slate-400 block font-semibold">Cabang Lomba</span>
+              <span id="card-branch" class="font-bold text-orange-600 block text-sm">-</span>
+            </div>
+            <div>
+              <span class="text-slate-400 block font-semibold">Asal Sekolah</span>
+              <span id="card-school" class="font-bold text-slate-800 block">-</span>
+            </div>
+            <div>
+              <span class="text-slate-400 block font-semibold">Kontak WhatsApp</span>
+              <span id="card-phone" class="font-bold text-slate-800 block">-</span>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-orange-100 text-center">
+            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">PT. Erlass Prokreatif Indonesia</span>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-center gap-3">
+          <button type="button" onclick="window.print()" class="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-800 text-white font-bold text-xs sm:text-sm rounded-xl hover:bg-slate-900 transition shadow-md">
+            <i data-lucide="printer" class="w-4 h-4"></i>
+            <span>Cetak / Simpan Kartu Peserta</span>
+          </button>
+          <a id="btn-wa-group" href="https://chat.whatsapp.com/ErlassCompetition2026" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-xl transition shadow-md">
+            <i data-lucide="message-circle" class="w-4 h-4"></i>
+            <span>Gabung Grup WhatsApp Peserta</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODUL CEK STATUS PENDAFTARAN MANDIRI -->
+  <section id="cek-status" class="max-w-4xl mx-auto px-4 sm:px-6 py-14">
+    <div class="bg-white rounded-3xl border border-amber-200/80 shadow-md p-6 sm:p-10">
+      <div class="text-center max-w-xl mx-auto mb-6">
+        <div class="w-12 h-12 rounded-2xl bg-orange-100 text-orange-600 mx-auto flex items-center justify-center mb-2">
+          <i data-lucide="search-check" class="w-6 h-6"></i>
+        </div>
+        <h3 class="display-font text-2xl font-bold text-slate-900">Cek Status Pendaftaran Anda</h3>
+        <p class="text-slate-500 text-xs sm:text-sm mt-1">Masukkan Kode Registrasi resmi Anda (Contoh: E-1026-0001) untuk memeriksa status verifikasi kepesertaan.</p>
+        <span class="inline-block text-[11px] font-semibold text-amber-700 bg-amber-50 px-3 py-1 rounded-full border border-amber-200 mt-2">
+          Pencarian hanya menggunakan Kode Registrasi demi keamanan data peserta.
+        </span>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+        <input id="check-query" type="text" placeholder="Masukkan Kode (Contoh: E-1026-0001)..." class="field-input text-center sm:text-left font-mono">
+        <button id="btn-check-status" type="button" class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl shadow transition shrink-0">
+          <i data-lucide="search" class="w-4 h-4"></i>
+          <span>Periksa</span>
+        </button>
+      </div>
+
+      <!-- Hasil Pencarian Status -->
+      <div id="check-result-container" class="mt-6 hidden"></div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="mt-auto bg-slate-900 text-slate-400 py-10 border-t border-slate-800 text-xs">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 grid sm:grid-cols-3 gap-8 mb-8">
+      <div>
+        <div class="flex items-center gap-2 mb-3">
+          <img src="img/logoerlassacademy.png" alt="Erlass Logo" class="h-8 w-auto brightness-200" onerror="this.src='img/logo_erlass.png'">
+          <span class="font-bold text-white text-base">Erlass Competition</span>
+        </div>
+        <p class="leading-relaxed">
+          Pusat pengembangan bakat koding dan robotika anak bangsa. Menyiapkan generasi unggul menyongsong era revolusi teknologi 5.0.
+        </p>
+      </div>
+      <div>
+        <h4 class="font-bold text-white text-sm mb-3">Tautan Penting</h4>
+        <ul class="space-y-2">
+          <li><a href="#cabang" class="hover:text-white transition">Cabang Kompetisi</a></li>
+          <li><a href="#jadwal" class="hover:text-white transition">Timeline & Jadwal</a></li>
+          <li><a href="#daftar" class="hover:text-white transition">Formulir Pendaftaran</a></li>
+          <li><a href="#cek-status" class="hover:text-white transition">Cek Status Peserta</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-bold text-white text-sm mb-3">Kontak Panitia</h4>
+        <p class="leading-relaxed">
+          <strong class="text-white">PT. Erlass Prokreatif Indonesia</strong><br>
+          WhatsApp CS: <a href="https://wa.me/6282311341381" target="_blank" rel="noopener noreferrer" class="text-white hover:text-orange-400 font-semibold transition">+62 823-1134-1381</a><br>
+          Email: <a href="mailto:info@galeribelajar.com" class="hover:text-white transition">info@galeribelajar.com</a>
+        </p>
+      </div>
+    </div>
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-slate-500">
+      <p>&copy; 2026 PT. Erlass Prokreatif Indonesia. Seluruh Hak Cipta Dilindungi.</p>
+      <p class="flex items-center gap-1">Portal Resmi Kompetisi Erlass Indonesia</p>
+    </div>
+  </footer>
+
+  <!-- Main JavaScript Logic -->
+  <script src="js/app.js?v=20261005_12"></script>
+</body>
+</html>

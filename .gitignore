@@ -1,0 +1,7 @@
+# User uploads (bukti transfer, dynamic files)
+uploads/
+uploads/*
+
+# Raw oversized banner working files in root
+/landscapelomba.png
+/herobanner.jpeg
