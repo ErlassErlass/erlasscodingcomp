@@ -988,12 +988,14 @@ if ($action === 'get_judging_submissions') {
     $params = [$judgeId];
 
     if ($branch !== '') {
-        $sql .= " AND p.branch = ?";
+        $sql .= " AND (p.branch = ? OR p.branch LIKE ?)";
         $params[] = $branch;
+        $params[] = "%$branch%";
     }
     if ($gradeCat !== '') {
-        $sql .= " AND p.grade_category = ?";
+        $sql .= " AND (p.grade_category = ? OR p.grade_category LIKE ?)";
         $params[] = $gradeCat;
+        $params[] = "%$gradeCat%";
     }
     if ($search !== '') {
         $sql .= " AND (p.reg_code LIKE ? OR p.project_title LIKE ?)";
@@ -1231,12 +1233,14 @@ if ($action === 'get_judging_leaderboard') {
     $params = [];
 
     if ($branch !== '') {
-        $sql .= " AND p.branch = ?";
+        $sql .= " AND (p.branch = ? OR p.branch LIKE ?)";
         $params[] = $branch;
+        $params[] = "%$branch%";
     }
     if ($gradeCat !== '') {
-        $sql .= " AND p.grade_category = ?";
+        $sql .= " AND (p.grade_category = ? OR p.grade_category LIKE ?)";
         $params[] = $gradeCat;
+        $params[] = "%$gradeCat%";
     }
 
     $sql .= " GROUP BY p.id HAVING judge_count > 0 ORDER BY final_score DESC, judge_count DESC";
@@ -1316,12 +1320,14 @@ if ($action === 'export_judging_csv') {
     ";
     $params = [];
     if ($branch !== '') {
-        $sql .= " AND p.branch = ?";
+        $sql .= " AND (p.branch = ? OR p.branch LIKE ?)";
         $params[] = $branch;
+        $params[] = "%$branch%";
     }
     if ($gradeCat !== '') {
-        $sql .= " AND p.grade_category = ?";
+        $sql .= " AND (p.grade_category = ? OR p.grade_category LIKE ?)";
         $params[] = $gradeCat;
+        $params[] = "%$gradeCat%";
     }
     $sql .= " GROUP BY p.id HAVING judge_count > 0 ORDER BY final_score DESC";
 

@@ -1,7 +1,7 @@
 /**
  * Erlass Competition 2026 - Portal Penjurian Resmi (Blind Review)
  * Logika Client-Side Penjurian, Preview Balok Scratch / MakeCode, Video Player & Rubrik Penilaian
- * Light Theme Edition
+ * Light Theme Edition with Dynamic Filters, Real-Time Search, and Auto-Advance
  */
 
 // Sesi & Auth State
@@ -144,69 +144,192 @@ async function logoutJudge() {
 }
 
 // 3. Load & Filter Submissions
-async function reloadSubmissions() {
+async function reloadSubmissions(preferredSelectId = null) {
   try {
     const res = await fetch(`api/admin.php?action=get_judging_submissions&token=${encodeURIComponent(authToken)}`);
     const data = await res.json();
     if (data.status === 'ok') {
       allSubmissions = data.submissions || [];
-      applyFilters();
+      applyFilters(preferredSelectId);
     }
   } catch (err) {
     console.error('Error reloading submissions:', err);
   }
 }
 
-function applyFilters() {
-  const branchFilter = document.getElementById('filter-branch').value;
-  const gradeFilter = document.getElementById('filter-grade').value;
+function stopAllMedia() {
+  const pIframe = document.getElementById('preview-iframe');
+  const vIframe = document.getElementById('video-player-iframe');
+  if (pIframe) pIframe.src = 'about:blank';
+  if (vIframe) vIframe.src = 'about:blank';
+}
 
-  // Hitung counter global
-  let totalAll = allSubmissions.length;
-  let totalUnscored = allSubmissions.filter(s => !s.is_scored).length;
-  let totalScored = allSubmissions.filter(s => s.is_scored).length;
+function applyFilters(preferredSelectId = null) {
+  const branchFilter = (document.getElementById('filter-branch')?.value || '').trim();
+  const gradeFilter = (document.getElementById('filter-grade')?.value || '').trim();
+  const searchFilter = (document.getElementById('filter-search')?.value || '').trim().toLowerCase();
+  const sortFilter = (document.getElementById('filter-sort')?.value || 'unscored_first');
 
-  document.getElementById('count-all').textContent = totalAll;
-  document.getElementById('count-unscored').textContent = totalUnscored;
-  document.getElementById('count-scored').textContent = totalScored;
+  // Toggle tombol Clear Search
+  const btnClearSearch = document.getElementById('btn-clear-search');
+  if (btnClearSearch) {
+    if (searchFilter) btnClearSearch.classList.remove('hidden');
+    else btnClearSearch.classList.add('hidden');
+  }
 
-  // Filter list
-  filteredSubmissions = allSubmissions.filter(s => {
-    if (branchFilter && s.branch !== branchFilter) return false;
-    if (gradeFilter && !s.grade_category.includes(gradeFilter)) return false;
+  // Toggle tombol Reset All Filters
+  const btnReset = document.getElementById('btn-reset-filters');
+  const isAnyFilterActive = Boolean(branchFilter || gradeFilter || searchFilter || currentStatusFilter || sortFilter !== 'unscored_first');
+  if (btnReset) {
+    if (isAnyFilterActive) {
+      btnReset.classList.remove('hidden');
+      btnReset.classList.add('inline-flex');
+    } else {
+      btnReset.classList.add('hidden');
+      btnReset.classList.remove('inline-flex');
+    }
+  }
+
+  // 1. Base Pool yang sesuai Filter Cabang, Jenjang, dan Pencarian
+  const baseList = allSubmissions.filter(s => {
+    // Cabang: exact atau substring (Scratch Coding, Micro:bit, Erboblox Robotics)
+    if (branchFilter) {
+      const bStr = (s.branch || '').toLowerCase();
+      const bFil = branchFilter.toLowerCase();
+      if (bStr !== bFil && !bStr.includes(bFil)) return false;
+    }
+
+    // Jenjang: null-safe substring (Kelas 1-3, Kelas 4-6, SMP 7-9)
+    if (gradeFilter) {
+      const gStr = (s.grade_category || '').toLowerCase();
+      const gFil = gradeFilter.toLowerCase();
+      if (!gStr || (!gStr.includes(gFil) && !gFil.includes(gStr))) return false;
+    }
+
+    // Pencarian cepat (Kode Samaran / Reg Code / Judul Proyek)
+    if (searchFilter) {
+      const blindStr = (s.blind_code || '').toLowerCase();
+      const regStr = (s.reg_code || '').toLowerCase();
+      const titleStr = (s.project_title || '').toLowerCase();
+      if (!blindStr.includes(searchFilter) && !regStr.includes(searchFilter) && !titleStr.includes(searchFilter)) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+
+  // 2. Hitung statistik counter dinamis sesuai pool yang terfilter
+  const countAll = baseList.length;
+  const countUnscored = baseList.filter(s => !s.is_scored).length;
+  const countScored = baseList.filter(s => s.is_scored).length;
+
+  const countAllEl = document.getElementById('count-all');
+  const countUnscoredEl = document.getElementById('count-unscored');
+  const countScoredEl = document.getElementById('count-scored');
+  if (countAllEl) countAllEl.textContent = countAll;
+  if (countUnscoredEl) countUnscoredEl.textContent = countUnscored;
+  if (countScoredEl) countScoredEl.textContent = countScored;
+
+  // 3. Filter berdasarkan Status Tab (Semua / Belum Dinilai / Sudah Dinilai)
+  filteredSubmissions = baseList.filter(s => {
     if (currentStatusFilter === 'unscored' && s.is_scored) return false;
     if (currentStatusFilter === 'scored' && !s.is_scored) return false;
     return true;
   });
 
-  // Update Progress Bar
-  const scoredCount = allSubmissions.filter(s => s.is_scored).length;
-  const percent = totalAll > 0 ? Math.round((scoredCount / totalAll) * 100) : 0;
+  // 4. Urutkan Antrean (Sorting)
+  filteredSubmissions.sort((a, b) => {
+    if (sortFilter === 'unscored_first') {
+      if (!a.is_scored && b.is_scored) return -1;
+      if (a.is_scored && !b.is_scored) return 1;
+      return (b.id - a.id);
+    } else if (sortFilter === 'code_asc') {
+      return (a.reg_code || '').localeCompare(b.reg_code || '');
+    } else if (sortFilter === 'date_desc') {
+      return (b.submitted_at || '').localeCompare(a.submitted_at || '');
+    } else if (sortFilter === 'date_asc') {
+      return (a.submitted_at || '').localeCompare(b.submitted_at || '');
+    } else if (sortFilter === 'score_desc') {
+      const scoreA = (a.my_score && a.my_score.total_score) ? a.my_score.total_score : 0;
+      const scoreB = (b.my_score && b.my_score.total_score) ? b.my_score.total_score : 0;
+      return (scoreB - scoreA);
+    }
+    return 0;
+  });
+
+  // 5. Update Progress Bar Penjurian
+  const totalGlobal = allSubmissions.length;
+  const scoredGlobal = allSubmissions.filter(s => s.is_scored).length;
+  const percent = totalGlobal > 0 ? Math.round((scoredGlobal / totalGlobal) * 100) : 0;
   const pBar = document.getElementById('progress-bar-fill');
   const pText = document.getElementById('progress-bar-text');
   if (pBar) pBar.style.width = `${percent}%`;
-  if (pText) pText.textContent = `${scoredCount}/${totalAll} (${percent}%)`;
+  if (pText) pText.textContent = `${scoredGlobal}/${totalGlobal} (${percent}%)`;
 
-  // Update participant selector dropdown
+  // 6. Update Dropdown Antrean Peserta
   updateParticipantSelector();
 
-  // Tampilkan item pertama atau empty state
+  // 7. Render Submission yang aktif
   if (filteredSubmissions.length > 0) {
     document.getElementById('empty-state').classList.add('hidden');
     document.getElementById('active-workspace').classList.remove('hidden');
-    // Jika currentSubmission ada di filtered, pertahankan
-    const existingIdx = filteredSubmissions.findIndex(s => currentSubmission && s.id === currentSubmission.id);
-    if (existingIdx !== -1) {
-      selectSubmissionByIndex(existingIdx);
-    } else {
-      selectSubmissionByIndex(0);
+
+    let selectIdx = 0;
+    if (preferredSelectId !== null) {
+      const pIdx = filteredSubmissions.findIndex(s => s.id === preferredSelectId);
+      if (pIdx !== -1) selectIdx = pIdx;
+    } else if (currentSubmission) {
+      const existingIdx = filteredSubmissions.findIndex(s => s.id === currentSubmission.id);
+      if (existingIdx !== -1) selectIdx = existingIdx;
     }
+
+    selectSubmissionByIndex(selectIdx);
   } else {
     document.getElementById('empty-state').classList.remove('hidden');
     document.getElementById('active-workspace').classList.add('hidden');
+    stopAllMedia();
     currentSubmission = null;
     currentIndex = -1;
+    const queueInd = document.getElementById('queue-indicator');
+    if (queueInd) queueInd.textContent = '0/0';
   }
+
+  if (window.lucide) lucide.createIcons();
+}
+
+function clearSearch() {
+  const sInput = document.getElementById('filter-search');
+  if (sInput) {
+    sInput.value = '';
+    sInput.focus();
+  }
+  applyFilters();
+}
+
+function resetAllFilters() {
+  const branchEl = document.getElementById('filter-branch');
+  const gradeEl = document.getElementById('filter-grade');
+  const searchEl = document.getElementById('filter-search');
+  const sortEl = document.getElementById('filter-sort');
+
+  if (branchEl) branchEl.value = '';
+  if (gradeEl) gradeEl.value = '';
+  if (searchEl) searchEl.value = '';
+  if (sortEl) sortEl.value = 'unscored_first';
+
+  currentStatusFilter = '';
+  const tabAll = document.getElementById('filter-tab-all');
+  const tabUnscored = document.getElementById('filter-tab-unscored');
+  const tabScored = document.getElementById('filter-tab-scored');
+  if (tabAll && tabUnscored && tabScored) {
+    [tabAll, tabUnscored, tabScored].forEach(tab => {
+      tab.className = 'px-3 py-1 rounded-lg font-bold text-slate-500 hover:text-slate-900 transition';
+    });
+    tabAll.className = 'px-3 py-1 rounded-lg font-bold text-slate-800 bg-white shadow-xs transition';
+  }
+
+  applyFilters();
 }
 
 function setStatusFilter(status) {
@@ -233,19 +356,29 @@ function setStatusFilter(status) {
 
 function updateParticipantSelector() {
   const sel = document.getElementById('participant-dropdown-selector');
+  const queueInd = document.getElementById('queue-indicator');
   if (!sel) return;
 
   if (filteredSubmissions.length === 0) {
     sel.innerHTML = '<option value="">(Tidak ada karya)</option>';
+    if (queueInd) queueInd.textContent = '0/0';
     return;
   }
 
   let html = '';
   filteredSubmissions.forEach((s, idx) => {
-    const scoredIcon = s.is_scored ? '✓' : '○';
-    html += `<option value="${s.id}">${scoredIcon} ${s.blind_code} - ${s.project_title.substring(0, 20)}...</option>`;
+    const statusLabel = s.is_scored ? `✓ ${(s.my_score ? s.my_score.total_score.toFixed(1) : '')}` : '○ Belum';
+    const shortTitle = s.project_title.length > 22 ? s.project_title.substring(0, 22) + '…' : s.project_title;
+    html += `<option value="${s.id}">${idx + 1}. [${statusLabel}] ${s.blind_code} - ${shortTitle}</option>`;
   });
   sel.innerHTML = html;
+
+  if (currentSubmission) {
+    sel.value = currentSubmission.id;
+  }
+  if (queueInd && currentIndex >= 0) {
+    queueInd.textContent = `${currentIndex + 1}/${filteredSubmissions.length}`;
+  }
 }
 
 function selectSubmissionById(id) {
@@ -275,11 +408,14 @@ function selectSubmissionByIndex(idx) {
   const sel = document.getElementById('participant-dropdown-selector');
   if (sel) sel.value = currentSubmission.id;
 
+  const queueInd = document.getElementById('queue-indicator');
+  if (queueInd) queueInd.textContent = `${currentIndex + 1}/${filteredSubmissions.length}`;
+
   // Render Left Workspace Info
   document.getElementById('current-blind-code').textContent = currentSubmission.blind_code;
   document.getElementById('current-project-title').textContent = currentSubmission.project_title;
   document.getElementById('current-branch-label').textContent = currentSubmission.branch;
-  document.getElementById('current-grade-label').textContent = currentSubmission.grade_category;
+  document.getElementById('current-grade-label').textContent = currentSubmission.grade_category || '-';
   document.getElementById('current-submitted-at').textContent = 'Diunggah: ' + currentSubmission.submitted_at;
   document.getElementById('current-version-badge').textContent = 'v' + currentSubmission.version;
 
@@ -309,11 +445,12 @@ function selectSubmissionByIndex(idx) {
   if (window.lucide) lucide.createIcons();
 }
 
-// 5. Code Preview (Official TurboWarp Embed & Microsoft MakeCode)
+// 5. Code Preview (Official TurboWarp Embed, Microsoft MakeCode & Erboblox Robotics)
 function renderCodePreview(sub) {
   const iframe = document.getElementById('preview-iframe');
   const loader = document.getElementById('preview-loader');
   const microbitFallback = document.getElementById('microbit-fallback');
+  const erbobloxFallback = document.getElementById('erboblox-fallback');
   const scratchStats = document.getElementById('scratch-stats-container');
   const btnOpenEditor = document.getElementById('btn-open-editor-tab');
   const btnOpenExternal = document.getElementById('btn-open-external');
@@ -321,50 +458,77 @@ function renderCodePreview(sub) {
 
   loader.classList.remove('hidden');
   iframe.classList.remove('hidden');
-  microbitFallback.classList.add('hidden');
+  if (microbitFallback) microbitFallback.classList.add('hidden');
+  if (erbobloxFallback) erbobloxFallback.classList.add('hidden');
 
   // Bersihkan sanitized file download link
   btnDownload.href = sub.stream_url;
   btnDownload.setAttribute('download', sub.project_file_name);
 
-  // Prioritas file URL: static project file URL (didukung CORS Nginx)
+  const isScratch = (sub.file_ext === 'sb3' || (sub.branch && sub.branch.includes('Scratch')));
+  const isMicrobit = (sub.file_ext === 'hex' || (sub.branch && sub.branch.includes('Micro:bit')));
+  const isErboblox = (sub.branch && sub.branch.toLowerCase().includes('erboblox')) || (!sub.project_file_path && !isScratch && !isMicrobit);
+
   const targetFileUrl = sub.project_file_url || sub.stream_url;
 
-  if (sub.file_ext === 'sb3' || sub.branch === 'Scratch Coding') {
-    scratchStats.classList.remove('hidden');
+  if (isScratch) {
+    if (scratchStats) scratchStats.classList.remove('hidden');
+    if (btnDownload) btnDownload.classList.remove('hidden');
+    if (btnOpenEditor) {
+      btnOpenEditor.classList.remove('hidden');
+      btnOpenEditor.href = `https://turbowarp.org/editor?project_url=${encodeURIComponent(targetFileUrl)}`;
+    }
+    if (btnOpenExternal) {
+      btnOpenExternal.classList.remove('hidden');
+      btnOpenExternal.href = `https://turbowarp.org/embed.html?project_url=${encodeURIComponent(targetFileUrl)}`;
+    }
 
-    // 1. Valid Official TurboWarp Embed URL (harus embed.html?project_url=...)
     const embedUrl = `https://turbowarp.org/embed.html?project_url=${encodeURIComponent(targetFileUrl)}`;
-    
-    // 2. Full Workspace Editor URL (untuk tab baru dengan editor visual lengkap)
-    const editorTabUrl = `https://turbowarp.org/editor?project_url=${encodeURIComponent(targetFileUrl)}`;
-
-    if (btnOpenEditor) btnOpenEditor.href = editorTabUrl;
-    btnOpenExternal.href = embedUrl;
-
     iframe.src = embedUrl;
     iframe.onload = () => {
       loader.classList.add('hidden');
     };
 
-    // Render Scratch Inspection Stats (ZipArchive Data)
     renderScratchInspector(sub.scratch_summary);
 
-  } else if (sub.file_ext === 'hex' || sub.branch === 'Micro:bit') {
-    scratchStats.classList.add('hidden');
+  } else if (isMicrobit) {
+    if (scratchStats) scratchStats.classList.add('hidden');
     loader.classList.add('hidden');
-
-    if (btnOpenEditor) btnOpenEditor.href = 'https://makecode.microbit.org/#editor';
-    btnOpenExternal.href = 'https://makecode.microbit.org/#editor';
     iframe.classList.add('hidden');
-    microbitFallback.classList.remove('hidden');
+    if (microbitFallback) microbitFallback.classList.remove('hidden');
+
+    if (btnOpenEditor) {
+      btnOpenEditor.classList.remove('hidden');
+      btnOpenEditor.href = 'https://makecode.microbit.org/#editor';
+    }
+    if (btnOpenExternal) {
+      btnOpenExternal.classList.remove('hidden');
+      btnOpenExternal.href = 'https://makecode.microbit.org/#editor';
+    }
+    if (btnDownload) btnDownload.classList.remove('hidden');
+
+  } else if (isErboblox) {
+    if (scratchStats) scratchStats.classList.add('hidden');
+    loader.classList.add('hidden');
+    iframe.classList.add('hidden');
+    if (erbobloxFallback) erbobloxFallback.classList.remove('hidden');
+
+    if (btnOpenEditor) btnOpenEditor.classList.add('hidden');
+    if (btnOpenExternal) btnOpenExternal.classList.add('hidden');
+    if (btnDownload) btnDownload.classList.add('hidden');
+
+    // Otomatis arahkan ke tab video bila di tab balok karena Erboblox dinilai lewat video presentasi
+    const tabBlocks = document.getElementById('tab-content-blocks');
+    if (tabBlocks && !tabBlocks.classList.contains('hidden')) {
+      switchContentTab('video');
+    }
 
   } else {
     // Default fallback
-    scratchStats.classList.add('hidden');
+    if (scratchStats) scratchStats.classList.add('hidden');
     loader.classList.add('hidden');
     if (btnOpenEditor) btnOpenEditor.href = sub.stream_url;
-    btnOpenExternal.href = sub.stream_url;
+    if (btnOpenExternal) btnOpenExternal.href = sub.stream_url;
     iframe.src = sub.stream_url;
   }
 }
@@ -631,6 +795,20 @@ async function submitScore(advanceToNext) {
     }
   }
 
+  // Tentukan target ID berikutnya SEBELUM menyimpan / merefresh queue
+  let targetNextId = null;
+  if (advanceToNext) {
+    const nextUnscored = filteredSubmissions.find((s, idx) => idx > currentIndex && !s.is_scored && s.id !== currentSubmission.id);
+    if (nextUnscored) {
+      targetNextId = nextUnscored.id;
+    } else {
+      const anyUnscored = filteredSubmissions.find(s => !s.is_scored && s.id !== currentSubmission.id);
+      if (anyUnscored) {
+        targetNextId = anyUnscored.id;
+      }
+    }
+  }
+
   const btnSave = document.getElementById('btn-save-score');
   const btnNext = document.getElementById('btn-save-and-next');
   btnSave.disabled = true;
@@ -655,8 +833,9 @@ async function submitScore(advanceToNext) {
     const data = await res.json();
 
     if (data.status === 'ok') {
-      alert(`Nilai untuk ${currentSubmission.blind_code} berhasil disimpan!\nTotal Nilai: ${data.total_score.toFixed(2)} / 100`);
-      
+      const savedBlind = currentSubmission.blind_code;
+      const finalVal = data.total_score.toFixed(2);
+
       // Update data di memori
       currentSubmission.is_scored = true;
       currentSubmission.my_score = {
@@ -671,23 +850,23 @@ async function submitScore(advanceToNext) {
         scored_at: new Date().toISOString().replace('T', ' ').substring(0, 19)
       };
 
-      // Reload data secara background
-      await reloadSubmissions();
+      // Sinkronkan ke pool allSubmissions
+      const foundInAll = allSubmissions.find(s => s.id === currentSubmission.id);
+      if (foundInAll) {
+        foundInAll.is_scored = true;
+        foundInAll.my_score = currentSubmission.my_score;
+      }
 
-      // Navigasi ke karya belum dinilai berikutnya jika advanceToNext
-      if (advanceToNext) {
-        const nextUnscoredIdx = filteredSubmissions.findIndex((s, idx) => idx > currentIndex && !s.is_scored);
-        if (nextUnscoredIdx !== -1) {
-          selectSubmissionByIndex(nextUnscoredIdx);
-        } else {
-          // Cari dari awal
-          const anyUnscoredIdx = filteredSubmissions.findIndex(s => !s.is_scored);
-          if (anyUnscoredIdx !== -1) {
-            selectSubmissionByIndex(anyUnscoredIdx);
-          } else {
-            alert('Selamat! Seluruh karya dalam filter ini telah Anda nilai.');
-          }
-        }
+      // Tentukan target yang akan dipilih setelah list diperbarui
+      const preferredId = (advanceToNext && targetNextId) ? targetNextId : currentSubmission.id;
+
+      // Reload data secara background
+      await reloadSubmissions(preferredId);
+
+      alert(`Nilai untuk ${savedBlind} berhasil disimpan!\nTotal Nilai: ${finalVal} / 100`);
+
+      if (advanceToNext && !targetNextId) {
+        alert('Selamat! Seluruh karya dalam filter ini telah Anda nilai.');
       }
     } else {
       alert(data.message || 'Gagal menyimpan penilaian karya.');
@@ -802,10 +981,39 @@ async function submitChangePassword(e) {
   }
 }
 
+// 13. Keyboard Shortcuts Listener
+document.addEventListener('keydown', (e) => {
+  const activeTag = (document.activeElement?.tagName || '').toLowerCase();
+  const isInputActive = activeTag === 'input' || activeTag === 'textarea' || activeTag === 'select';
+
+  // Ctrl + Enter: Simpan Penilaian (Bisa di mana saja)
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    e.preventDefault();
+    submitScore(false);
+    return;
+  }
+
+  // Alt + Arrow Left: Peserta Sebelumnya (Bisa di mana saja)
+  if (e.altKey && e.key === 'ArrowLeft') {
+    e.preventDefault();
+    navigateSubmission(-1);
+    return;
+  }
+
+  // Alt + Arrow Right: Peserta Berikutnya (Bisa di mana saja)
+  if (e.altKey && e.key === 'ArrowRight') {
+    e.preventDefault();
+    navigateSubmission(1);
+    return;
+  }
+});
+
 // Global Bindings untuk inline HTML calls
 window.togglePasswordVisibility = togglePasswordVisibility;
 window.logoutJudge = logoutJudge;
 window.applyFilters = applyFilters;
+window.clearSearch = clearSearch;
+window.resetAllFilters = resetAllFilters;
 window.setStatusFilter = setStatusFilter;
 window.selectSubmissionById = selectSubmissionById;
 window.navigateSubmission = navigateSubmission;
