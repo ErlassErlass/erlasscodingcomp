@@ -21,68 +21,166 @@
 <body class="min-h-screen flex flex-col">
 
   <!-- Navigation Bar -->
+  <!-- Navigation Bar -->
   <nav class="sticky top-0 z-50 glass-nav transition-all">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-18 py-3 flex items-center justify-between">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
+      <!-- Official Brand Logo -->
       <a href="#" class="cartoon-logo-btn group" title="Erlass Academy Competition">
         <img src="img/logoerlassacademy.png" alt="Erlass Academy" class="cartoon-logo-img h-9 sm:h-11 w-auto object-contain" onerror="this.src='img/logo_erlass.png'">
         <div class="cartoon-logo-text border-l-2 border-orange-200 pl-3">
-          <span class="display-font font-bold text-orange-600 text-lg sm:text-xl tracking-tight leading-none block">COMPETITION</span>
-          <span class="text-[10px] sm:text-xs text-slate-500 font-semibold tracking-wider uppercase block">Portal Resmi</span>
+          <span class="display-font font-black text-orange-600 text-lg sm:text-xl tracking-tight leading-none block">COMPETITION</span>
+          <span class="text-[10px] sm:text-xs text-slate-500 font-bold tracking-wider uppercase block">Portal Resmi 2026</span>
         </div>
       </a>
-      <div class="hidden md:flex items-center gap-6 text-sm font-semibold text-slate-700">
-        <a href="#tentang" class="hover:text-orange-600 transition">Tentang</a>
-        <a href="#cabang" class="hover:text-orange-600 transition">Cabang Lomba</a>
-        <a href="#jadwal" class="hover:text-orange-600 transition">Jadwal</a>
-        <a href="#daftar" class="text-orange-600 font-bold hover:text-orange-700 transition">Pendaftaran</a>
-        <a href="#cek-status" class="hover:text-orange-600 transition">Cek Status</a>
+
+      <!-- Desktop Navigation Menu -->
+      <div class="hidden lg:flex items-center gap-1 xl:gap-2 text-sm font-bold text-slate-700">
+        <a href="#tentang" class="px-3 py-1.5 rounded-xl hover:text-orange-600 hover:bg-orange-50/80 transition">Tentang</a>
+        <a href="#cabang" class="px-3 py-1.5 rounded-xl hover:text-orange-600 hover:bg-orange-50/80 transition">Cabang Lomba</a>
+        <a href="#jadwal" class="px-3 py-1.5 rounded-xl hover:text-orange-600 hover:bg-orange-50/80 transition">Jadwal</a>
+        <a href="#perlengkapan" class="px-3 py-1.5 rounded-xl hover:text-[#EE4D2D] hover:bg-orange-50/80 transition flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-[#EE4D2D]"></span>
+          <span>Kit Shopee</span>
+        </a>
+        <a href="#cek-status" class="px-3 py-1.5 rounded-xl hover:text-orange-600 hover:bg-orange-50/80 transition flex items-center gap-1">
+          <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400"></i>
+          <span>Cek Status</span>
+        </a>
       </div>
-      <div class="flex items-center gap-2">
-        <a href="#daftar" class="cartoon-btn inline-flex items-center gap-1.5 px-4 py-2 text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-700 hover:to-amber-600 rounded-xl shadow-md hover:shadow-lg transition">
-          <i data-lucide="sparkles" class="w-4 h-4"></i>
-          <span>Daftar Sekarang</span>
+
+      <!-- Action Button Group & Mobile Hamburger -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Kumpul Proyek Pill Button -->
+        <a href="kumpul-proyek.html" class="inline-flex items-center gap-2 px-3 sm:px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-extrabold text-xs sm:text-sm border border-emerald-200/90 shadow-sm transition hover:shadow group">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+          <i data-lucide="upload-cloud" class="w-4 h-4 text-emerald-600 group-hover:-translate-y-0.5 transition-transform"></i>
+          <span>Kumpul Proyek</span>
+        </a>
+
+        <!-- Daftar Sekarang Primary Button -->
+        <a href="#daftar" class="cartoon-btn inline-flex items-center gap-1.5 px-4 sm:px-5 py-2 text-xs sm:text-sm font-black text-white bg-gradient-to-r from-orange-600 via-orange-500 to-amber-500 hover:from-orange-700 hover:to-amber-600 rounded-xl shadow-md hover:shadow-lg transition">
+          <i data-lucide="sparkles" class="w-4 h-4 text-amber-200"></i>
+          <span class="hidden xs:inline">Daftar Sekarang</span>
+          <span class="xs:hidden">Daftar</span>
+        </a>
+
+        <!-- Mobile Drawer Toggle Button -->
+        <button
+          type="button"
+          id="mobile-menu-btn"
+          onclick="toggleMobileMenu()"
+          class="lg:hidden p-2 rounded-xl text-slate-700 hover:text-orange-600 hover:bg-orange-50 border border-slate-200 transition"
+          aria-label="Buka Menu Navigasi"
+        >
+          <i id="mobile-menu-icon" data-lucide="menu" class="w-5 h-5"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Drawer Menu -->
+    <div id="mobile-menu-drawer" class="hidden lg:hidden border-t border-orange-100 bg-white/95 backdrop-blur-xl px-4 py-4 space-y-2 shadow-2xl transition-all">
+      <a href="#tentang" onclick="toggleMobileMenu()" class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold text-slate-700 hover:bg-orange-50 hover:text-orange-600">
+        <i data-lucide="info" class="w-4 h-4 text-orange-500"></i>
+        <span>Tentang Kompetisi</span>
+      </a>
+      <a href="#cabang" onclick="toggleMobileMenu()" class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold text-slate-700 hover:bg-orange-50 hover:text-orange-600">
+        <i data-lucide="layers" class="w-4 h-4 text-orange-500"></i>
+        <span>Cabang Lomba (Scratch, Micro:bit, Erboblox)</span>
+      </a>
+      <a href="#jadwal" onclick="toggleMobileMenu()" class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold text-slate-700 hover:bg-orange-50 hover:text-orange-600">
+        <i data-lucide="calendar" class="w-4 h-4 text-orange-500"></i>
+        <span>Jadwal & Tahapan</span>
+      </a>
+      <a href="#perlengkapan" onclick="toggleMobileMenu()" class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold text-[#EE4D2D] hover:bg-orange-50">
+        <span class="w-2 h-2 rounded-full bg-[#EE4D2D]"></span>
+        <span>Perlengkapan Resmi Shopee</span>
+      </a>
+      <a href="kumpul-proyek.html" class="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-black text-emerald-800 bg-emerald-50 border border-emerald-200">
+        <i data-lucide="upload-cloud" class="w-4 h-4 text-emerald-600"></i>
+        <span>Form Pengumpulan Proyek (Deadline 21 Nov)</span>
+      </a>
+      <a href="#cek-status" onclick="toggleMobileMenu()" class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold text-slate-700 hover:bg-orange-50">
+        <i data-lucide="search" class="w-4 h-4 text-amber-600"></i>
+        <span>Cek Status & Cetak Kartu Peserta</span>
+      </a>
+      <div class="pt-2 border-t border-slate-100">
+        <a href="#daftar" onclick="toggleMobileMenu()" class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-black text-white bg-gradient-to-r from-orange-600 to-amber-500 shadow-md">
+          <i data-lucide="edit-3" class="w-4 h-4"></i>
+          <span>Isi Formulir Pendaftaran</span>
         </a>
       </div>
     </div>
   </nav>
 
-  <!-- Hero Header Banner -->
+  <!-- Hero Header Banner with Ambient Lights -->
   <header id="tentang" class="relative overflow-hidden bg-gradient-to-br from-orange-600 via-orange-500 to-amber-500 text-white">
+    <!-- Ambient Light Mesh Blobs -->
+    <div class="absolute -top-28 -left-28 w-96 h-96 bg-white/15 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute top-1/2 -right-28 w-96 h-96 bg-amber-300/25 rounded-full blur-3xl pointer-events-none"></div>
     <div class="absolute inset-0 opacity-15 dot-pattern pointer-events-none"></div>
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 pt-6 sm:pt-8 pb-14 relative z-10">
+
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 pt-5 sm:pt-7 pb-14 relative z-10">
       
-      <!-- Main Master Banner Showcase (Landscape) -->
-      <div class="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white/90 bg-slate-900 cartoon-reveal mb-6 sm:mb-8 group">
+      <!-- Top Announcement & Live Deadline Pill Bar -->
+      <div class="flex flex-wrap items-center justify-between gap-2.5 mb-4 sm:mb-5">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white text-xs font-black shadow-sm">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-200"></i>
+          <span>Erlass Competition 2026 • Portal Resmi</span>
+        </div>
+        <div class="inline-flex items-center gap-2 text-xs font-bold text-orange-100 bg-white/15 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/25 shadow-sm">
+          <i data-lucide="clock" class="w-3.5 h-3.5 text-amber-300"></i>
+          <span>Batas Proyek: 21 Nov 2026 •</span>
+          <span id="hero-countdown-pill" class="font-mono text-amber-200 font-black">-- Hari lagi</span>
+        </div>
+      </div>
+
+      <!-- Main Master Banner Showcase (Landscape Poster) -->
+      <div class="relative rounded-3xl overflow-hidden shadow-2xl border-2 sm:border-4 border-white/85 bg-slate-900 cartoon-reveal group">
         <picture>
           <source srcset="img/herobanner.webp?v=20261014" type="image/webp">
           <img id="hero-banner-img" src="img/herobanner.jpeg?v=20261014" alt="Kids & Youth Robotics & Coding Competition - Erlass Competition 2026" class="w-full h-auto aspect-[7/4] object-cover transition-transform duration-500 group-hover:scale-[1.015]">
         </picture>
       </div>
 
-      <!-- Hero Summary & Action Bar -->
-      <div class="bg-white/10 backdrop-blur-md rounded-2xl p-5 sm:p-6 border border-white/20 flex flex-col md:flex-row items-center justify-between gap-6 shadow-lg">
-        <div class="text-left w-full md:w-auto">
-          <div class="inline-flex items-center gap-2 rounded-full px-3.5 py-1 text-xs font-extrabold bg-amber-300 text-amber-950 mb-2 anim-cartoon-badge shadow-sm">
-            <i data-lucide="award" class="w-4 h-4 text-orange-800"></i>
-            <span id="badge-title">Erlass Competition 2026 • Open Registration</span>
+      <!-- Hero Summary & Action Bar with Luminous Frosted Glassmorphism -->
+      <div class="relative p-1 rounded-3xl bg-gradient-to-b from-white/35 via-white/20 to-white/10 border border-white/35 shadow-2xl backdrop-blur-2xl mt-5 sm:mt-6">
+        <div class="bg-white/15 backdrop-blur-xl rounded-[calc(1.5rem-0.125rem)] p-5 sm:p-6 border border-white/25 flex flex-col lg:flex-row items-center justify-between gap-6 shadow-inner text-white">
+          
+          <div class="text-left w-full lg:w-auto space-y-1.5">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-amber-300 text-amber-950 shadow-sm">
+                <i data-lucide="award" class="w-3.5 h-3.5 text-orange-800"></i>
+                <span id="badge-title">Erlass Competition 2026 • Pendaftaran Dibuka</span>
+              </span>
+              <span class="text-xs font-bold text-orange-100 hidden sm:inline">• SD & SMP Se-Indonesia</span>
+            </div>
+            <h1 id="hero-title" class="display-font text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight drop-shadow-sm anim-cartoon-title">
+              Technology for a Better Today
+            </h1>
+            <p id="hero-theme" class="text-orange-100 text-xs sm:text-sm font-medium anim-cartoon-subtitle">
+              Create, Code, and Innovate for a Better Future • Scratch Coding • Micro:bit IoT • Erboblox Robotics
+            </p>
           </div>
-          <h1 id="hero-title" class="display-font text-2xl sm:text-3xl font-extrabold text-white tracking-tight drop-shadow-sm anim-cartoon-title">
-            Technology for a Better Today
-          </h1>
-          <p id="hero-theme" class="text-orange-100 text-sm sm:text-base font-medium mt-1 anim-cartoon-subtitle">
-            Create, Code, and Innovate for a Better Future
-          </p>
-        </div>
 
-        <div class="flex flex-wrap items-center gap-3 shrink-0 w-full md:w-auto justify-start md:justify-end anim-cartoon-cta">
-          <a href="#daftar" class="cartoon-btn inline-flex items-center gap-2 px-6 py-3.5 bg-white text-orange-600 font-extrabold text-sm rounded-2xl shadow-xl hover:bg-orange-50 transition">
-            <i data-lucide="edit-3" class="w-5 h-5"></i>
-            <span>Daftar Sekarang</span>
-          </a>
-          <a href="#cek-status" class="cartoon-btn inline-flex items-center gap-2 px-5 py-3.5 bg-orange-700/70 hover:bg-orange-700/90 text-white font-bold text-sm rounded-2xl border border-white/25 backdrop-blur transition">
-            <i data-lucide="search" class="w-5 h-5"></i>
-            <span>Cek Status Peserta</span>
-          </a>
+          <div class="flex flex-wrap items-center gap-2.5 sm:gap-3 shrink-0 w-full lg:w-auto justify-start lg:justify-end anim-cartoon-cta">
+            <a href="#daftar" class="cartoon-btn inline-flex items-center gap-2 px-5 sm:px-6 py-3.5 bg-white hover:bg-orange-50 text-orange-600 font-black text-xs sm:text-sm rounded-2xl shadow-xl hover:shadow-2xl transition hover:scale-[1.02] active:scale-95 border border-white">
+              <i data-lucide="edit-3" class="w-4 h-4"></i>
+              <span>Daftar Sekarang</span>
+            </a>
+            <a href="kumpul-proyek.html" class="cartoon-btn inline-flex items-center gap-2 px-4 sm:px-5 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black text-xs sm:text-sm rounded-2xl shadow-lg transition hover:scale-[1.02] active:scale-95 border border-emerald-300/40">
+              <i data-lucide="upload-cloud" class="w-4 h-4"></i>
+              <span>Kumpul Proyek</span>
+            </a>
+            <a href="#cek-status" class="cartoon-btn inline-flex items-center gap-2 px-4 py-3.5 bg-white/15 hover:bg-white/25 text-white font-bold text-xs sm:text-sm rounded-2xl border border-white/25 backdrop-blur transition">
+              <i data-lucide="search" class="w-4 h-4"></i>
+              <span>Cek Status</span>
+            </a>
+          </div>
+
         </div>
       </div>
 
@@ -100,7 +198,7 @@
         <div>
           <span class="text-xs font-bold text-orange-600 uppercase tracking-wide">Tahap 1</span>
           <h4 class="font-extrabold text-slate-800 text-sm">Pendaftaran Peserta</h4>
-          <p id="schedule-reg-text" class="text-xs text-slate-500 font-medium mt-0.5">15 – 31 Oktober 2026</p>
+          <p id="schedule-reg-text" class="text-xs text-slate-500 font-medium mt-0.5">15 Okt – 5 Nov 2026 (Diperpanjang)</p>
         </div>
       </div>
       <!-- Tahap 2: Periode Penjurian -->
@@ -154,16 +252,15 @@
           <div class="w-12 h-12 rounded-2xl bg-orange-500 text-white flex items-center justify-center mb-4 group-hover:scale-115 group-hover:rotate-6 transition-transform">
             <i data-lucide="gamepad-2" class="w-6 h-6"></i>
           </div>
-          <span class="inline-block text-[11px] font-bold text-orange-700 bg-orange-50 px-2.5 py-1 rounded-md mb-2">SD Kelas 1 - 6</span>
+          <span class="inline-block text-[11px] font-bold text-orange-700 bg-orange-50 px-2.5 py-1 rounded-md mb-2">Kelas 1-3, 4-6 & SMP 7-9</span>
           <h3 class="display-font text-xl font-bold text-slate-900">Scratch Coding</h3>
           <p class="text-slate-600 text-sm mt-2 leading-relaxed">
             Merancang game interaktif, animasi kreatif, atau simulasi cerita edukatif dengan visual programming Scratch.
           </p>
         </div>
-        <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-          <span class="text-xs font-semibold text-slate-500">Karya Mandiri</span>
+        <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-end">
           <button onclick="selectBranch('Scratch Coding')" class="text-xs font-bold text-orange-600 hover:text-orange-700 flex items-center gap-1">
-            Daftar Cabang Ini <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            Daftar Cabang <i data-lucide="arrow-right" class="w-4 h-4"></i>
           </button>
         </div>
       </div>
@@ -174,16 +271,25 @@
           <div class="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center mb-4 group-hover:scale-115 group-hover:rotate-6 transition-transform">
             <i data-lucide="microchip" class="w-6 h-6"></i>
           </div>
-          <span class="inline-block text-[11px] font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-md mb-2">SD 4-6 & SMP 7-9</span>
+          <span class="inline-block text-[11px] font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-md mb-2">Kelas 1-3, 4-6 & SMP 7-9</span>
           <h3 class="display-font text-xl font-bold text-slate-900">Micro:bit IoT</h3>
           <p class="text-slate-600 text-sm mt-2 leading-relaxed">
             Eksplorasi sensor cerdas, display LED, dan prototype Internet of Things (IoT) berbasis microcontroller BBC Micro:bit.
           </p>
         </div>
-        <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-          <span class="text-xs font-semibold text-slate-500">Inovasi Hardware</span>
+        <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between gap-2">
+          <a
+            href="https://shopee.co.id/Learning-Kit-Microbit-i.1360904030.49707071177?extraParams=%7B%22display_model_id%22%3A380629258134%2C%22model_selection_logic%22%3A3%7D"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-1.5 text-[11px] font-extrabold text-[#EE4D2D] hover:text-[#d73211] bg-orange-50 hover:bg-orange-100/80 px-2.5 py-1.5 rounded-xl border border-orange-200 transition"
+            title="Beli Micro:bit Learning Kit di Shopee"
+          >
+            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M19.78 7.37a.82.82 0 0 0-.66-.37h-3.41V5.5A4.5 4.5 0 0 0 11.21 1a4.5 4.5 0 0 0-4.5 4.5V7H3.3a.82.82 0 0 0-.66.37.84.84 0 0 0-.07.76l2.4 12A2.25 2.25 0 0 0 7.18 22h9.64a2.25 2.25 0 0 0 2.21-1.87l2.4-12a.84.84 0 0 0-.07-.76zM8.21 5.5A3 3 0 0 1 11.21 2.5a3 3 0 0 1 3 3V7h-6V5.5zm4.84 8.78c-1.37.54-2.26.85-2.26 1.48 0 .54.49.88 1.35.88a4.2 4.2 0 0 0 2.15-.65l.4 1.15a5.53 5.53 0 0 1-2.65.7c-1.68 0-2.68-.89-2.68-2.12 0-1.42 1.34-1.99 2.58-2.47 1.25-.49 1.94-.78 1.94-1.38 0-.48-.43-.79-1.18-.79a3.86 3.86 0 0 0-1.85.55l-.42-1.15a5.1 5.1 0 0 1 2.37-.6c1.61 0 2.5 1 2.5 2.05 0 1.27-1.17 1.8-2.25 2.3z"/></svg>
+            <span>Beli Kit</span>
+          </a>
           <button onclick="selectBranch('Micro:bit')" class="text-xs font-bold text-amber-600 hover:text-amber-700 flex items-center gap-1">
-            Daftar Cabang Ini <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            Daftar Cabang <i data-lucide="arrow-right" class="w-4 h-4"></i>
           </button>
         </div>
       </div>
@@ -194,18 +300,174 @@
           <div class="w-12 h-12 rounded-2xl bg-orange-600 text-white flex items-center justify-center mb-4 group-hover:scale-115 group-hover:rotate-6 transition-transform">
             <i data-lucide="bot" class="w-6 h-6"></i>
           </div>
-          <span class="inline-block text-[11px] font-bold text-orange-700 bg-orange-50 px-2.5 py-1 rounded-md mb-2">SD 4-6 & SMP 7-9</span>
+          <span class="inline-block text-[11px] font-bold text-orange-700 bg-orange-50 px-2.5 py-1 rounded-md mb-2">Kelas 1-3, 4-6 & SMP 7-9</span>
           <h3 class="display-font text-xl font-bold text-slate-900">Erboblox Robotics</h3>
           <p class="text-slate-600 text-sm mt-2 leading-relaxed">
             Perakitan robot modular mekanis, pemrograman motor servo presisi, dan uji misi ketangkasan robotika terpadu.
           </p>
         </div>
-        <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-          <span class="text-xs font-semibold text-slate-500">Mekanik & Koding</span>
+        <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between gap-2">
+          <a
+            href="https://shopee.co.id/Robotic-Erboblox-i.1360904030.44769344808?extraParams=%7B%22display_model_id%22%3A411619885284%2C%22model_selection_logic%22%3A3%7D"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-1.5 text-[11px] font-extrabold text-[#EE4D2D] hover:text-[#d73211] bg-orange-50 hover:bg-orange-100/80 px-2.5 py-1.5 rounded-xl border border-orange-200 transition"
+            title="Beli Robotic Erboblox di Shopee"
+          >
+            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M19.78 7.37a.82.82 0 0 0-.66-.37h-3.41V5.5A4.5 4.5 0 0 0 11.21 1a4.5 4.5 0 0 0-4.5 4.5V7H3.3a.82.82 0 0 0-.66.37.84.84 0 0 0-.07.76l2.4 12A2.25 2.25 0 0 0 7.18 22h9.64a2.25 2.25 0 0 0 2.21-1.87l2.4-12a.84.84 0 0 0-.07-.76zM8.21 5.5A3 3 0 0 1 11.21 2.5a3 3 0 0 1 3 3V7h-6V5.5zm4.84 8.78c-1.37.54-2.26.85-2.26 1.48 0 .54.49.88 1.35.88a4.2 4.2 0 0 0 2.15-.65l.4 1.15a5.53 5.53 0 0 1-2.65.7c-1.68 0-2.68-.89-2.68-2.12 0-1.42 1.34-1.99 2.58-2.47 1.25-.49 1.94-.78 1.94-1.38 0-.48-.43-.79-1.18-.79a3.86 3.86 0 0 0-1.85.55l-.42-1.15a5.1 5.1 0 0 1 2.37-.6c1.61 0 2.5 1 2.5 2.05 0 1.27-1.17 1.8-2.25 2.3z"/></svg>
+            <span>Beli Robot</span>
+          </a>
           <button onclick="selectBranch('Erboblox Robotics')" class="text-xs font-bold text-orange-600 hover:text-orange-700 flex items-center gap-1">
-            Daftar Cabang Ini <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            Daftar Cabang <i data-lucide="arrow-right" class="w-4 h-4"></i>
           </button>
         </div>
+      </div>
+    </div>
+
+    <!-- Showcase Perlengkapan & Kit Lomba Resmi di Shopee -->
+    <div id="perlengkapan" class="mt-10 p-6 sm:p-8 bg-gradient-to-br from-orange-50/70 via-amber-50/50 to-white rounded-3xl border-2 border-orange-200/90 shadow-md cartoon-card cartoon-reveal">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 pb-4 border-b border-orange-200/60">
+        <div>
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-[#EE4D2D]/10 text-[#EE4D2D] uppercase tracking-wider mb-2">
+            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M19.78 7.37a.82.82 0 0 0-.66-.37h-3.41V5.5A4.5 4.5 0 0 0 11.21 1a4.5 4.5 0 0 0-4.5 4.5V7H3.3a.82.82 0 0 0-.66.37.84.84 0 0 0-.07.76l2.4 12A2.25 2.25 0 0 0 7.18 22h9.64a2.25 2.25 0 0 0 2.21-1.87l2.4-12a.84.84 0 0 0-.07-.76zM8.21 5.5A3 3 0 0 1 11.21 2.5a3 3 0 0 1 3 3V7h-6V5.5zm4.84 8.78c-1.37.54-2.26.85-2.26 1.48 0 .54.49.88 1.35.88a4.2 4.2 0 0 0 2.15-.65l.4 1.15a5.53 5.53 0 0 1-2.65.7c-1.68 0-2.68-.89-2.68-2.12 0-1.42 1.34-1.99 2.58-2.47 1.25-.49 1.94-.78 1.94-1.38 0-.48-.43-.79-1.18-.79a3.86 3.86 0 0 0-1.85.55l-.42-1.15a5.1 5.1 0 0 1 2.37-.6c1.61 0 2.5 1 2.5 2.05 0 1.27-1.17 1.8-2.25 2.3z"/></svg>
+            <span>Shopee Official Store</span>
+          </div>
+          <h3 class="display-font text-xl sm:text-2xl font-extrabold text-slate-900">
+            Perlengkapan, Modul & Kit Resmi Lomba
+          </h3>
+          <p class="text-xs sm:text-sm text-slate-600 mt-1">
+            Belum memiliki perangkat atau modul belajar? Dapatkan kit resmi bersertifikasi Erlass langsung di Shopee untuk persiapan maksimal menuju perlombaan.
+          </p>
+        </div>
+        <div class="shrink-0">
+          <span class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-sm">
+            <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i>
+            <span>100% Original & Bersertifikasi</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- 3 Product Cards -->
+      <div class="grid sm:grid-cols-3 gap-4 sm:gap-6">
+        <!-- 1. Modul Scratch -->
+        <div class="bg-white rounded-2xl p-5 border border-orange-100 shadow-sm hover:shadow-md hover:border-orange-300 transition flex flex-col justify-between group">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">Scratch Coding</span>
+              <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">Akses Web Gratis</span>
+            </div>
+            <h4 class="font-bold text-slate-900 text-sm sm:text-base group-hover:text-orange-600 transition">Platform & Modul Scratch</h4>
+            <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
+              Dapat diakses langsung secara gratis melalui web resmi Scratch MIT tanpa perangkat keras tambahan. Siap digunakan untuk belajar, eksplorasi ide, dan perlombaan.
+            </p>
+          </div>
+          <div class="mt-5 pt-3 border-t border-slate-100">
+            <a
+              href="https://scratch.mit.edu/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-extrabold text-xs text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-sm hover:shadow-md transition active:scale-98"
+              title="Buka Platform Scratch MIT Resmi (Gratis)"
+            >
+              <i data-lucide="globe" class="w-3.5 h-3.5"></i>
+              <span>Akses Scratch Web (Gratis)</span>
+              <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- 2. Micro:bit Learning Kit -->
+        <div class="bg-white rounded-2xl p-5 border border-amber-100 shadow-sm hover:shadow-md hover:border-amber-300 transition flex flex-col justify-between group">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">Micro:bit IoT</span>
+              <span class="text-[10px] font-bold text-slate-400">SD 4-6 & SMP</span>
+            </div>
+            <h4 class="font-bold text-slate-900 text-sm sm:text-base group-hover:text-amber-600 transition">Micro:bit Learning Kit</h4>
+            <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
+              Paket papan mikrokontroler BBC Micro:bit original dilengkapi sensor-sensor cerdas, modul display LED, dan kabel interface terpadu.
+            </p>
+          </div>
+          <div class="mt-5 pt-3 border-t border-slate-100">
+            <a
+              href="https://shopee.co.id/Learning-Kit-Microbit-i.1360904030.49707071177?extraParams=%7B%22display_model_id%22%3A380629258134%2C%22model_selection_logic%22%3A3%7D"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-extrabold text-xs text-white bg-gradient-to-r from-[#EE4D2D] to-orange-500 hover:from-[#d73211] hover:to-orange-600 shadow-sm hover:shadow-md transition active:scale-98"
+            >
+              <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M19.78 7.37a.82.82 0 0 0-.66-.37h-3.41V5.5A4.5 4.5 0 0 0 11.21 1a4.5 4.5 0 0 0-4.5 4.5V7H3.3a.82.82 0 0 0-.66.37.84.84 0 0 0-.07.76l2.4 12A2.25 2.25 0 0 0 7.18 22h9.64a2.25 2.25 0 0 0 2.21-1.87l2.4-12a.84.84 0 0 0-.07-.76zM8.21 5.5A3 3 0 0 1 11.21 2.5a3 3 0 0 1 3 3V7h-6V5.5zm4.84 8.78c-1.37.54-2.26.85-2.26 1.48 0 .54.49.88 1.35.88a4.2 4.2 0 0 0 2.15-.65l.4 1.15a5.53 5.53 0 0 1-2.65.7c-1.68 0-2.68-.89-2.68-2.12 0-1.42 1.34-1.99 2.58-2.47 1.25-.49 1.94-.78 1.94-1.38 0-.48-.43-.79-1.18-.79a3.86 3.86 0 0 0-1.85.55l-.42-1.15a5.1 5.1 0 0 1 2.37-.6c1.61 0 2.5 1 2.5 2.05 0 1.27-1.17 1.8-2.25 2.3z"/></svg>
+              <span>Beli Kit di Shopee</span>
+              <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- 3. Robotic Erboblox -->
+        <div class="bg-white rounded-2xl p-5 border border-orange-100 shadow-sm hover:shadow-md hover:border-orange-300 transition flex flex-col justify-between group">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-orange-50 text-orange-800 border border-orange-200">Erboblox Robotics</span>
+              <span class="text-[10px] font-bold text-slate-400">SD 4-6 & SMP</span>
+            </div>
+            <h4 class="font-bold text-slate-900 text-sm sm:text-base group-hover:text-orange-600 transition">Robotic Erboblox Modular</h4>
+            <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
+              Kit robotika modular resmi lengkap dengan chassis mekanik, motor servo presisi, baterai rechargeable, dan mikrokontroler siap rakit.
+            </p>
+          </div>
+          <div class="mt-5 pt-3 border-t border-slate-100">
+            <a
+              href="https://shopee.co.id/Robotic-Erboblox-i.1360904030.44769344808?extraParams=%7B%22display_model_id%22%3A411619885284%2C%22model_selection_logic%22%3A3%7D"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-extrabold text-xs text-white bg-gradient-to-r from-[#EE4D2D] to-orange-500 hover:from-[#d73211] hover:to-orange-600 shadow-sm hover:shadow-md transition active:scale-98"
+            >
+              <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M19.78 7.37a.82.82 0 0 0-.66-.37h-3.41V5.5A4.5 4.5 0 0 0 11.21 1a4.5 4.5 0 0 0-4.5 4.5V7H3.3a.82.82 0 0 0-.66.37.84.84 0 0 0-.07.76l2.4 12A2.25 2.25 0 0 0 7.18 22h9.64a2.25 2.25 0 0 0 2.21-1.87l2.4-12a.84.84 0 0 0-.07-.76zM8.21 5.5A3 3 0 0 1 11.21 2.5a3 3 0 0 1 3 3V7h-6V5.5zm4.84 8.78c-1.37.54-2.26.85-2.26 1.48 0 .54.49.88 1.35.88a4.2 4.2 0 0 0 2.15-.65l.4 1.15a5.53 5.53 0 0 1-2.65.7c-1.68 0-2.68-.89-2.68-2.12 0-1.42 1.34-1.99 2.58-2.47 1.25-.49 1.94-.78 1.94-1.38 0-.48-.43-.79-1.18-.79a3.86 3.86 0 0 0-1.85.55l-.42-1.15a5.1 5.1 0 0 1 2.37-.6c1.61 0 2.5 1 2.5 2.05 0 1.27-1.17 1.8-2.25 2.3z"/></svg>
+              <span>Beli Robot di Shopee</span>
+              <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Bar Juknis Resmi (PDF View & Unduh) -->
+    <div class="mt-8 sm:mt-10 p-5 sm:p-6 bg-gradient-to-r from-orange-50 via-amber-50 to-orange-50 rounded-3xl border-2 border-orange-200/90 shadow-md flex flex-col md:flex-row items-center justify-between gap-5 cartoon-card cartoon-reveal">
+      <div class="flex items-center gap-4 text-left w-full md:w-auto">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 text-white flex items-center justify-center shrink-0 shadow-md">
+          <i data-lucide="file-text" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-black bg-orange-100 text-orange-800 uppercase tracking-wider mb-1">
+            <i data-lucide="sparkles" class="w-3 h-3 text-orange-600"></i>
+            <span>Dokumen Panduan Resmi</span>
+          </div>
+          <h3 class="display-font text-base sm:text-lg font-extrabold text-slate-900">
+            Petunjuk Teknis (Juknis) Erlass Competition 2026
+          </h3>
+          <p class="text-xs sm:text-sm text-slate-600 font-medium mt-0.5">
+            Pelajari aturan perlombaan, tema, format karya, kriteria penilaian, dan jadwal lengkapnya.
+          </p>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap sm:flex-nowrap items-center gap-3 shrink-0 w-full md:w-auto justify-start md:justify-end">
+        <button
+          type="button"
+          onclick="openJuknisModal()"
+          class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-white hover:bg-orange-50 text-orange-600 font-extrabold text-xs sm:text-sm border-2 border-orange-300 hover:border-orange-400 shadow-sm transition hover:scale-[1.02] active:scale-95 w-full sm:w-auto"
+        >
+          <i data-lucide="eye" class="w-4 h-4"></i>
+          <span>Baca Juknis (PDF View)</span>
+        </button>
+
+        <a
+          href="docs/Juknis_Lomba_Erlass_Competition_2026.pdf"
+          download="Juknis_Lomba_Erlass_Competition_2026.pdf"
+          class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-700 hover:to-amber-600 text-white font-extrabold text-xs sm:text-sm shadow-md hover:shadow-lg transition hover:scale-[1.02] active:scale-95 w-full sm:w-auto"
+        >
+          <i data-lucide="download" class="w-4 h-4"></i>
+          <span>Unduh PDF (2.9 MB)</span>
+        </a>
       </div>
     </div>
   </section>
@@ -216,15 +478,15 @@
       
       <!-- Heading Pendaftaran -->
       <div class="text-center mb-8">
-        <span class="text-xs font-extrabold text-orange-600 uppercase tracking-widest bg-orange-100 px-3 py-1 rounded-full">Formulir Resmi</span>
-        <h2 class="display-font text-2xl sm:text-4xl font-extrabold text-slate-900 mt-2">Registrasi Peserta Lomba</h2>
-        <p class="text-slate-600 text-sm sm:text-base mt-2 max-w-xl mx-auto">
+        <span id="badge-form-label" class="text-xs font-extrabold text-orange-600 uppercase tracking-widest bg-orange-100 px-3 py-1 rounded-full">Formulir Resmi</span>
+        <h2 id="registration-heading-title" class="display-font text-2xl sm:text-4xl font-extrabold text-slate-900 mt-2">Registrasi Peserta Lomba</h2>
+        <p id="registration-heading-desc" class="text-slate-600 text-sm sm:text-base mt-2 max-w-xl mx-auto">
           Silakan isi formulir di bawah ini dengan lengkap dan teliti untuk mendaftarkan siswa pada ajang Erlass Competition 2026.
         </p>
       </div>
 
       <!-- Step Indicator -->
-      <div class="mb-8 bg-white rounded-2xl p-4 sm:p-5 border border-amber-200/80 shadow-sm" aria-label="Tahapan pendaftaran">
+      <div id="step-indicator-container" class="mb-8 bg-white rounded-2xl p-4 sm:p-5 border border-amber-200/80 shadow-sm" aria-label="Tahapan pendaftaran">
         <div class="flex items-center justify-between gap-1 sm:gap-3">
           <div class="flex items-center gap-2">
             <span id="dot-1" class="progress-dot active">1</span>
@@ -244,6 +506,59 @@
           <div class="flex items-center gap-2">
             <span id="dot-4" class="progress-dot inactive">4</span>
             <span class="hidden sm:inline text-xs font-bold text-slate-700">Selesai & Kartu</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card Pendaftaran Ditutup (Ditampilkan otomatis saat pendaftaran berakhir) -->
+      <div id="registration-closed-card" class="hidden bg-white border border-amber-200/90 rounded-3xl p-6 sm:p-10 shadow-lg text-center cartoon-reveal">
+        <div class="max-w-xl mx-auto space-y-4">
+          <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-600 text-white mx-auto flex items-center justify-center shadow-md shadow-orange-500/20">
+            <i data-lucide="lock" class="w-8 h-8"></i>
+          </div>
+
+          <div class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-black bg-amber-100 text-amber-900 border border-amber-200">
+            <i data-lucide="calendar-off" class="w-3.5 h-3.5 text-orange-600"></i>
+            <span>Pendaftaran Resmi Ditutup • 5 November 2026</span>
+          </div>
+
+          <h3 class="display-font text-2xl sm:text-3xl font-extrabold text-slate-900">
+            Pendaftaran Erlass Competition 2026 Telah Ditutup
+          </h3>
+
+          <p class="text-slate-600 text-sm leading-relaxed">
+            Terima kasih yang sebesar-besarnya atas partisipasi dan antusiasme luar biasa dari lebih dari <strong class="text-slate-800">540 peserta</strong> dan sekolah di seluruh Indonesia. Periode registrasi peserta baru kini telah resmi berakhir.
+          </p>
+
+          <!-- Quick Action Buttons for Registered Participants -->
+          <div class="pt-4 grid sm:grid-cols-2 gap-3 text-left">
+            <a href="#cek-status" class="flex items-start gap-3 p-4 rounded-2xl bg-orange-50/70 hover:bg-orange-100/70 border border-orange-200 transition group">
+              <div class="w-9 h-9 rounded-xl bg-orange-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+                <i data-lucide="search" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h4 class="font-bold text-slate-900 text-xs sm:text-sm group-hover:text-orange-600 transition">Cek Status & Unduh Kartu</h4>
+                <p class="text-[11px] text-slate-500 mt-0.5">Lihat status verifikasi dan cetak Kartu Tanda Peserta resmi Anda.</p>
+              </div>
+            </a>
+
+            <a href="kumpul-proyek.html" class="flex items-start gap-3 p-4 rounded-2xl bg-emerald-50/70 hover:bg-emerald-100/70 border border-emerald-200 transition group">
+              <div class="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+                <i data-lucide="upload-cloud" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h4 class="font-bold text-slate-900 text-xs sm:text-sm group-hover:text-emerald-700 transition">Kumpul Proyek Lomba</h4>
+                <p class="text-[11px] text-slate-500 mt-0.5">Unggah berkas proyek & link video (aktif hingga 21 Nov 2026).</p>
+              </div>
+            </a>
+          </div>
+
+          <div class="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-center gap-3 text-xs text-slate-500">
+            <span>Ada pertanyaan atau kendala seputar lomba?</span>
+            <a id="closed-contact-wa" href="https://chat.whatsapp.com/DMKB10TaBaZ8k23pVsaoZw" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 font-bold text-emerald-600 hover:text-emerald-700 hover:underline">
+              <i data-lucide="message-circle" class="w-4 h-4"></i>
+              <span>Hubungi Panitia via WhatsApp</span>
+            </a>
           </div>
         </div>
       </div>
@@ -339,24 +654,72 @@
                 <label class="choice-option cursor-pointer">
                   <input type="radio" name="cabang_kompetisi" value="Scratch Coding" required>
                   <div>
-                    <span class="text-sm font-bold text-slate-800 block">Scratch Coding</span>
-                    <span class="text-[11px] text-slate-500">SD Kelas 1 - 6</span>
+                    <span class="text-sm font-bold text-slate-800 block">Coding Scratch</span>
+                    <span class="text-[11px] text-slate-500">Kelas 1-3, 4-6, SMP 7-9</span>
                   </div>
                 </label>
                 <label class="choice-option cursor-pointer">
                   <input type="radio" name="cabang_kompetisi" value="Micro:bit" required>
                   <div>
                     <span class="text-sm font-bold text-slate-800 block">Micro:bit</span>
-                    <span class="text-[11px] text-slate-500">SD 4-6 & SMP 7-9</span>
+                    <span class="text-[11px] text-slate-500">Kelas 1-3, 4-6, SMP 7-9</span>
                   </div>
                 </label>
                 <label class="choice-option cursor-pointer">
                   <input type="radio" name="cabang_kompetisi" value="Erboblox Robotics" required>
                   <div>
-                    <span class="text-sm font-bold text-slate-800 block">Erboblox Robotics</span>
-                    <span class="text-[11px] text-slate-500">SD 4-6 & SMP 7-9</span>
+                    <span class="text-sm font-bold text-slate-800 block">Erboblox</span>
+                    <span class="text-[11px] text-slate-500">Kelas 1-3, 4-6, SMP 7-9</span>
                   </div>
                 </label>
+              </div>
+
+              <!-- Pilihan Jenjang Lomba (Sub-Kategori) -->
+              <div class="mt-4 p-4 rounded-2xl bg-white border border-slate-200 shadow-sm">
+                <label class="block mb-2 text-xs font-bold text-slate-800">
+                  Kategori Jenjang Lomba <span class="text-red-500">*</span>
+                </label>
+                <div class="grid grid-cols-3 gap-2.5">
+                  <label class="cursor-pointer">
+                    <input type="radio" name="grade_category" value="Kelas 1-3" class="sr-only peer" required>
+                    <div class="p-3 text-center rounded-xl border-2 border-slate-200 peer-checked:border-orange-500 peer-checked:bg-orange-50/70 peer-checked:text-orange-900 transition hover:border-orange-300">
+                      <span class="text-xs font-extrabold block">Kelas 1–3</span>
+                      <span class="text-[10px] text-slate-500 block">SD Awal</span>
+                    </div>
+                  </label>
+                  <label class="cursor-pointer">
+                    <input type="radio" name="grade_category" value="Kelas 4-6" class="sr-only peer" required>
+                    <div class="p-3 text-center rounded-xl border-2 border-slate-200 peer-checked:border-orange-500 peer-checked:bg-orange-50/70 peer-checked:text-orange-900 transition hover:border-orange-300">
+                      <span class="text-xs font-extrabold block">Kelas 4–6</span>
+                      <span class="text-[10px] text-slate-500 block">SD Lanjut</span>
+                    </div>
+                  </label>
+                  <label class="cursor-pointer">
+                    <input type="radio" name="grade_category" value="SMP 7-9" class="sr-only peer" required>
+                    <div class="p-3 text-center rounded-xl border-2 border-slate-200 peer-checked:border-orange-500 peer-checked:bg-orange-50/70 peer-checked:text-orange-900 transition hover:border-orange-300">
+                      <span class="text-xs font-extrabold block">SMP 7–9</span>
+                      <span class="text-[10px] text-slate-500 block">Tingkat SMP</span>
+                    </div>
+                  </label>
+                </div>
+                <p class="text-[11px] text-slate-500 mt-2 flex items-center gap-1.5">
+                  <i data-lucide="info" class="w-3.5 h-3.5 text-orange-500 shrink-0"></i>
+                  <span>Kategori otomatis disesuaikan dengan pilihan jenjang kelas siswa di Langkah 1.</span>
+                </p>
+              </div>
+
+              <!-- Shopee Kit Notice -->
+              <div class="mt-3 p-3 rounded-2xl bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs">
+                <div class="flex items-center gap-2 text-slate-700">
+                  <div class="w-6 h-6 rounded-lg bg-[#EE4D2D]/10 text-[#EE4D2D] flex items-center justify-center shrink-0">
+                    <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M19.78 7.37a.82.82 0 0 0-.66-.37h-3.41V5.5A4.5 4.5 0 0 0 11.21 1a4.5 4.5 0 0 0-4.5 4.5V7H3.3a.82.82 0 0 0-.66.37.84.84 0 0 0-.07.76l2.4 12A2.25 2.25 0 0 0 7.18 22h9.64a2.25 2.25 0 0 0 2.21-1.87l2.4-12a.84.84 0 0 0-.07-.76zM8.21 5.5A3 3 0 0 1 11.21 2.5a3 3 0 0 1 3 3V7h-6V5.5zm4.84 8.78c-1.37.54-2.26.85-2.26 1.48 0 .54.49.88 1.35.88a4.2 4.2 0 0 0 2.15-.65l.4 1.15a5.53 5.53 0 0 1-2.65.7c-1.68 0-2.68-.89-2.68-2.12 0-1.42 1.34-1.99 2.58-2.47 1.25-.49 1.94-.78 1.94-1.38 0-.48-.43-.79-1.18-.79a3.86 3.86 0 0 0-1.85.55l-.42-1.15a5.1 5.1 0 0 1 2.37-.6c1.61 0 2.5 1 2.5 2.05 0 1.27-1.17 1.8-2.25 2.3z"/></svg>
+                  </div>
+                  <span>Belum memiliki kit lomba (Micro:bit / Erboblox)? Dapatkan perlengkapan resmi di Shopee.</span>
+                </div>
+                <a href="#perlengkapan" class="font-extrabold text-[#EE4D2D] hover:text-[#d73211] inline-flex items-center gap-1 shrink-0 self-end sm:self-auto hover:underline">
+                  <span>Lihat Perlengkapan Resmi</span>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                </a>
               </div>
             </fieldset>
 
@@ -419,48 +782,10 @@
                 </div>
               </div>
 
-              <!-- Fallback Manual Input -->
-              <div class="pt-1 flex items-center justify-between text-xs">
-                <span class="text-slate-500">Mencakup lebih dari 224.000 SD & SMP se-Indonesia.</span>
-                <button
-                  type="button"
-                  id="toggle-manual-school-btn"
-                  class="text-orange-600 hover:text-orange-700 hover:underline font-semibold"
-                >
-                  Sekolah tidak ditemukan? Ketik manual
-                </button>
-              </div>
-
-              <!-- Manual School Input Container (Initially Hidden) -->
-              <div id="manual-school-container" class="hidden p-4 rounded-2xl bg-amber-50/60 border border-amber-200 space-y-3 mt-3">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-bold text-amber-900">Input Manual Data Sekolah</span>
-                  <button type="button" id="close-manual-school-btn" class="text-xs text-slate-500 hover:text-slate-700">Tutup</button>
-                </div>
-                <div class="grid md:grid-cols-3 gap-3">
-                  <div>
-                    <label class="block mb-1 text-[11px] font-bold text-slate-700" for="manual-jenjang">Jenjang *</label>
-                    <select id="manual-jenjang" class="field-select text-xs">
-                      <option value="SD">SD / MI</option>
-                      <option value="SMP">SMP / MTs</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block mb-1 text-[11px] font-bold text-slate-700" for="manual-npsn">NPSN (Bila ada)</label>
-                    <input id="manual-npsn" type="text" placeholder="8 digit NPSN" class="field-input text-xs font-mono">
-                  </div>
-                  <div>
-                    <label class="block mb-1 text-[11px] font-bold text-slate-700" for="manual-city">Kota / Kabupaten *</label>
-                    <input id="manual-city" type="text" placeholder="Contoh: JAKARTA PUSAT" class="field-input text-xs uppercase" style="text-transform: uppercase;">
-                  </div>
-                </div>
-                <div>
-                  <label class="block mb-1 text-[11px] font-bold text-slate-700" for="manual-name">Nama Lengkap Sekolah *</label>
-                  <input id="manual-name" type="text" placeholder="Contoh: SD BINTANG HARAPAN" class="field-input text-xs uppercase" style="text-transform: uppercase;">
-                </div>
-                <button type="button" id="apply-manual-school-btn" class="w-full py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl transition">
-                  Gunakan Sekolah Ini
-                </button>
+              <!-- Info Pencarian Sekolah Resmi -->
+              <div class="pt-2 flex items-center gap-2 text-xs text-slate-500">
+                <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600 shrink-0"></i>
+                <span>Database mencakup lebih dari 224.000 SD, SMP & MTs resmi se-Indonesia. Cari dengan nama sekolah atau 8 digit NPSN Anda.</span>
               </div>
 
               <!-- Hidden form inputs for submission -->
@@ -693,7 +1018,7 @@
             <i data-lucide="printer" class="w-4 h-4"></i>
             <span>Cetak / Simpan Kartu Peserta</span>
           </button>
-          <a id="btn-wa-group" href="https://chat.whatsapp.com/ErlassCompetition2026" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-xl transition shadow-md">
+          <a id="btn-wa-group" href="https://chat.whatsapp.com/DMKB10TaBaZ8k23pVsaoZw" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-xl transition shadow-md">
             <i data-lucide="message-circle" class="w-4 h-4"></i>
             <span>Gabung Grup WhatsApp Peserta</span>
           </a>
@@ -765,7 +1090,72 @@
     </div>
   </footer>
 
+  <!-- JUKNIS PDF VIEWER MODAL -->
+  <div id="juknis-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-2 sm:p-4 md:p-6 bg-slate-900/80 backdrop-blur-sm transition-opacity duration-300" role="dialog" aria-modal="true" aria-labelledby="modal-juknis-title">
+    <div class="relative w-full max-w-5xl h-[92vh] sm:h-[88vh] bg-white rounded-3xl shadow-2xl flex flex-col overflow-hidden border-2 border-orange-200">
+      <!-- Modal Header -->
+      <div class="px-5 py-3.5 bg-gradient-to-r from-orange-500 via-orange-600 to-amber-500 text-white flex items-center justify-between gap-3 shrink-0">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div class="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+            <i data-lucide="file-text" class="w-4 h-4 text-white"></i>
+          </div>
+          <div class="min-w-0">
+            <h3 id="modal-juknis-title" class="font-extrabold text-sm sm:text-base text-white truncate">
+              Petunjuk Teknis (Juknis) Erlass Competition 2026
+            </h3>
+            <span class="text-[11px] text-orange-100 hidden sm:inline">Dokumen Panduan & Syarat Ketentuan Resmi</span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 shrink-0">
+          <!-- Direct download from modal -->
+          <a
+            href="docs/Juknis_Lomba_Erlass_Competition_2026.pdf"
+            download="Juknis_Lomba_Erlass_Competition_2026.pdf"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white text-orange-600 hover:bg-orange-50 text-xs font-bold transition shadow-sm"
+            title="Download PDF"
+          >
+            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+            <span class="hidden sm:inline">Unduh PDF</span>
+          </a>
+
+          <!-- Open in new tab -->
+          <a
+            href="docs/Juknis_Lomba_Erlass_Competition_2026.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-semibold transition"
+            title="Buka Tab Penuh"
+          >
+            <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+            <span class="hidden md:inline">Tab Baru</span>
+          </a>
+
+          <!-- Close Modal -->
+          <button
+            type="button"
+            onclick="closeJuknisModal()"
+            class="w-8 h-8 rounded-xl bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition"
+            aria-label="Tutup Juknis"
+          >
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal Body (Responsive PDF Frame) -->
+      <div class="relative flex-1 w-full bg-slate-100 p-1 sm:p-2 overflow-hidden">
+        <iframe
+          id="juknis-pdf-frame"
+          src=""
+          class="w-full h-full rounded-2xl bg-white border border-slate-200 shadow-inner"
+          title="Pratinjau PDF Juknis Lomba"
+        ></iframe>
+      </div>
+    </div>
+  </div>
+
   <!-- Main JavaScript Logic -->
-  <script src="js/app.js?v=20261005_12"></script>
+  <script src="js/app.js?v=20261021_1"></script>
 </body>
 </html>

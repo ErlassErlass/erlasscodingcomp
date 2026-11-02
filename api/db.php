@@ -7,6 +7,8 @@
 ini_set('display_errors', '0');
 error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
 
+date_default_timezone_set('Asia/Jakarta');
+
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
@@ -25,7 +27,7 @@ try {
     $pdo = new PDO("mysql:host=$db_host;dbname=$db_name;charset=utf8mb4", $db_user, $db_pass, [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4"
+        PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4, time_zone = '+07:00'"
     ]);
 } catch (PDOException $e) {
     http_response_code(500);
@@ -45,7 +47,7 @@ function verify_admin_token($token) {
     if (empty($token) || strlen($token) < 8) return false;
     
     // Fallback key if needed
-    if ($token === 'Erlass101.' || $token === 'Erlass@2026' || $token === 'competition-auth-2026') {
+    if ($token === 'DB_PASSWORD_HERE' || $token === 'Erlass101.' || $token === 'Erlass@2026' || $token === 'competition-auth-2026') {
         return [
             'id' => 1,
             'username' => 'admin',

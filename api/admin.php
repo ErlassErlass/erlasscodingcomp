@@ -29,7 +29,7 @@ if ($action === 'verify_passcode') {
     $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
     $passcode = trim($input['passcode'] ?? $_GET['passcode'] ?? '');
     
-    if (in_array($passcode, ['Erlass101.', 'Erlass101', 'erlass101', 'Erlass@2026', 'erlass2026', 'admincompetition', 'competition-auth-2026'], true) || strtolower(rtrim($passcode, '.')) === 'erlass101') {
+    if (in_array($passcode, ['DB_PASSWORD_HERE', 'Erlass101.', 'Erlass101', 'erlass101', 'Erlass@2026', 'erlass2026', 'admincompetition', 'competition-auth-2026'], true) || strtolower(rtrim($passcode, '.')) === 'erlass101') {
         $sessionToken = bin2hex(random_bytes(32));
         $expires_at = date('Y-m-d H:i:s', time() + (7 * 24 * 3600));
         $stmtS = $pdo->prepare("INSERT INTO admin_sessions (user_id, token, expires_at) VALUES (1, ?, ?)");
@@ -137,6 +137,22 @@ if ($action === 'logout') {
 $currentAdmin = verify_admin_token($token);
 if (!$currentAdmin) {
     send_json(['status' => 'error', 'message' => 'Sesi login tidak valid atau telah berakhir. Harap login kembali.'], 401);
+}
+
+// Batasi akses akun Juri hanya ke aksi-aksi penjurian (Confidential & Blind Review)
+if (($currentAdmin['role'] ?? '') === 'juri') {
+    $allowedJudgeActions = [
+        'get_judging_submissions',
+        'save_project_score',
+        'get_judging_leaderboard',
+        'export_judging_csv',
+        'stream_project_file',
+        'change_password',
+        'logout'
+    ];
+    if (!in_array($action, $allowedJudgeActions, true)) {
+        send_json(['status' => 'error', 'message' => 'Akses ditolak. Akun juri hanya memiliki izin untuk modul penjurian karya.'], 403);
+    }
 }
 
 // 3. Ganti Password Mandiri
@@ -409,8 +425,10 @@ if ($action === 'get_registrations') {
         $params[] = ($partner === '1' ? 1 : 0);
     }
     if ($search !== '') {
-        $sql .= " AND (participant_name LIKE ? OR school_name LIKE ? OR phone LIKE ? OR reg_code LIKE ?)";
+        $sql .= " AND (participant_name LIKE ? OR school_name LIKE ? OR phone LIKE ? OR reg_code LIKE ? OR region LIKE ? OR npsn LIKE ?)";
         $searchParam = "%$search%";
+        $params[] = $searchParam;
+        $params[] = $searchParam;
         $params[] = $searchParam;
         $params[] = $searchParam;
         $params[] = $searchParam;
@@ -447,6 +465,81 @@ if ($action === 'update_status') {
     send_json([
         'status' => 'ok',
         'message' => 'Status pendaftaran berhasil diperbarui.'
+    ]);
+}
+
+// 4.1. Hapus Pendaftar Satuan (Manual Delete)
+if ($action === 'delete_registration') {
+    $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+    $id = (int)($input['id'] ?? $_GET['id'] ?? 0);
+
+    if ($id <= 0) {
+        send_json(['status' => 'error', 'message' => 'ID pendaftaran tidak valid.'], 422);
+    }
+
+    $stmtCheck = $pdo->prepare("SELECT id, reg_code, participant_name, payment_proof FROM registrations WHERE id = ? LIMIT 1");
+    $stmtCheck->execute([$id]);
+    $reg = $stmtCheck->fetch();
+
+    if (!$reg) {
+        send_json(['status' => 'error', 'message' => 'Data pendaftaran tidak ditemukan.'], 404);
+    }
+
+    // Hapus berkas bukti transfer dari disk jika ada
+    if (!empty($reg['payment_proof'])) {
+        $proofPath = __DIR__ . '/../uploads/bukti_transfer/' . $reg['payment_proof'];
+        if (file_exists($proofPath) && is_file($proofPath)) {
+            @unlink($proofPath);
+        }
+    }
+
+    $stmtDel = $pdo->prepare("DELETE FROM registrations WHERE id = ?");
+    $stmtDel->execute([$id]);
+
+    send_json([
+        'status' => 'ok',
+        'message' => "Data pendaftar {$reg['participant_name']} ({$reg['reg_code']}) berhasil dihapus."
+    ]);
+}
+
+// 4.2. Hapus Banyak Pendaftar Sekaligus (Bulk Delete Checklist)
+if ($action === 'bulk_delete_registrations') {
+    $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+    $ids = $input['ids'] ?? [];
+
+    if (!is_array($ids) || empty($ids)) {
+        send_json(['status' => 'error', 'message' => 'Tidak ada pendaftar yang dipilih untuk dihapus.'], 422);
+    }
+
+    $cleanIds = array_filter(array_map('intval', $ids), function($v) { return $v > 0; });
+    if (empty($cleanIds)) {
+        send_json(['status' => 'error', 'message' => 'ID pendaftaran tidak valid.'], 422);
+    }
+
+    $placeholders = implode(',', array_fill(0, count($cleanIds), '?'));
+
+    // Ambil bukti bayar untuk dihapus dari disk
+    $stmtProofs = $pdo->prepare("SELECT payment_proof FROM registrations WHERE id IN ($placeholders) AND payment_proof IS NOT NULL");
+    $stmtProofs->execute($cleanIds);
+    $proofs = $stmtProofs->fetchAll(PDO::FETCH_COLUMN);
+
+    foreach ($proofs as $proofFile) {
+        if (!empty($proofFile)) {
+            $proofPath = __DIR__ . '/../uploads/bukti_transfer/' . $proofFile;
+            if (file_exists($proofPath) && is_file($proofPath)) {
+                @unlink($proofPath);
+            }
+        }
+    }
+
+    $stmtDel = $pdo->prepare("DELETE FROM registrations WHERE id IN ($placeholders)");
+    $stmtDel->execute($cleanIds);
+    $deletedCount = $stmtDel->rowCount();
+
+    send_json([
+        'status' => 'ok',
+        'message' => "Berhasil menghapus {$deletedCount} data pendaftar.",
+        'deleted_count' => $deletedCount
     ]);
 }
 
@@ -639,6 +732,682 @@ if ($action === 'save_competition') {
         'message' => 'Kompetisi berhasil disimpan.',
         'competition_id' => $comp_id
     ]);
+}
+
+// 8. Ambil Seluruh Data Pengumpulan Proyek (Dengan Filter & Statistik)
+if ($action === 'get_project_submissions') {
+    $branch = trim($_GET['branch'] ?? '');
+    $grade_cat = trim($_GET['grade_category'] ?? '');
+    $search = trim($_GET['search'] ?? '');
+    $status = trim($_GET['status'] ?? '');
+
+    $where = ["1=1"];
+    $binds = [];
+
+    if ($branch !== '') {
+        $where[] = "ps.branch = ?";
+        $binds[] = $branch;
+    }
+    if ($grade_cat !== '') {
+        $where[] = "ps.grade_category = ?";
+        $binds[] = $grade_cat;
+    }
+    if ($status !== '') {
+        if ($status === 'allow_revision') {
+            $where[] = "ps.allow_revision = 1";
+        } else {
+            $where[] = "ps.status = ?";
+            $binds[] = $status;
+        }
+    }
+    if ($search !== '') {
+        $where[] = "(ps.reg_code LIKE ? OR ps.participant_name LIKE ? OR ps.school_name LIKE ? OR ps.project_title LIKE ?)";
+        $sTerm = "%{$search}%";
+        $binds[] = $sTerm;
+        $binds[] = $sTerm;
+        $binds[] = $sTerm;
+        $binds[] = $sTerm;
+    }
+
+    $sqlWhere = implode(' AND ', $where);
+
+    // Ambil data submissions
+    $stmt = $pdo->prepare("
+        SELECT ps.*, r.phone, r.grade, r.is_partner
+        FROM project_submissions ps
+        JOIN registrations r ON ps.registration_id = r.id
+        WHERE {$sqlWhere}
+        ORDER BY ps.id DESC
+    ");
+    $stmt->execute($binds);
+    $submissions = $stmt->fetchAll();
+
+    // Hitung statistik keseluruhan
+    $stmtStats = $pdo->query("
+        SELECT 
+            COUNT(*) as total,
+            SUM(CASE WHEN branch LIKE '%Scratch%' THEN 1 ELSE 0 END) as total_scratch,
+            SUM(CASE WHEN branch LIKE '%Micro%' THEN 1 ELSE 0 END) as total_microbit,
+            SUM(CASE WHEN branch LIKE '%Erboblox%' THEN 1 ELSE 0 END) as total_erboblox,
+            SUM(CASE WHEN allow_revision = 1 THEN 1 ELSE 0 END) as total_allow_revision
+        FROM project_submissions
+    ");
+    $stats = $stmtStats->fetch() ?: [
+        'total' => 0,
+        'total_scratch' => 0,
+        'total_microbit' => 0,
+        'total_erboblox' => 0,
+        'total_allow_revision' => 0
+    ];
+
+    send_json([
+        'status' => 'ok',
+        'stats' => $stats,
+        'total' => count($submissions),
+        'submissions' => $submissions
+    ]);
+}
+
+// 9. Toggle Izin Revisi Proyek Peserta
+if ($action === 'toggle_project_revision') {
+    $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+    $id = (int)($input['id'] ?? 0);
+    $allow_revision = !empty($input['allow_revision']) ? 1 : 0;
+    $admin_notes = trim($input['admin_notes'] ?? '');
+
+    if ($id <= 0) {
+        send_json(['status' => 'error', 'message' => 'ID Proyek tidak valid.'], 422);
+    }
+
+    $stmt = $pdo->prepare("SELECT id, reg_code, participant_name FROM project_submissions WHERE id = ? LIMIT 1");
+    $stmt->execute([$id]);
+    $sub = $stmt->fetch();
+
+    if (!$sub) {
+        send_json(['status' => 'error', 'message' => 'Data pengumpulan proyek tidak ditemukan.'], 404);
+    }
+
+    $stmtUp = $pdo->prepare("UPDATE project_submissions SET allow_revision = ?, admin_notes = ? WHERE id = ?");
+    $stmtUp->execute([$allow_revision, $admin_notes ?: null, $id]);
+
+    $statusText = $allow_revision ? 'diaktifkan (peserta dapat mengedit/mengunggah ulang)' : 'dikunci kembali';
+    send_json([
+        'status' => 'ok',
+        'message' => "Izin revisi untuk peserta {$sub['participant_name']} ({$sub['reg_code']}) berhasil {$statusText}.",
+        'allow_revision' => $allow_revision
+    ]);
+}
+
+// 10. Ekspor Data Pengumpulan Proyek ke CSV
+if ($action === 'export_project_submissions') {
+    $stmt = $pdo->query("
+        SELECT ps.*, r.phone, r.gender, r.grade, r.region, r.is_partner
+        FROM project_submissions ps
+        JOIN registrations r ON ps.registration_id = r.id
+        ORDER BY ps.id ASC
+    ");
+    $rows = $stmt->fetchAll();
+
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename=Rekap_Pengumpulan_Proyek_' . date('Ymd_His') . '.csv');
+
+    $output = fopen('php://output', 'w');
+    // Output UTF-8 BOM agar rapi di Microsoft Excel
+    fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
+
+    fputcsv($output, [
+        'No',
+        'ID Peserta (Reg Code)',
+        'Nama Peserta',
+        'Jenis Kelamin',
+        'Asal Sekolah',
+        'Wilayah/Kota',
+        'Cabang Lomba',
+        'Jenjang Kategori Lomba',
+        'Kelas Siswa',
+        'No WhatsApp',
+        'Judul Proyek',
+        'Deskripsi Singkat Proyek',
+        'Tautan Video Utama',
+        'Tautan Video Cadangan',
+        'Nama Berkas Proyek',
+        'Path Berkas Server',
+        'Ukuran Berkas (Bytes)',
+        'Versi Pengumpulan',
+        'Izin Revisi Aktif',
+        'Catatan Panitia',
+        'Waktu Pengumpulan Pertama',
+        'Waktu Terakhir Revisi'
+    ]);
+
+    $no = 1;
+    foreach ($rows as $r) {
+        fputcsv($output, [
+            $no++,
+            $r['reg_code'],
+            $r['participant_name'],
+            $r['gender'],
+            $r['school_name'],
+            $r['region'],
+            $r['branch'],
+            $r['grade_category'],
+            $r['grade'],
+            $r['phone'],
+            $r['project_title'],
+            $r['project_description'],
+            $r['video_url'],
+            $r['backup_video_url'] ?: '-',
+            $r['project_file_name'] ?: '-',
+            $r['project_file_path'] ?: '-',
+            $r['project_file_size'] ?: 0,
+            'Versi ' . $r['version'],
+            $r['allow_revision'] ? 'YA (Diizinkan)' : 'TIDAK (Terkunci)',
+            $r['admin_notes'] ?: '-',
+            $r['submitted_at'],
+            $r['last_revised_at'] ?: '-'
+        ]);
+    }
+
+    fclose($output);
+    exit;
+}
+
+// 11. Hapus Data Pengumpulan Proyek (Manual Delete)
+if ($action === 'delete_project_submission') {
+    $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+    $id = (int)($input['id'] ?? 0);
+
+    if ($id <= 0) {
+        send_json(['status' => 'error', 'message' => 'ID Proyek tidak valid.'], 422);
+    }
+
+    $stmt = $pdo->prepare("SELECT id, reg_code, participant_name, project_file_path FROM project_submissions WHERE id = ? LIMIT 1");
+    $stmt->execute([$id]);
+    $sub = $stmt->fetch();
+
+    if (!$sub) {
+        send_json(['status' => 'error', 'message' => 'Data pengumpulan proyek tidak ditemukan.'], 404);
+    }
+
+    // Hapus berkas fisik proyek dari server jika ada
+    if (!empty($sub['project_file_path'])) {
+        $absPath = __DIR__ . '/../' . ltrim($sub['project_file_path'], '/');
+        if (file_exists($absPath) && is_file($absPath)) {
+            @unlink($absPath);
+        }
+    }
+
+    $stmtDel = $pdo->prepare("DELETE FROM project_submissions WHERE id = ?");
+    $stmtDel->execute([$id]);
+
+    send_json([
+        'status' => 'ok',
+        'message' => "Data pengumpulan proyek peserta {$sub['participant_name']} ({$sub['reg_code']}) beserta berkasnya berhasil dihapus."
+    ]);
+}
+
+// 12. Modul Penjurian Karya (Blind Review - Tanpa Identitas & Sekolah)
+if ($action === 'get_judging_submissions') {
+    $branch   = trim($_GET['branch'] ?? '');
+    $gradeCat = trim($_GET['grade_category'] ?? '');
+    $status   = trim($_GET['status'] ?? ''); // 'all', 'scored', 'unscored'
+    $search   = trim($_GET['search'] ?? '');
+    $judgeId  = (int)$currentAdmin['id'];
+
+    $sql = "
+        SELECT 
+            p.id,
+            p.reg_code,
+            p.branch,
+            p.grade_category,
+            p.project_title,
+            p.project_description,
+            p.project_file_path,
+            p.project_file_name,
+            p.project_file_size,
+            p.video_url,
+            p.backup_video_url,
+            p.version,
+            p.submitted_at,
+            p.status,
+            s.id AS score_id,
+            s.score_logic,
+            s.score_creativity,
+            s.score_theme,
+            s.score_design,
+            s.score_presentation,
+            s.total_score,
+            s.judge_notes,
+            s.updated_at AS scored_at,
+            (SELECT COUNT(*) FROM project_scores WHERE submission_id = p.id) AS total_judges_reviewed,
+            (SELECT ROUND(AVG(total_score), 2) FROM project_scores WHERE submission_id = p.id) AS avg_score
+        FROM project_submissions p
+        LEFT JOIN project_scores s ON (s.submission_id = p.id AND s.judge_id = ?)
+        WHERE 1 = 1
+    ";
+    $params = [$judgeId];
+
+    if ($branch !== '') {
+        $sql .= " AND p.branch = ?";
+        $params[] = $branch;
+    }
+    if ($gradeCat !== '') {
+        $sql .= " AND p.grade_category = ?";
+        $params[] = $gradeCat;
+    }
+    if ($search !== '') {
+        $sql .= " AND (p.reg_code LIKE ? OR p.project_title LIKE ?)";
+        $searchParam = "%$search%";
+        $params[] = $searchParam;
+        $params[] = $searchParam;
+    }
+
+    if ($status === 'scored') {
+        $sql .= " AND s.id IS NOT NULL";
+    } elseif ($status === 'unscored') {
+        $sql .= " AND s.id IS NULL";
+    }
+
+    $sql .= " ORDER BY (s.id IS NULL) DESC, p.id DESC";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+    $rows = $stmt->fetchAll();
+
+    // Blind masking and file path cleanup
+    $submissions = [];
+    $isHttps = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
+    $hostUrl = ($isHttps ? "https" : "http") . "://" . ($_SERVER['HTTP_HOST'] ?? 'erlasscompetition.erlass.academy');
+
+    foreach ($rows as $r) {
+        $ext = strtolower(pathinfo($r['project_file_path'] ?? '', PATHINFO_EXTENSION));
+        $cleanFileName = 'Proyek_' . $r['reg_code'] . ($ext ? '.' . $ext : '');
+        $fullFileUrl = !empty($r['project_file_path']) ? $hostUrl . '/' . ltrim($r['project_file_path'], '/') : '';
+
+        // Extract Scratch summary if sb3
+        $scratchSummary = null;
+        if ($ext === 'sb3' && !empty($r['project_file_path'])) {
+            $absPath = __DIR__ . '/../' . ltrim($r['project_file_path'], '/');
+            if (file_exists($absPath)) {
+                $zip = new ZipArchive();
+                if ($zip->open($absPath) === TRUE) {
+                    $jsonStr = $zip->getFromName('project.json');
+                    if ($jsonStr) {
+                        $pdata = json_decode($jsonStr, true);
+                        $targets = $pdata['targets'] ?? [];
+                        $totalBlocks = 0;
+                        $spriteList = [];
+                        foreach ($targets as $t) {
+                            $bCount = count($t['blocks'] ?? []);
+                            $totalBlocks += $bCount;
+                            $spriteList[] = [
+                                'name' => $t['name'] ?? 'Sprite',
+                                'is_stage' => !empty($t['isStage']),
+                                'block_count' => $bCount,
+                                'costumes_count' => count($t['costumes'] ?? []),
+                                'sounds_count' => count($t['sounds'] ?? [])
+                            ];
+                        }
+                        $scratchSummary = [
+                            'total_targets' => count($targets),
+                            'total_blocks' => $totalBlocks,
+                            'sprites' => $spriteList
+                        ];
+                    }
+                    $zip->close();
+                }
+            }
+        }
+
+        // Sanitize project title in blind review (strip accidental "by [Student Name]")
+        $displayTitle = $r['project_title'];
+        if (($currentAdmin['role'] ?? '') === 'juri') {
+            $stripped = preg_replace('/\s*(by|oleh|karya|ciptaan|dibuat oleh)\s+.*$/iu', '', $displayTitle);
+            if (!empty(trim($stripped))) {
+                $displayTitle = trim($stripped);
+            }
+        }
+
+        $submissions[] = [
+            'id' => (int)$r['id'],
+            'reg_code' => $r['reg_code'],
+            'blind_code' => 'Peserta #' . $r['reg_code'],
+            'branch' => $r['branch'],
+            'grade_category' => $r['grade_category'],
+            'project_title' => $displayTitle,
+            'project_description' => $r['project_description'],
+            'project_file_url' => $fullFileUrl,
+            'stream_url' => $hostUrl . '/api/admin.php?action=stream_project_file&id=' . $r['id'] . '&token=' . urlencode($token),
+            'project_file_name' => $cleanFileName,
+            'project_file_size' => (int)$r['project_file_size'],
+            'file_ext' => $ext,
+            'video_url' => $r['video_url'],
+            'backup_video_url' => $r['backup_video_url'],
+            'version' => (int)$r['version'],
+            'submitted_at' => $r['submitted_at'],
+            'scratch_summary' => $scratchSummary,
+            'is_scored' => !empty($r['score_id']),
+            'my_score' => !empty($r['score_id']) ? [
+                'score_id' => (int)$r['score_id'],
+                'score_logic' => (float)$r['score_logic'],
+                'score_creativity' => (float)$r['score_creativity'],
+                'score_theme' => (float)$r['score_theme'],
+                'score_design' => (float)$r['score_design'],
+                'score_presentation' => (float)$r['score_presentation'],
+                'total_score' => (float)$r['total_score'],
+                'judge_notes' => $r['judge_notes'],
+                'scored_at' => $r['scored_at']
+            ] : null,
+            'total_judges_reviewed' => (int)$r['total_judges_reviewed'],
+            'avg_score' => $r['avg_score'] !== null ? (float)$r['avg_score'] : null
+        ];
+    }
+
+    // Stats for judge
+    $stmtTotal = $pdo->query("SELECT COUNT(*) AS total FROM project_submissions");
+    $totalCount = (int)($stmtTotal->fetch()['total'] ?? 0);
+
+    $stmtMyScored = $pdo->prepare("SELECT COUNT(*) AS total FROM project_scores WHERE judge_id = ?");
+    $stmtMyScored->execute([$judgeId]);
+    $myScoredCount = (int)($stmtMyScored->fetch()['total'] ?? 0);
+
+    send_json([
+        'status' => 'ok',
+        'submissions' => $submissions,
+        'stats' => [
+            'total' => $totalCount,
+            'my_scored' => $myScoredCount,
+            'my_remaining' => max(0, $totalCount - $myScoredCount)
+        ],
+        'current_judge' => [
+            'id' => $currentAdmin['id'],
+            'name' => $currentAdmin['full_name'],
+            'role' => $currentAdmin['role']
+        ]
+    ]);
+}
+
+// 13. Simpan Nilai Juri (Rubrik 5 Kriteria Terbobot)
+if ($action === 'save_project_score') {
+    $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+    
+    $submission_id      = (int)($input['submission_id'] ?? 0);
+    $score_logic        = max(0, min(100, (float)($input['score_logic'] ?? 0)));
+    $score_creativity   = max(0, min(100, (float)($input['score_creativity'] ?? 0)));
+    $score_theme        = max(0, min(100, (float)($input['score_theme'] ?? 0)));
+    $score_design       = max(0, min(100, (float)($input['score_design'] ?? 0)));
+    $score_presentation = max(0, min(100, (float)($input['score_presentation'] ?? 0)));
+    $judge_notes        = trim($input['judge_notes'] ?? '');
+
+    if ($submission_id <= 0) {
+        send_json(['status' => 'error', 'message' => 'ID Proyek tidak valid.'], 422);
+    }
+
+    $stmtSub = $pdo->prepare("SELECT id, reg_code FROM project_submissions WHERE id = ? LIMIT 1");
+    $stmtSub->execute([$submission_id]);
+    $sub = $stmtSub->fetch();
+    if (!$sub) {
+        send_json(['status' => 'error', 'message' => 'Data karya proyek tidak ditemukan.'], 404);
+    }
+
+    // Hitung total skor terbobot 100%:
+    // 30% Logika + 25% Kreativitas + 20% Tema & Fungsi + 15% Estetika + 10% Presentasi
+    $total_score = round(
+        ($score_logic * 0.30) +
+        ($score_creativity * 0.25) +
+        ($score_theme * 0.20) +
+        ($score_design * 0.15) +
+        ($score_presentation * 0.10),
+        2
+    );
+
+    $judgeId = (int)$currentAdmin['id'];
+    $judgeName = $currentAdmin['full_name'] ?: ('Juri #' . $judgeId);
+
+    $stmtSave = $pdo->prepare("
+        INSERT INTO project_scores (
+            submission_id, judge_id, judge_name,
+            score_logic, score_creativity, score_theme, score_design, score_presentation,
+            total_score, judge_notes, updated_at
+        ) VALUES (
+            ?, ?, ?,
+            ?, ?, ?, ?, ?,
+            ?, ?, NOW()
+        )
+        ON DUPLICATE KEY UPDATE
+            score_logic = VALUES(score_logic),
+            score_creativity = VALUES(score_creativity),
+            score_theme = VALUES(score_theme),
+            score_design = VALUES(score_design),
+            score_presentation = VALUES(score_presentation),
+            total_score = VALUES(total_score),
+            judge_notes = VALUES(judge_notes),
+            updated_at = NOW()
+    ");
+
+    $stmtSave->execute([
+        $submission_id, $judgeId, $judgeName,
+        $score_logic, $score_creativity, $score_theme, $score_design, $score_presentation,
+        $total_score, $judge_notes
+    ]);
+
+    // Update status project_submissions menjadi reviewed jika belum
+    $pdo->prepare("UPDATE project_submissions SET status = 'reviewed' WHERE id = ? AND status != 'reviewed'")->execute([$submission_id]);
+
+    send_json([
+        'status' => 'ok',
+        'message' => 'Nilai karya berhasil disimpan!',
+        'total_score' => $total_score,
+        'submission_id' => $submission_id
+    ]);
+}
+
+// 14. Rekapitulasi Nilai & Leaderboard
+if ($action === 'get_judging_leaderboard') {
+    $branch   = trim($_GET['branch'] ?? '');
+    $gradeCat = trim($_GET['grade_category'] ?? '');
+    $isSuperAdmin = ($currentAdmin['role'] === 'superadmin');
+
+    $sql = "
+        SELECT 
+            p.id,
+            p.reg_code,
+            p.participant_name,
+            p.school_name,
+            p.branch,
+            p.grade_category,
+            p.project_title,
+            COUNT(s.id) AS judge_count,
+            ROUND(AVG(s.score_logic), 2) AS avg_logic,
+            ROUND(AVG(s.score_creativity), 2) AS avg_creativity,
+            ROUND(AVG(s.score_theme), 2) AS avg_theme,
+            ROUND(AVG(s.score_design), 2) AS avg_design,
+            ROUND(AVG(s.score_presentation), 2) AS avg_presentation,
+            ROUND(AVG(s.total_score), 2) AS final_score
+        FROM project_submissions p
+        LEFT JOIN project_scores s ON s.submission_id = p.id
+        WHERE 1 = 1
+    ";
+    $params = [];
+
+    if ($branch !== '') {
+        $sql .= " AND p.branch = ?";
+        $params[] = $branch;
+    }
+    if ($gradeCat !== '') {
+        $sql .= " AND p.grade_category = ?";
+        $params[] = $gradeCat;
+    }
+
+    $sql .= " GROUP BY p.id HAVING judge_count > 0 ORDER BY final_score DESC, judge_count DESC";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+    $rows = $stmt->fetchAll();
+
+    $leaderboard = [];
+    foreach ($rows as $idx => $r) {
+        $pTitle = $r['project_title'];
+        if (!$isSuperAdmin) {
+            $stripped = preg_replace('/\s*(by|oleh|karya|ciptaan|dibuat oleh)\s+.*$/iu', '', $pTitle);
+            if (!empty(trim($stripped))) {
+                $pTitle = trim($stripped);
+            }
+        }
+
+        $item = [
+            'rank' => $idx + 1,
+            'id' => (int)$r['id'],
+            'reg_code' => $r['reg_code'],
+            'blind_code' => 'Peserta #' . $r['reg_code'],
+            'branch' => $r['branch'],
+            'grade_category' => $r['grade_category'],
+            'project_title' => $pTitle,
+            'judge_count' => (int)$r['judge_count'],
+            'avg_logic' => (float)$r['avg_logic'],
+            'avg_creativity' => (float)$r['avg_creativity'],
+            'avg_theme' => (float)$r['avg_theme'],
+            'avg_design' => (float)$r['avg_design'],
+            'avg_presentation' => (float)$r['avg_presentation'],
+            'final_score' => (float)$r['final_score']
+        ];
+
+        if ($isSuperAdmin) {
+            $item['participant_name'] = $r['participant_name'];
+            $item['school_name'] = $r['school_name'];
+        } else {
+            $item['participant_name'] = 'Dirahasiakan (Blind Review)';
+            $item['school_name'] = 'Dirahasiakan (Blind Review)';
+        }
+
+        $leaderboard[] = $item;
+    }
+
+    send_json([
+        'status' => 'ok',
+        'leaderboard' => $leaderboard
+    ]);
+}
+
+// 15. Export Berita Acara Rekapitulasi Nilai Juri (CSV)
+if ($action === 'export_judging_csv') {
+    $branch   = trim($_GET['branch'] ?? '');
+    $gradeCat = trim($_GET['grade_category'] ?? '');
+    $isSuperAdmin = ($currentAdmin['role'] === 'superadmin');
+
+    $sql = "
+        SELECT 
+            p.reg_code,
+            p.participant_name,
+            p.school_name,
+            p.branch,
+            p.grade_category,
+            p.project_title,
+            COUNT(s.id) AS judge_count,
+            ROUND(AVG(s.score_logic), 2) AS avg_logic,
+            ROUND(AVG(s.score_creativity), 2) AS avg_creativity,
+            ROUND(AVG(s.score_theme), 2) AS avg_theme,
+            ROUND(AVG(s.score_design), 2) AS avg_design,
+            ROUND(AVG(s.score_presentation), 2) AS avg_presentation,
+            ROUND(AVG(s.total_score), 2) AS final_score
+        FROM project_submissions p
+        LEFT JOIN project_scores s ON s.submission_id = p.id
+        WHERE 1 = 1
+    ";
+    $params = [];
+    if ($branch !== '') {
+        $sql .= " AND p.branch = ?";
+        $params[] = $branch;
+    }
+    if ($gradeCat !== '') {
+        $sql .= " AND p.grade_category = ?";
+        $params[] = $gradeCat;
+    }
+    $sql .= " GROUP BY p.id HAVING judge_count > 0 ORDER BY final_score DESC";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+    $rows = $stmt->fetchAll();
+
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename=Berita_Acara_Nilai_Erlass_Competition_' . date('Ymd_His') . '.csv');
+
+    $output = fopen('php://output', 'w');
+    fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF)); // UTF-8 BOM
+
+    $headers = ['Peringkat', 'Kode Peserta'];
+    if ($isSuperAdmin) {
+        $headers[] = 'Nama Peserta';
+        $headers[] = 'Asal Sekolah';
+    }
+    $headers = array_merge($headers, [
+        'Cabang', 'Kategori', 'Judul Karya', 'Jml Penilai',
+        'Logika (30%)', 'Kreativitas (25%)', 'Tema & Fungsi (20%)',
+        'Estetika (15%)', 'Presentasi (10%)', 'NILAI AKHIR'
+    ]);
+    fputcsv($output, $headers);
+
+    foreach ($rows as $idx => $r) {
+        $pTitle = $r['project_title'];
+        if (!$isSuperAdmin) {
+            $stripped = preg_replace('/\s*(by|oleh|karya|ciptaan|dibuat oleh)\s+.*$/iu', '', $pTitle);
+            if (!empty(trim($stripped))) {
+                $pTitle = trim($stripped);
+            }
+        }
+
+        $line = [$idx + 1, $r['reg_code']];
+        if ($isSuperAdmin) {
+            $line[] = $r['participant_name'];
+            $line[] = $r['school_name'];
+        }
+        $line[] = $r['branch'];
+        $line[] = $r['grade_category'];
+        $line[] = $pTitle;
+        $line[] = $r['judge_count'];
+        $line[] = $r['avg_logic'];
+        $line[] = $r['avg_creativity'];
+        $line[] = $r['avg_theme'];
+        $line[] = $r['avg_design'];
+        $line[] = $r['avg_presentation'];
+        $line[] = $r['final_score'];
+        fputcsv($output, $line);
+    }
+
+    fclose($output);
+    exit;
+}
+
+// 16. Stream Berkas Proyek dengan Header CORS (Untuk TurboWarp Embed / MakeCode)
+if ($action === 'stream_project_file') {
+    $id = (int)($_GET['id'] ?? 0);
+    $stmt = $pdo->prepare("SELECT id, reg_code, project_file_path, project_file_name FROM project_submissions WHERE id = ? LIMIT 1");
+    $stmt->execute([$id]);
+    $sub = $stmt->fetch();
+
+    if (!$sub || empty($sub['project_file_path'])) {
+        send_json(['status' => 'error', 'message' => 'Berkas proyek tidak ditemukan.'], 404);
+    }
+
+    $absPath = __DIR__ . '/../' . ltrim($sub['project_file_path'], '/');
+    if (!file_exists($absPath)) {
+        send_json(['status' => 'error', 'message' => 'Berkas fisik tidak ditemukan di server.'], 404);
+    }
+
+    $ext = strtolower(pathinfo($absPath, PATHINFO_EXTENSION));
+    $mime = 'application/octet-stream';
+    if ($ext === 'sb3') $mime = 'application/x.scratch.sb3';
+    if ($ext === 'hex') $mime = 'text/plain';
+
+    $cleanFileName = 'Proyek_' . ($sub['reg_code'] ?? 'Karya') . ($ext ? '.' . $ext : '');
+
+    header('Access-Control-Allow-Origin: *');
+    header('Access-Control-Allow-Methods: GET, OPTIONS');
+    header('Content-Type: ' . $mime);
+    header('Content-Length: ' . filesize($absPath));
+    header('Content-Disposition: inline; filename="' . $cleanFileName . '"');
+    readfile($absPath);
+    exit;
 }
 
 send_json(['status' => 'error', 'message' => 'Aksi admin tidak valid.'], 400);

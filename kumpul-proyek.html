@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pengumpulan Proyek - Erlass Coding & Robotics Competition 2026</title>
+  <meta name="description" content="Formulir Pengumpulan Proyek Resmi Erlass Coding & Robotics Competition 2026. Kumpulkan karya Scratch Coding, Micro:bit, dan Erboblox Anda sebelum batas akhir.">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS & Lucide Icons -->
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.577.0/dist/umd/lucide.min.js"></script>
+
+  <!-- Custom Styling -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="min-h-screen flex flex-col bg-slate-50 text-slate-800">
+
+  <!-- Navigation Bar -->
+  <nav class="sticky top-0 z-50 glass-nav transition-all">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
+      <a href="index.html" class="cartoon-logo-btn group" title="Kembali ke Beranda Kompetisi">
+        <img src="img/logoerlassacademy.png" alt="Erlass Academy" class="cartoon-logo-img h-9 sm:h-11 w-auto object-contain" onerror="this.src='img/logo_erlass.png'">
+        <div class="cartoon-logo-text border-l-2 border-orange-200 pl-3">
+          <span class="display-font font-black text-orange-600 text-lg sm:text-xl tracking-tight leading-none block">COMPETITION</span>
+          <span class="text-[10px] sm:text-xs text-slate-500 font-bold tracking-wider uppercase block">Pengumpulan Proyek 2026</span>
+        </div>
+      </a>
+
+      <div class="flex items-center gap-2 sm:gap-3">
+        <a href="index.html" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs sm:text-sm font-bold text-slate-700 hover:text-orange-600 bg-white hover:bg-orange-50 border border-slate-200 rounded-xl transition shadow-sm">
+          <i data-lucide="home" class="w-4 h-4 text-orange-600"></i>
+          <span class="hidden sm:inline">Beranda Portal</span>
+        </a>
+        <a href="index.html#cek-status" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs sm:text-sm font-bold text-slate-700 hover:text-orange-600 bg-white hover:bg-orange-50 border border-slate-200 rounded-xl transition shadow-sm">
+          <i data-lucide="search" class="w-4 h-4 text-amber-600"></i>
+          <span>Cek ID Peserta</span>
+        </a>
+        <a href="docs/Juknis_Lomba_Erlass_Competition_2026.pdf" target="_blank" class="hidden md:inline-flex items-center gap-1.5 px-3.5 py-2 text-xs sm:text-sm font-extrabold text-orange-700 bg-orange-100 hover:bg-orange-200 rounded-xl transition border border-orange-200">
+          <i data-lucide="file-text" class="w-4 h-4"></i>
+          <span>Juknis PDF</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- High-End Aesthetic Hero Header with Glowing Ambient & Luminous Frosted Countdown Vault -->
+  <header class="relative overflow-hidden bg-gradient-to-br from-orange-600 via-orange-500 to-amber-500 text-white pt-8 sm:pt-12 pb-16 sm:pb-20">
+    <!-- Ambient Light Mesh Blobs -->
+    <div class="absolute -top-32 -left-32 w-96 h-96 bg-white/15 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute top-1/2 -right-32 w-96 h-96 bg-amber-300/25 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute inset-0 opacity-15 dot-pattern pointer-events-none"></div>
+
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
+      <div class="grid lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+        
+        <!-- Left Column: Editorial Presentation & Event Meta -->
+        <div class="lg:col-span-7 text-left space-y-4 sm:space-y-5">
+          
+          <!-- Eyebrow Tag -->
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white text-xs font-black shadow-sm">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-200"></i>
+            <span>Erlass Competition 2026 • Portal Pengumpulan Resmi</span>
+          </div>
+
+          <!-- Main Title -->
+          <h1 class="display-font text-3xl sm:text-5xl font-black text-white tracking-tight leading-[1.12] drop-shadow-md">
+            Pengumpulan Proyek <br class="hidden sm:inline">
+            <span class="text-amber-200">Karya & Robotika</span>
+          </h1>
+
+          <!-- Description -->
+          <p class="text-orange-100 text-sm sm:text-base leading-relaxed max-w-xl font-normal">
+            Buktikan inovasi dan kreativitas terbaikmu sesuai tema <strong class="text-white font-semibold">“Teknologi untuk Kehidupan yang Lebih Cerdas, Kreatif, dan Berkelanjutan”</strong>. Kirimkan file proyek asli (.sb3 / .hex) dan video presentasi sebelum batas akhir.
+          </p>
+
+          <!-- Branch Specifications Badge Row -->
+          <div class="flex flex-wrap items-center gap-2.5 pt-1">
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/15 backdrop-blur border border-white/25 text-xs text-white font-bold shadow-sm">
+              <i data-lucide="gamepad-2" class="w-4 h-4 text-amber-300"></i>
+              <span>Scratch / PictoBlox (.sb3)</span>
+            </div>
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/15 backdrop-blur border border-white/25 text-xs text-white font-bold shadow-sm">
+              <i data-lucide="microchip" class="w-4 h-4 text-amber-300"></i>
+              <span>Micro:bit IoT (.hex)</span>
+            </div>
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/15 backdrop-blur border border-white/25 text-xs text-white font-bold shadow-sm">
+              <i data-lucide="bot" class="w-4 h-4 text-amber-300"></i>
+              <span>Erboblox (Video Demo)</span>
+            </div>
+          </div>
+
+          <!-- Checklist Requirements -->
+          <div class="pt-2 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-orange-100 border-t border-white/20">
+            <span class="flex items-center gap-1.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-300"></i> Durasi Video 1–5 Menit</span>
+            <span class="flex items-center gap-1.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-300"></i> Tag @komunitaserlass</span>
+            <span class="flex items-center gap-1.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-300"></i> Terbuka untuk Peserta Terverifikasi</span>
+          </div>
+        </div>
+
+        <!-- Right Column: The Luminous Frosted Countdown Vault Card -->
+        <div class="lg:col-span-5">
+          <div class="relative p-2 sm:p-2.5 rounded-[2.2rem] bg-gradient-to-b from-white/35 via-white/20 to-white/10 border border-white/35 shadow-2xl backdrop-blur-2xl">
+            <!-- Inner Core -->
+            <div class="bg-white/15 backdrop-blur-xl rounded-[calc(2.2rem-0.5rem)] p-5 sm:p-6 border border-white/25 relative overflow-hidden text-white shadow-inner">
+              
+              <!-- Card Header -->
+              <div class="flex items-center justify-between pb-3.5 mb-4 border-b border-white/20 text-xs">
+                <div class="flex items-center gap-2">
+                  <span class="relative flex h-2.5 w-2.5">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-300 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400"></span>
+                  </span>
+                  <span class="font-black text-emerald-200 text-[11px] uppercase tracking-wider">Submisi Dibuka</span>
+                </div>
+                <div class="text-right">
+                  <span class="text-[10px] text-orange-200 uppercase tracking-widest block font-bold">Batas Akhir:</span>
+                  <span class="font-extrabold text-white text-xs">21 Nov 2026 • 23:59 WIB</span>
+                </div>
+              </div>
+
+              <div class="text-center mb-3">
+                <span class="text-[11px] font-extrabold text-white uppercase tracking-wider block drop-shadow-sm">Sisa Waktu Pengumpulan</span>
+              </div>
+
+              <!-- 4 Digital Counter Pods -->
+              <div class="grid grid-cols-4 gap-2 text-center mb-4">
+                <div class="bg-white/20 border border-white/25 rounded-2xl py-3 px-1.5 shadow-inner">
+                  <span id="cd-days" class="display-font text-2xl sm:text-3xl font-black text-white font-mono tracking-tight block drop-shadow-sm">--</span>
+                  <span class="text-[9px] uppercase tracking-widest text-amber-200 font-black block mt-1">Hari</span>
+                </div>
+                <div class="bg-white/20 border border-white/25 rounded-2xl py-3 px-1.5 shadow-inner">
+                  <span id="cd-hours" class="display-font text-2xl sm:text-3xl font-black text-white font-mono tracking-tight block drop-shadow-sm">--</span>
+                  <span class="text-[9px] uppercase tracking-widest text-amber-200 font-black block mt-1">Jam</span>
+                </div>
+                <div class="bg-white/20 border border-white/25 rounded-2xl py-3 px-1.5 shadow-inner">
+                  <span id="cd-minutes" class="display-font text-2xl sm:text-3xl font-black text-white font-mono tracking-tight block drop-shadow-sm">--</span>
+                  <span class="text-[9px] uppercase tracking-widest text-amber-200 font-black block mt-1">Menit</span>
+                </div>
+                <div class="bg-white/20 border border-white/25 rounded-2xl py-3 px-1.5 shadow-inner">
+                  <span id="cd-seconds" class="display-font text-2xl sm:text-3xl font-black text-white font-mono tracking-tight block drop-shadow-sm">--</span>
+                  <span class="text-[9px] uppercase tracking-widest text-amber-200 font-black block mt-1">Detik</span>
+                </div>
+              </div>
+
+              <!-- Timeline Milestones -->
+              <div class="bg-white/15 rounded-xl p-3 border border-white/20 space-y-2 mb-4 text-[11px]">
+                <div class="flex items-center justify-between font-bold text-orange-100">
+                  <span class="flex items-center gap-1 text-emerald-200"><i data-lucide="check" class="w-3.5 h-3.5"></i> 7 Nov: Buka</span>
+                  <span class="text-amber-200 font-black">21 Nov: Deadline</span>
+                  <span class="text-orange-200">5 Des: Juara</span>
+                </div>
+                <div class="w-full bg-black/15 h-1.5 rounded-full overflow-hidden">
+                  <div class="bg-gradient-to-r from-emerald-300 via-amber-300 to-white h-full w-[65%] rounded-full animate-pulse"></div>
+                </div>
+              </div>
+
+              <!-- Direct Scroll Action Button -->
+              <a href="#form-pengumpulan" class="cartoon-btn w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-white hover:bg-orange-50 text-orange-600 font-black text-xs sm:text-sm shadow-lg transition hover:scale-[1.02] active:scale-95 border border-white">
+                <i data-lucide="arrow-down-circle" class="w-4 h-4 text-orange-600"></i>
+                <span>Mulai Isi Formulir Proyek</span>
+              </a>
+
+              <!-- Hotline Panitia -->
+              <div class="flex items-center justify-between text-[11px] pt-3 mt-3 border-t border-white/15 text-orange-100">
+                <span class="flex items-center gap-1.5">
+                  <i data-lucide="headphones" class="w-3.5 h-3.5 text-amber-200"></i>
+                  <span>Kendala Teknis?</span>
+                </span>
+                <a href="https://chat.whatsapp.com/DMKB10TaBaZ8k23pVsaoZw" target="_blank" rel="noopener noreferrer" class="font-extrabold text-white hover:underline transition inline-flex items-center gap-1">
+                  <span>Hubungi Panitia &rarr;</span>
+                </a>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 -mt-10 sm:-mt-12 relative z-20 pb-16 flex-1 w-full">
+
+    <!-- Card 1: Lookup / Verifikasi Identitas Peserta -->
+    <div id="lookup-card" class="bg-white rounded-3xl border-2 border-orange-200 shadow-xl p-6 sm:p-8 cartoon-card mb-6">
+      <div class="flex items-center gap-3 border-b border-slate-100 pb-4 mb-6">
+        <div class="w-10 h-10 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center font-extrabold shrink-0">
+          <i data-lucide="key-round" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h2 class="display-font text-lg sm:text-xl font-bold text-slate-900">
+            Langkah 1: Verifikasi ID Peserta
+          </h2>
+          <p class="text-xs text-slate-500">
+            Masukkan ID Peserta resmi Anda (contoh: <code class="font-mono bg-slate-100 px-1 py-0.5 rounded text-orange-700">E-1026-0001</code>) untuk menarik data otomatis.
+          </p>
+        </div>
+      </div>
+
+      <form id="lookup-form" class="space-y-4">
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label for="lookup-reg-code" class="block text-xs font-bold text-slate-700 mb-1.5">
+              ID Peserta / No. Registrasi <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <input
+                id="lookup-reg-code"
+                type="text"
+                placeholder="Contoh: E-1026-0001"
+                required
+                class="field-input uppercase font-mono tracking-wider pl-10"
+              >
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                <i data-lucide="id-card" class="w-4 h-4"></i>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label for="lookup-name" class="block text-xs font-bold text-slate-700 mb-1.5">
+              Nama Lengkap Peserta <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <input
+                id="lookup-name"
+                type="text"
+                placeholder="Sesuai nama saat mendaftar"
+                required
+                class="field-input pl-10"
+              >
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                <i data-lucide="user" class="w-4 h-4"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="lookup-error-box" class="hidden p-4 rounded-2xl bg-red-50 border border-red-200 text-xs text-red-700"></div>
+
+        <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <span class="text-xs text-slate-500 flex items-center gap-1.5">
+            <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i>
+            <span>Hanya peserta yang berstatus <strong>Terverifikasi / Mitra</strong> yang dapat mengumpulkan proyek.</span>
+          </span>
+          <button
+            type="submit"
+            id="btn-lookup"
+            class="w-full sm:w-auto px-6 py-3 rounded-2xl font-extrabold text-xs sm:text-sm text-white bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-700 hover:to-amber-600 shadow-md hover:shadow-lg transition active:scale-98 flex items-center justify-center gap-2"
+          >
+            <i data-lucide="search" class="w-4 h-4"></i>
+            <span>Verifikasi & Buka Formulir</span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Card 2: Read-Only Bukti Pengumpulan (Muncul jika sudah mengumpulkan dan belum diizinkan revisi) -->
+    <div id="receipt-card" class="hidden bg-white rounded-3xl border-2 border-emerald-300 shadow-xl p-6 sm:p-8 cartoon-card mb-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5 mb-5">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+            <i data-lucide="check-circle-2" class="w-7 h-7"></i>
+          </div>
+          <div>
+            <span class="inline-flex items-center gap-1 text-[11px] font-extrabold bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full mb-1">
+              <i data-lucide="check" class="w-3 h-3"></i> Sudah Mengumpulkan
+            </span>
+            <h2 class="display-font text-lg sm:text-xl font-bold text-slate-900">
+              Proyek Anda Telah Diterima Panitia
+            </h2>
+            <p id="receipt-timestamp" class="text-xs text-slate-500 mt-0.5"></p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            onclick="window.print()"
+            class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition"
+          >
+            <i data-lucide="printer" class="w-4 h-4"></i> Cetak Tanda Terima
+          </button>
+        </div>
+      </div>
+
+      <!-- Detail Proyek Tersimpan -->
+      <div class="bg-slate-50 rounded-2xl p-5 border border-slate-200 space-y-4 text-xs sm:text-sm">
+        <div class="grid sm:grid-cols-2 gap-3">
+          <div>
+            <span class="text-slate-500 block text-xs">ID Peserta & Nama:</span>
+            <span id="receipt-reg-code" class="font-mono font-bold text-orange-600 text-sm"></span> - 
+            <strong id="receipt-name" class="text-slate-900"></strong>
+          </div>
+          <div>
+            <span class="text-slate-500 block text-xs">Asal Sekolah:</span>
+            <strong id="receipt-school" class="text-slate-900"></strong>
+          </div>
+        </div>
+
+        <div class="grid sm:grid-cols-2 gap-3 pt-2 border-t border-slate-200">
+          <div>
+            <span class="text-slate-500 block text-xs">Cabang & Kategori:</span>
+            <span id="receipt-branch" class="font-extrabold text-slate-900"></span>
+          </div>
+          <div>
+            <span class="text-slate-500 block text-xs">Versi Pengumpulan:</span>
+            <span id="receipt-version" class="font-bold text-slate-700"></span>
+          </div>
+        </div>
+
+        <div class="pt-2 border-t border-slate-200">
+          <span class="text-slate-500 block text-xs">Judul Proyek:</span>
+          <h3 id="receipt-title" class="font-bold text-base text-slate-900 mt-0.5"></h3>
+        </div>
+
+        <div>
+          <span class="text-slate-500 block text-xs">Deskripsi Singkat:</span>
+          <p id="receipt-desc" class="text-slate-700 leading-relaxed mt-1 text-xs sm:text-sm"></p>
+        </div>
+
+        <div class="pt-2 border-t border-slate-200 flex flex-wrap items-center gap-3">
+          <a
+            id="receipt-video-btn"
+            href="#"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs transition shadow-sm"
+          >
+            <i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i>
+            <span>Tonton Video Presentasi</span>
+          </a>
+
+          <a
+            id="receipt-file-btn"
+            href="#"
+            download
+            class="hidden inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs transition shadow-sm"
+          >
+            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+            <span id="receipt-file-text">Unduh Berkas Proyek</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Informasi Revisi -->
+      <div class="mt-5 p-4 rounded-2xl bg-amber-50 border border-amber-200 flex items-start gap-3 text-xs text-amber-900">
+        <i data-lucide="lock" class="w-4 h-4 text-amber-600 shrink-0 mt-0.5"></i>
+        <div>
+          <strong class="font-bold block">Status Formulir: Terkunci (Final)</strong>
+          <span>Sesuai ketentuan juknis, setelah pengiriman berhasil, proyek Anda berstatus final. Jika terdapat kekeliruan tautan atau berkas sebelum tanggal 21 November 2026, silakan hubungi panitia melalui grup WhatsApp resmi untuk dibukakan <strong>Izin Revisi</strong>.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3: Form Pengisian Proyek (Aktif setelah verifikasi atau mode revisi) -->
+    <div id="submission-card" class="hidden bg-white rounded-3xl border-2 border-orange-200 shadow-xl p-6 sm:p-8 cartoon-card mb-6">
+      
+      <!-- Revision Mode Notice (jika ada izin revisi aktif) -->
+      <div id="revision-notice-banner" class="hidden mb-6 p-4 rounded-2xl bg-blue-50 border-2 border-blue-200 text-blue-900 flex items-start gap-3 text-xs">
+        <i data-lucide="info" class="w-5 h-5 text-blue-600 shrink-0 mt-0.5"></i>
+        <div>
+          <strong class="font-bold text-sm block">Mode Revisi Proyek Aktif (Versi Baru)</strong>
+          <span>Panitia telah memberikan izin revisi untuk Anda. Anda dapat memperbarui informasi, mengganti tautan video, atau mengunggah ulang berkas proyek. Setelah dikirim ulang, sistem akan mencatat versi terbaru dan mengunci kembali formulir Anda.</span>
+        </div>
+      </div>
+
+      <form id="submission-form" class="space-y-8" enctype="multipart/form-data">
+        <input type="hidden" id="sub-reg-code" name="reg_code">
+        <input type="hidden" id="sub-participant-name" name="participant_name">
+
+        <!-- SECTION A: DATA PESERTA (TERISI OTOMATIS) -->
+        <div>
+          <div class="flex items-center gap-2.5 border-b border-orange-100 pb-3 mb-4">
+            <span class="w-7 h-7 rounded-xl bg-orange-100 text-orange-700 flex items-center justify-center font-extrabold text-xs">A</span>
+            <h3 class="display-font text-base sm:text-lg font-bold text-slate-900">Data Peserta & Kategori Lomba</h3>
+          </div>
+
+          <div class="grid sm:grid-cols-2 gap-4 bg-orange-50/50 p-4 sm:p-5 rounded-2xl border border-orange-200/70">
+            <div>
+              <span class="text-[11px] font-bold text-slate-500 uppercase block">ID Peserta & Nama:</span>
+              <div class="flex items-center gap-2 mt-0.5">
+                <span id="disp-reg-code" class="font-mono font-black text-orange-600 text-sm"></span>
+                <span class="text-slate-400">•</span>
+                <span id="disp-name" class="font-extrabold text-slate-900 text-sm"></span>
+              </div>
+            </div>
+
+            <div>
+              <span class="text-[11px] font-bold text-slate-500 uppercase block">Asal Sekolah:</span>
+              <span id="disp-school" class="font-bold text-slate-800 text-sm mt-0.5 block"></span>
+            </div>
+
+            <div>
+              <span class="text-[11px] font-bold text-slate-500 uppercase block">Cabang Kompetisi:</span>
+              <span id="disp-branch" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-orange-100 text-orange-900 font-extrabold text-xs mt-1"></span>
+            </div>
+
+            <div>
+              <label class="text-[11px] font-bold text-slate-700 uppercase block mb-1">
+                Kategori Jenjang Lomba <span class="text-red-500">*</span>
+              </label>
+              <div class="grid grid-cols-3 gap-2">
+                <label class="cursor-pointer">
+                  <input type="radio" name="grade_category" value="Kelas 1-3" class="sr-only peer" required>
+                  <div class="py-1.5 text-center rounded-xl border border-slate-300 peer-checked:border-orange-500 peer-checked:bg-white peer-checked:text-orange-900 text-xs font-bold transition">
+                    Kelas 1–3
+                  </div>
+                </label>
+                <label class="cursor-pointer">
+                  <input type="radio" name="grade_category" value="Kelas 4-6" class="sr-only peer" required>
+                  <div class="py-1.5 text-center rounded-xl border border-slate-300 peer-checked:border-orange-500 peer-checked:bg-white peer-checked:text-orange-900 text-xs font-bold transition">
+                    Kelas 4–6
+                  </div>
+                </label>
+                <label class="cursor-pointer">
+                  <input type="radio" name="grade_category" value="SMP 7-9" class="sr-only peer" required>
+                  <div class="py-1.5 text-center rounded-xl border border-slate-300 peer-checked:border-orange-500 peer-checked:bg-white peer-checked:text-orange-900 text-xs font-bold transition">
+                    SMP 7–9
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION B: DATA PROYEK -->
+        <div>
+          <div class="flex items-center gap-2.5 border-b border-orange-100 pb-3 mb-4">
+            <span class="w-7 h-7 rounded-xl bg-orange-100 text-orange-700 flex items-center justify-center font-extrabold text-xs">B</span>
+            <h3 class="display-font text-base sm:text-lg font-bold text-slate-900">Informasi & Berkas Proyek</h3>
+          </div>
+
+          <div class="space-y-4">
+            <div>
+              <label for="project_title" class="block text-xs font-bold text-slate-700 mb-1.5">
+                Nama / Judul Proyek <span class="text-red-500">*</span>
+              </label>
+              <input
+                id="project_title"
+                name="project_title"
+                type="text"
+                placeholder="Contoh: Smart Robotic Trash Bin / Game Edukasi Petualangan Sampah"
+                required
+                class="field-input"
+              >
+            </div>
+
+            <div>
+              <label for="project_description" class="block text-xs font-bold text-slate-700 mb-1.5">
+                Deskripsi Singkat Proyek <span class="text-red-500">*</span>
+              </label>
+              <textarea
+                id="project_description"
+                name="project_description"
+                rows="4"
+                placeholder="Jelaskan ide latar belakang, tujuan proyek, fungsi utama, dan cara kerjanya secara ringkas..."
+                required
+                class="field-textarea"
+              ></textarea>
+              <p class="text-[11px] text-slate-500 mt-1">Kaitkan dengan tema: <em>Teknologi untuk Kehidupan yang Lebih Cerdas, Kreatif, dan Berkelanjutan</em>.</p>
+            </div>
+
+            <!-- Upload File Proyek (Dinamis: Tampil untuk Scratch .sb3 & Microbit .hex, disembunyikan untuk Erboblox) -->
+            <div id="file-upload-container">
+              <label class="block text-xs font-bold text-slate-700 mb-1.5">
+                <span id="upload-label-text">Upload File Proyek</span> <span class="text-red-500">*</span>
+              </label>
+              
+              <div
+                id="project-dropzone"
+                class="border-2 border-dashed border-orange-300 hover:border-orange-500 bg-orange-50/40 hover:bg-orange-50/80 rounded-2xl p-6 text-center cursor-pointer transition flex flex-col items-center justify-center gap-2"
+              >
+                <input
+                  type="file"
+                  id="project_file"
+                  name="project_file"
+                  class="hidden"
+                >
+                <div class="w-12 h-12 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center">
+                  <i data-lucide="upload" class="w-6 h-6"></i>
+                </div>
+                <div class="text-xs sm:text-sm font-bold text-slate-800">
+                  <span class="text-orange-600 underline">Klik untuk memilih file</span> atau seret file ke sini
+                </div>
+                <p id="upload-format-hint" class="text-[11px] text-slate-500">
+                  Format berkas yang didukung (Maksimal 50 MB).
+                </p>
+                <div id="selected-file-info" class="hidden mt-2 p-2 px-3 bg-white border border-orange-200 rounded-xl text-xs font-mono font-bold text-orange-700 flex items-center gap-2">
+                  <i data-lucide="file-code" class="w-4 h-4"></i>
+                  <span id="selected-file-name"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Info Box Khusus Erboblox (Muncul menggantikan upload file) -->
+            <div id="erboblox-info-container" class="hidden p-5 rounded-2xl bg-amber-50 border-2 border-amber-200 text-amber-950 flex items-start gap-3.5">
+              <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0">
+                <i data-lucide="bot" class="w-5 h-5"></i>
+              </div>
+              <div class="text-xs leading-relaxed">
+                <strong class="font-extrabold text-sm block mb-1">Ketentuan Berkas Kategori Erboblox Robotics</strong>
+                <span>Untuk cabang Erboblox Robotics, <strong>tidak perlu mengunggah berkas kode</strong>. Penilaian proyek dinilai langsung secara komprehensif melalui video presentasi dan demonstrasi alat robotik yang Anda cantumkan di bawah ini.</span>
+              </div>
+            </div>
+
+            <!-- Link Video Presentasi (Wajib) -->
+            <div class="pt-2">
+              <label for="video_url" class="block text-xs font-bold text-slate-700 mb-1.5">
+                Link Video Presentasi Proyek (YouTube / Instagram) <span class="text-red-500">*</span>
+              </label>
+              <div class="relative">
+                <input
+                  id="video_url"
+                  name="video_url"
+                  type="url"
+                  placeholder="https://www.youtube.com/watch?v=... atau https://www.instagram.com/reel/..."
+                  required
+                  class="field-input pl-10"
+                >
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-red-500">
+                  <i data-lucide="video" class="w-4 h-4"></i>
+                </div>
+              </div>
+
+              <!-- Ketentuan Video Card -->
+              <div class="mt-2.5 p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-600 space-y-1.5">
+                <div class="font-bold text-slate-800 flex items-center gap-1.5">
+                  <i data-lucide="check-circle" class="w-3.5 h-3.5 text-emerald-600"></i>
+                  <span>Ketentuan Wajib Video Presentasi (Durasi 1–5 Menit):</span>
+                </div>
+                <ul class="list-disc list-inside space-y-1 pl-1 text-[11px] text-slate-600">
+                  <li>Memperlihatkan peserta, cara kerja proyek, dan fungsi utamanya.</li>
+                  <li>Caption wajib mencantumkan: <strong>Nama Peserta</strong>, <strong>Asal Sekolah</strong>, dan <strong>Kelas</strong>.</li>
+                  <li>Instagram wajib menandai / mention: <strong class="text-orange-600">@komunitaserlass</strong>.</li>
+                  <li>YouTube wajib mencantumkan nama: <strong class="text-orange-600">Erlass Prokreatif Indonesia</strong>.</li>
+                  <li>Pastikan privasi video disetel ke <strong>Publik</strong> atau <strong>Unlisted</strong> (tidak privat) agar juri dapat menilai.</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Link Cadangan Video (Opsional) -->
+            <div>
+              <label for="backup_video_url" class="block text-xs font-bold text-slate-700 mb-1.5">
+                Link Cadangan Video Presentasi <span class="text-slate-400 font-normal">(Opsional - Google Drive / Link Lain)</span>
+              </label>
+              <div class="relative">
+                <input
+                  id="backup_video_url"
+                  name="backup_video_url"
+                  type="url"
+                  placeholder="Contoh: https://drive.google.com/file/d/... (Opsional untuk antisipasi kendala akses)"
+                  class="field-input pl-10"
+                >
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                  <i data-lucide="link" class="w-4 h-4"></i>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- SECTION C: KONFIRMASI DAN PERNYATAAN (5 CHECKBOX WAJIB) -->
+        <div>
+          <div class="flex items-center gap-2.5 border-b border-orange-100 pb-3 mb-4">
+            <span class="w-7 h-7 rounded-xl bg-orange-100 text-orange-700 flex items-center justify-center font-extrabold text-xs">C</span>
+            <h3 class="display-font text-base sm:text-lg font-bold text-slate-900">Konfirmasi & Pernyataan Peserta</h3>
+          </div>
+
+          <div class="space-y-3 bg-slate-50 p-4 sm:p-5 rounded-2xl border border-slate-200">
+            <!-- Checkbox 1 -->
+            <label class="flex items-start gap-3 cursor-pointer group">
+              <input
+                type="checkbox"
+                name="statement_originality"
+                value="1"
+                required
+                class="mt-1 w-4 h-4 text-orange-600 rounded border-slate-300 focus:ring-orange-500 cursor-pointer"
+              >
+              <span class="text-xs text-slate-700 leading-relaxed group-hover:text-slate-900">
+                <strong>Pernyataan Keaslian Karya:</strong> Saya menyatakan bahwa proyek yang dikumpulkan merupakan karya asli yang saya buat dan kembangkan sendiri, bukan hasil plagiarisme atau menyalin karya orang lain. <span class="text-red-500">*</span>
+              </span>
+            </label>
+
+            <!-- Checkbox 2 -->
+            <label class="flex items-start gap-3 cursor-pointer group">
+              <input
+                type="checkbox"
+                name="agree_disqualification"
+                value="1"
+                required
+                class="mt-1 w-4 h-4 text-orange-600 rounded border-slate-300 focus:ring-orange-500 cursor-pointer"
+              >
+              <span class="text-xs text-slate-700 leading-relaxed group-hover:text-slate-900">
+                <strong>Persetujuan Diskualifikasi:</strong> Saya menyetujui bahwa apabila proyek terbukti merupakan hasil plagiarisme, saya bersedia didiskualifikasi dari Erlass Coding & Robotics Competition 2026. <span class="text-red-500">*</span>
+              </span>
+            </label>
+
+            <!-- Checkbox 3 -->
+            <label class="flex items-start gap-3 cursor-pointer group">
+              <input
+                type="checkbox"
+                name="agree_video_active"
+                value="1"
+                required
+                class="mt-1 w-4 h-4 text-orange-600 rounded border-slate-300 focus:ring-orange-500 cursor-pointer"
+              >
+              <span class="text-xs text-slate-700 leading-relaxed group-hover:text-slate-900">
+                <strong>Persetujuan Masa Aktif Video:</strong> Saya menyetujui bahwa video presentasi proyek akan tetap aktif dan dapat diakses hingga pengumuman pemenang Erlass Coding & Robotics Competition 2026. <span class="text-red-500">*</span>
+              </span>
+            </label>
+
+            <!-- Checkbox 4 -->
+            <label class="flex items-start gap-3 cursor-pointer group">
+              <input
+                type="checkbox"
+                name="confirm_completeness"
+                value="1"
+                required
+                class="mt-1 w-4 h-4 text-orange-600 rounded border-slate-300 focus:ring-orange-500 cursor-pointer"
+              >
+              <span class="text-xs text-slate-700 leading-relaxed group-hover:text-slate-900">
+                <strong>Konfirmasi Kelengkapan Pengumpulan:</strong> Saya memastikan seluruh data telah diisi dengan benar, video berdurasi 1–5 menit, serta file atau tautan proyek sesuai kategori lomba dan dapat diakses oleh panitia dan dewan juri. <span class="text-red-500">*</span>
+              </span>
+            </label>
+
+            <!-- Checkbox 5 -->
+            <label class="flex items-start gap-3 cursor-pointer group">
+              <input
+                type="checkbox"
+                name="agree_documentation"
+                value="1"
+                required
+                class="mt-1 w-4 h-4 text-orange-600 rounded border-slate-300 focus:ring-orange-500 cursor-pointer"
+              >
+              <span class="text-xs text-slate-700 leading-relaxed group-hover:text-slate-900">
+                <strong>Persetujuan Penggunaan Dokumentasi Proyek:</strong> Saya telah membaca ketentuan penggunaan dokumentasi kompetisi dan menyetujui penggunaan video atau dokumentasi proyek untuk publikasi Erlass sesuai persetujuan peserta dan/atau orang tua atau wali yang diperlukan. <span class="text-red-500">*</span>
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <div id="submit-error-box" class="hidden p-4 rounded-2xl bg-red-50 border border-red-200 text-xs text-red-700"></div>
+
+        <!-- Tombol Kirim Proyek -->
+        <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div class="text-xs text-slate-500">
+            <strong>Peringatan Sebelum Kirim:</strong> Pastikan seluruh data, file proyek, dan tautan video sudah benar.
+          </div>
+
+          <button
+            type="submit"
+            id="btn-submit-project"
+            class="w-full sm:w-auto px-8 py-3.5 rounded-2xl font-extrabold text-sm text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-lg hover:shadow-xl transition active:scale-98 flex items-center justify-center gap-2"
+          >
+            <i data-lucide="send" class="w-4 h-4"></i>
+            <span id="btn-submit-text">Kirim Proyek Sekarang</span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-slate-900 text-slate-400 py-8 border-t border-slate-800 text-center text-xs mt-auto">
+    <div class="max-w-4xl mx-auto px-4">
+      <p class="font-semibold text-slate-300">Erlass Coding & Robotics Competition 2026</p>
+      <p class="mt-1">Penyelenggara: PT. Erlass Prokreatif Indonesia • Narahubung Panitia: +62 823-1134-1381</p>
+      <p class="text-[11px] text-slate-500 mt-2">© 2026 Erlass Academy. Hak Cipta Dilindungi Undang-Undang.</p>
+    </div>
+  </footer>
+
+  <!-- Script Khusus Pengumpulan Proyek -->
+  <script src="js/kumpul-proyek.js?v=20261021_1"></script>
+</body>
+</html>

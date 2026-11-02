@@ -30,6 +30,53 @@ function clearMessage() {
   messageBox.textContent = '';
 }
 
+// Cek dan terapkan status penutupan pendaftaran (Otomatis ditutup pada 5 November 2026 pukul 23:59:59 WIB)
+function applyRegistrationClosedUI(isClosed) {
+  const formEl = document.getElementById('registration-form');
+  const closedCardEl = document.getElementById('registration-closed-card');
+  const stepIndicator = document.getElementById('step-indicator-container');
+  const regHeadingDesc = document.getElementById('registration-heading-desc');
+  const badgeTitle = document.getElementById('badge-title');
+  const badgeFormLabel = document.getElementById('badge-form-label');
+
+  if (isClosed) {
+    if (formEl) formEl.classList.add('hidden');
+    if (stepIndicator) stepIndicator.classList.add('hidden');
+    if (closedCardEl) closedCardEl.classList.remove('hidden');
+
+    if (badgeTitle && competitionData) {
+      badgeTitle.textContent = `${competitionData.title} • Pendaftaran Ditutup`;
+    }
+    if (badgeFormLabel) {
+      badgeFormLabel.textContent = 'Status Pendaftaran';
+      badgeFormLabel.className = 'text-xs font-extrabold text-slate-700 uppercase tracking-widest bg-slate-200 px-3 py-1 rounded-full';
+    }
+    if (regHeadingDesc) {
+      regHeadingDesc.textContent = 'Pendaftaran peserta baru telah resmi berakhir pada 5 November 2026. Peserta terdaftar dapat memeriksa kartu dan mengunggah proyek di bawah ini.';
+    }
+
+    // Perbarui teks tombol navigasi 'Isi Formulir Pendaftaran'
+    const navDaftarBtns = document.querySelectorAll('a[href="#daftar"]');
+    navDaftarBtns.forEach(btn => {
+      const span = btn.querySelector('span');
+      if (span && (span.textContent.includes('Formulir') || span.textContent.includes('Daftar'))) {
+        span.textContent = 'Status Pendaftaran';
+      }
+    });
+  } else {
+    if (formEl) formEl.classList.remove('hidden');
+    if (stepIndicator) stepIndicator.classList.remove('hidden');
+    if (closedCardEl) closedCardEl.classList.add('hidden');
+
+    if (badgeTitle && competitionData) {
+      badgeTitle.textContent = `${competitionData.title} • Pendaftaran Dibuka`;
+    }
+  }
+
+  if (window.lucide) lucide.createIcons();
+}
+window.applyRegistrationClosedUI = applyRegistrationClosedUI;
+
 // 1. Inisialisasi Data dari API
 async function initApp() {
   try {
@@ -40,8 +87,9 @@ async function initApp() {
 
       // Populate info kompetisi ke halaman
       if (competitionData) {
-        const badgeEl = document.getElementById('badge-title');
-        if (badgeEl) badgeEl.textContent = `${competitionData.title} • Open Registration`;
+        // Terapkan penutupan otomatis jika sudah melewati batas waktu
+        const isClosed = Boolean(competitionData.is_registration_closed);
+        applyRegistrationClosedUI(isClosed);
         
         const heroTitle = document.getElementById('hero-title');
         if (heroTitle) heroTitle.textContent = competitionData.theme || 'Technology for a Better Today';
@@ -62,6 +110,21 @@ async function initApp() {
         if (btnWa && competitionData.whatsapp_group_url) {
           btnWa.href = competitionData.whatsapp_group_url;
         }
+
+        const closedWa = document.getElementById('closed-contact-wa');
+        if (closedWa && competitionData.whatsapp_group_url) {
+          closedWa.href = competitionData.whatsapp_group_url;
+        }
+
+        // Timer pengecekan background berkala untuk penutupan otomatis tepat waktu
+        if (competitionData.registration_end_timestamp) {
+          setInterval(() => {
+            const nowSec = Math.floor(Date.now() / 1000);
+            if (nowSec > competitionData.registration_end_timestamp) {
+              applyRegistrationClosedUI(true);
+            }
+          }, 30000);
+        }
       }
     }
   } catch (err) {
@@ -80,10 +143,6 @@ function initSchoolSearch() {
   const clearBtn = document.getElementById('clear-search-btn');
   const card = document.getElementById('school-selected-card');
   const changeBtn = document.getElementById('change-school-btn');
-  const toggleManualBtn = document.getElementById('toggle-manual-school-btn');
-  const manualContainer = document.getElementById('manual-school-container');
-  const closeManualBtn = document.getElementById('close-manual-school-btn');
-  const applyManualBtn = document.getElementById('apply-manual-school-btn');
 
   if (!searchInput || !dropdown) return;
 
@@ -125,7 +184,7 @@ function initSchoolSearch() {
     if (!schools || schools.length === 0) {
       dropdown.innerHTML = `
         <div class="p-4 text-center text-xs text-slate-500">
-          Sekolah tidak ditemukan untuk kata kunci ini. Silakan coba kata kunci lain atau gunakan menu <strong class="text-orange-600">Ketik manual</strong> di bawah.
+          Sekolah tidak ditemukan untuk kata kunci ini. Silakan periksa kembali ejaan kata kunci atau coba gunakan 8 digit NPSN resmi sekolah Anda.
         </div>
       `;
       dropdown.classList.remove('hidden');
@@ -134,7 +193,7 @@ function initSchoolSearch() {
 
     schools.forEach(item => {
       const row = document.createElement('div');
-      row.className = 'school-item';
+      row.className = 'school-item cursor-pointer p-3 hover:bg-orange-50/70 border-b border-slate-100 last:border-b-0 transition';
       
       const jenjangBadgeClass = item.jenjang === 'SMP'
         ? 'bg-purple-100 text-purple-800'
@@ -143,8 +202,8 @@ function initSchoolSearch() {
       row.innerHTML = `
         <div class="font-bold text-sm text-slate-900 leading-snug">${item.school_name}</div>
         <div class="flex items-center gap-2 mt-1.5 flex-wrap">
-          <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold ${jenjangBadgeClass}">${item.jenjang}</span>
-          <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 text-slate-700">NPSN: ${item.npsn}</span>
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold ${jenjangBadgeClass}">${item.jenjang || 'SD'}</span>
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 text-slate-700">NPSN: ${item.npsn || '-'}</span>
           <span class="text-[11px] text-slate-500 flex items-center gap-1">
             <i data-lucide="map-pin" class="w-3 h-3 text-slate-400"></i> ${item.city || '-'}
           </span>
@@ -167,20 +226,22 @@ function initSchoolSearch() {
     selectedSchool = item;
     dropdown.classList.add('hidden');
 
+    const isPartner = Number(item.is_partner) === 1;
+
     // Simpan ke hidden inputs
     document.getElementById('selected_school_npsn_val').value = item.npsn || '';
     document.getElementById('selected_school_name_val').value = item.school_name || '';
     document.getElementById('selected_school_city_val').value = item.city || '';
     document.getElementById('selected_school_jenjang_val').value = item.jenjang || '';
-    document.getElementById('selected_school_is_partner_val').value = Number(item.is_partner) === 1 ? '1' : '0';
-    document.getElementById('selected_school_partnership_val').value = Number(item.is_partner) === 1 
+    document.getElementById('selected_school_is_partner_val').value = isPartner ? '1' : '0';
+    document.getElementById('selected_school_partnership_val').value = isPartner 
       ? 'Siswa Aktif / Sekolah Pelanggan Erlass' 
       : 'Non-Pelanggan Erlass (UMUM)';
 
     // Update kartu preview sekolah
     const jenjangEl = document.getElementById('selected-school-jenjang');
     if (jenjangEl) {
-      jenjangEl.textContent = item.jenjang;
+      jenjangEl.textContent = item.jenjang || 'SD';
       jenjangEl.className = `inline-flex items-center px-2.5 py-0.5 rounded text-[11px] font-bold ${
         item.jenjang === 'SMP' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
       }`;
@@ -201,7 +262,7 @@ function initSchoolSearch() {
     // Update ringkasan di Step 3
     const s3Summary = document.getElementById('step3-school-summary');
     if (s3Summary) {
-      s3Summary.textContent = `${item.school_name} (${item.jenjang}) - NPSN: ${item.npsn || '-'}`;
+      s3Summary.textContent = `${item.school_name} (${item.jenjang || 'SD'}) - NPSN: ${item.npsn || '-'}`;
     }
 
     // Tampilkan kartu terpilih dan sembunyikan kotak input pencarian
@@ -245,45 +306,6 @@ function initSchoolSearch() {
       dropdown.classList.add('hidden');
     }
   });
-
-  // Menu Input Manual Data Sekolah
-  if (toggleManualBtn && manualContainer) {
-    toggleManualBtn.addEventListener('click', () => {
-      manualContainer.classList.toggle('hidden');
-    });
-  }
-
-  if (closeManualBtn && manualContainer) {
-    closeManualBtn.addEventListener('click', () => {
-      manualContainer.classList.add('hidden');
-    });
-  }
-
-  if (applyManualBtn) {
-    applyManualBtn.addEventListener('click', () => {
-      const jnj = document.getElementById('manual-jenjang').value;
-      const npsn = document.getElementById('manual-npsn').value.trim() || '-';
-      const city = document.getElementById('manual-city').value.trim().toUpperCase();
-      const name = document.getElementById('manual-name').value.trim().toUpperCase();
-
-      if (!city || !name) {
-        showMessage('Harap masukkan Kota/Kabupaten dan Nama Lengkap Sekolah.');
-        return;
-      }
-
-      selectSchool({
-        id: 0,
-        npsn: npsn,
-        school_name: name,
-        jenjang: jnj,
-        city: city,
-        province: '',
-        is_partner: 0
-      });
-
-      manualContainer.classList.add('hidden');
-    });
-  }
 }
 
 // Inisialisasi Animasi Scroll Bergaya Kartun
@@ -369,6 +391,12 @@ function isStepValid() {
       return false;
     }
 
+    const gradeCat = form.querySelector('input[name="grade_category"]:checked');
+    if (!gradeCat) {
+      showMessage('Silakan pilih kategori jenjang lomba (Kelas 1-3, Kelas 4-6, atau SMP 7-9).');
+      return false;
+    }
+
     if (!selectedSchool || !document.getElementById('selected_school_name_val').value) {
       showMessage('Silakan cari dan pilih sekolah asal peserta pada kolom pencarian.');
       const searchInput = document.getElementById('school-search-input');
@@ -401,6 +429,26 @@ document.getElementById('tanggal_lahir').addEventListener('change', function () 
     document.getElementById('usia').value = age;
   }
 });
+
+// Auto-select grade_category when kelas changes
+const kelasSelect = document.getElementById('kelas');
+if (kelasSelect) {
+  kelasSelect.addEventListener('change', function () {
+    const val = this.value;
+    let targetCat = 'Kelas 4-6';
+    if (['Kelas 1', 'Kelas 2', 'Kelas 3'].includes(val)) {
+      targetCat = 'Kelas 1-3';
+    } else if (['Kelas 4', 'Kelas 5', 'Kelas 6'].includes(val)) {
+      targetCat = 'Kelas 4-6';
+    } else if (['Kelas 7', 'Kelas 8', 'Kelas 9'].includes(val)) {
+      targetCat = 'SMP 7-9';
+    }
+    const catRadio = form.querySelector(`input[name="grade_category"][value="${targetCat}"]`);
+    if (catRadio) {
+      catRadio.checked = true;
+    }
+  });
+}
 
 // Setup File Upload & Drag-Drop (Step 3)
 if (dropzone) {
@@ -484,7 +532,10 @@ function selectBranch(branchName) {
 function populateReviewData() {
   document.getElementById('review-name').textContent = document.getElementById('nama_lengkap').value || '-';
   const branch = form.querySelector('input[name="cabang_kompetisi"]:checked');
-  document.getElementById('review-branch').textContent = branch ? branch.value : '-';
+  const gradeCat = form.querySelector('input[name="grade_category"]:checked');
+  const branchText = branch ? branch.value : '-';
+  const catText = gradeCat ? ` • ${gradeCat.value}` : '';
+  document.getElementById('review-branch').textContent = branchText + catText;
 
   const isCust = selectedSchool && Number(selectedSchool.is_partner) === 1;
 
@@ -499,7 +550,7 @@ function populateReviewData() {
 
   const paymentEl = document.getElementById('review-payment');
   if (isCust) {
-    paymentEl.textContent = 'Bebas Biaya Pendaftaran (Sekolah Rekanan)';
+    paymentEl.textContent = 'Bebas Biaya Pendaftaran (Rp 0)';
     paymentEl.className = 'font-bold text-emerald-600';
   } else {
     paymentEl.textContent = 'Rp 75.000 (Mandiri - Berita: Lomba Erlass 2026)';
@@ -567,6 +618,8 @@ form.addEventListener('submit', async e => {
   formData.append('alamat', document.getElementById('alamat').value.trim());
 
   formData.append('cabang_kompetisi', form.querySelector('input[name="cabang_kompetisi"]:checked').value);
+  const gradeCatChecked = form.querySelector('input[name="grade_category"]:checked');
+  formData.append('grade_category', gradeCatChecked ? gradeCatChecked.value : '');
   formData.append('nama_sekolah', selectedSchool ? selectedSchool.school_name : '');
   formData.append('npsn', selectedSchool ? (selectedSchool.npsn || '') : '');
   formData.append('wilayah', selectedSchool ? (selectedSchool.city || '') : '');
@@ -616,6 +669,9 @@ form.addEventListener('submit', async e => {
       successScreen.scrollIntoView({ behavior: 'smooth', block: 'start' });
     } else {
       showMessage(result.message || 'Pendaftaran belum berhasil dikirim.');
+      if (result.message && (result.message.includes('berakhir') || result.message.includes('ditutup'))) {
+        applyRegistrationClosedUI(true);
+      }
       submitBtn.disabled = false;
       submitBtn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> Kirim Pendaftaran Sekarang';
       lucide.createIcons();
@@ -681,10 +737,19 @@ document.getElementById('btn-check-status').addEventListener('click', async () =
             </div>
             <div class="pt-2 border-t border-orange-50 flex items-center justify-between text-xs">
               <span class="text-slate-400">Terdaftar: ${item.created_at}</span>
-              <a href="${item.whatsapp_group_url || 'https://chat.whatsapp.com/ErlassCompetition2026'}" target="_blank" class="text-emerald-700 font-bold hover:underline inline-flex items-center gap-1">
+              <a href="${item.whatsapp_group_url || 'https://chat.whatsapp.com/DMKB10TaBaZ8k23pVsaoZw'}" target="_blank" class="text-emerald-700 font-bold hover:underline inline-flex items-center gap-1">
                 <i data-lucide="message-circle" class="w-3.5 h-3.5"></i> Grup WhatsApp
               </a>
             </div>
+            ${item.payment_status === 'verified' ? `
+              <div class="mt-3 pt-3 border-t border-orange-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 bg-emerald-50/50 p-2.5 rounded-xl border border-emerald-100">
+                <span class="text-[11px] font-semibold text-emerald-800">Pendaftaran terverifikasi. Kumpulkan karya proyek Anda sekarang!</span>
+                <a href="kumpul-proyek.html?reg=${encodeURIComponent(item.reg_code)}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-sm transition shrink-0">
+                  <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i>
+                  <span>Kumpul Proyek</span>
+                </a>
+              </div>
+            ` : ''}
           </div>
         `;
       });
@@ -710,4 +775,85 @@ window.copyTransferNote = copyTransferNote;
 window.resetFile = resetFile;
 window.selectBranch = selectBranch;
 
-document.addEventListener('DOMContentLoaded', initApp);
+// Juknis PDF Viewer Modal Handlers
+function openJuknisModal() {
+  const modal = document.getElementById('juknis-modal');
+  const frame = document.getElementById('juknis-pdf-frame');
+  if (modal && frame) {
+    if (!frame.src || frame.src === 'about:blank' || frame.src === window.location.href) {
+      frame.src = 'docs/Juknis_Lomba_Erlass_Competition_2026.pdf#toolbar=1';
+    }
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+    if (window.lucide) lucide.createIcons();
+  }
+}
+
+function closeJuknisModal() {
+  const modal = document.getElementById('juknis-modal');
+  if (modal) {
+    modal.classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeJuknisModal();
+});
+
+document.addEventListener('click', (e) => {
+  const modal = document.getElementById('juknis-modal');
+  if (modal && e.target === modal) {
+    closeJuknisModal();
+  }
+});
+
+window.openJuknisModal = openJuknisModal;
+window.closeJuknisModal = closeJuknisModal;
+
+// Mobile Menu Toggle
+function toggleMobileMenu() {
+  const drawer = document.getElementById('mobile-menu-drawer');
+  const icon = document.getElementById('mobile-menu-icon');
+  if (drawer) {
+    drawer.classList.toggle('hidden');
+    if (icon) {
+      const isClosed = drawer.classList.contains('hidden');
+      icon.setAttribute('data-lucide', isClosed ? 'menu' : 'x');
+      if (window.lucide) lucide.createIcons();
+    }
+  }
+}
+window.toggleMobileMenu = toggleMobileMenu;
+
+// Hero Countdown Ticker (Batas Pengumpulan Proyek: 21 Nov 2026, 23:59:59 WIB)
+function initHeroCountdown() {
+  const pill = document.getElementById('hero-countdown-pill');
+  if (!pill) return;
+
+  const targetDate = new Date('2026-11-21T23:59:59+07:00').getTime();
+
+  function update() {
+    const now = new Date().getTime();
+    const diff = targetDate - now;
+
+    if (diff <= 0) {
+      pill.textContent = 'Submisi Berakhir';
+      return;
+    }
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    pill.textContent = `${days} Hari ${hours} Jam lagi`;
+  }
+
+  update();
+  setInterval(update, 60000);
+}
+window.initHeroCountdown = initHeroCountdown;
+
+document.addEventListener('DOMContentLoaded', () => {
+  initApp();
+  initHeroCountdown();
+});
+

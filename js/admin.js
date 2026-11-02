@@ -31,6 +31,10 @@ const compSelector = document.getElementById('competition-selector');
 // 1. Inisialisasi & Verifikasi Sesi
 async function checkAuth() {
   if (authToken) {
+    if (currentUser && currentUser.role === 'juri') {
+      window.location.href = 'penjurian.html';
+      return;
+    }
     try {
       const res = await fetch(`api/admin.php?action=get_competitions&token=${encodeURIComponent(authToken)}`);
       const data = await res.json();
@@ -111,6 +115,11 @@ authForm.addEventListener('submit', async e => {
       currentUser = data.user;
       sessionStorage.setItem('erlass_admin_token', authToken);
       sessionStorage.setItem('erlass_admin_user', JSON.stringify(currentUser));
+
+      if (currentUser && currentUser.role === 'juri') {
+        window.location.href = 'penjurian.html';
+        return;
+      }
 
       const headerName = document.getElementById('header-user-name');
       if (headerName) headerName.textContent = currentUser.username;
@@ -385,8 +394,12 @@ function renderRegistrationsTable(rows) {
   tbody.innerHTML = '';
   document.getElementById('table-record-count').textContent = `Menampilkan ${rows.length} pendaftar`;
 
+  const checkAll = document.getElementById('check-all-reg');
+  if (checkAll) checkAll.checked = false;
+  updateSelectedCount();
+
   if (rows.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="10" class="py-8 text-center text-slate-400">Tidak ada data pendaftaran untuk event ini.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="11" class="py-8 text-center text-slate-400">Tidak ada data pendaftaran untuk event ini.</td></tr>`;
     return;
   }
 
@@ -417,7 +430,10 @@ function renderRegistrationsTable(rows) {
     const tr = document.createElement('tr');
     tr.className = 'hover:bg-slate-50/80 transition';
     tr.innerHTML = `
-      <td class="py-3 px-4 font-mono text-slate-400">${idx + 1}</td>
+      <td class="py-3 px-3 text-center no-print">
+        <input type="checkbox" class="reg-checkbox rounded border-slate-300 text-orange-600 focus:ring-orange-500 cursor-pointer w-4 h-4" value="${r.id}" onchange="updateSelectedCount()">
+      </td>
+      <td class="py-3 px-3 font-mono text-slate-400">${idx + 1}</td>
       <td class="py-3 px-4 font-mono font-bold text-orange-600 whitespace-nowrap">${r.reg_code}</td>
       <td class="py-3 px-4">
         <strong class="text-slate-900 block text-xs">${r.participant_name}</strong>
@@ -438,11 +454,14 @@ function renderRegistrationsTable(rows) {
       <td class="py-3 px-4 whitespace-nowrap">${statusBadge}</td>
       <td class="py-3 px-4 text-right whitespace-nowrap no-print">
         <div class="inline-flex items-center gap-1.5">
-          <a href="${waUrl}" target="_blank" class="p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50 border border-emerald-200" title="Chat WhatsApp">
+          <a href="${waUrl}" target="_blank" class="p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50 border border-emerald-200 transition" title="Chat WhatsApp">
             <i data-lucide="message-circle" class="w-3.5 h-3.5"></i>
           </a>
-          <button type="button" onclick="openModal(${r.id})" class="px-2.5 py-1.5 rounded-lg text-xs font-bold text-white bg-slate-800 hover:bg-slate-900 shadow-sm" title="Ubah Status Verifikasi">
+          <button type="button" onclick="openModal(${r.id})" class="px-2.5 py-1.5 rounded-lg text-xs font-bold text-white bg-slate-800 hover:bg-slate-900 shadow-sm transition" title="Ubah Status Verifikasi">
             Verifikasi
+          </button>
+          <button type="button" onclick="deleteSingleRegistration(${r.id}, '${escapeHtml(r.reg_code)}', '${escapeHtml(r.participant_name)}')" class="p-1.5 rounded-lg text-red-600 hover:bg-red-50 hover:text-red-700 border border-red-200 transition" title="Hapus Pendaftar">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
           </button>
         </div>
       </td>
@@ -451,6 +470,113 @@ function renderRegistrationsTable(rows) {
   });
 
   lucide.createIcons();
+}
+
+// 5.1. Checklist & Aksi Massal Pendaftar
+function toggleSelectAll(checked) {
+  document.querySelectorAll('.reg-checkbox').forEach(cb => {
+    cb.checked = checked;
+  });
+  updateSelectedCount();
+}
+
+function updateSelectedCount() {
+  const checked = document.querySelectorAll('.reg-checkbox:checked');
+  const countEl = document.getElementById('selected-reg-count');
+  const bar = document.getElementById('bulk-actions-container');
+  const checkAll = document.getElementById('check-all-reg');
+
+  if (countEl) countEl.textContent = checked.length;
+  if (bar) {
+    if (checked.length > 0) {
+      bar.classList.remove('hidden');
+    } else {
+      bar.classList.add('hidden');
+    }
+  }
+
+  const allCheckboxes = document.querySelectorAll('.reg-checkbox');
+  if (checkAll && allCheckboxes.length > 0) {
+    checkAll.checked = (checked.length === allCheckboxes.length);
+  }
+}
+
+function cancelSelection() {
+  document.querySelectorAll('.reg-checkbox').forEach(cb => {
+    cb.checked = false;
+  });
+  const checkAll = document.getElementById('check-all-reg');
+  if (checkAll) checkAll.checked = false;
+  updateSelectedCount();
+}
+
+// 5.2. Hapus Pendaftar Satuan (Manual Delete)
+async function deleteSingleRegistration(id, regCode, name) {
+  if (!confirm(`Apakah Anda yakin ingin menghapus data peserta:\n\n• Nama: ${name}\n• No. Reg: ${regCode}\n\nData dan berkas bukti bayar akan dihapus permanen.`)) {
+    return;
+  }
+
+  try {
+    const res = await fetch(`api/admin.php?action=delete_registration&token=${encodeURIComponent(authToken)}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`
+      },
+      body: JSON.stringify({ id })
+    });
+    const data = await res.json();
+
+    if (data.status === 'ok') {
+      alert(data.message || 'Pendaftar berhasil dihapus.');
+      await loadRegistrations();
+      await loadReports();
+    } else {
+      alert(data.message || 'Gagal menghapus pendaftar.');
+    }
+  } catch (err) {
+    console.error('Error deleting registration:', err);
+    alert('Terjadi kesalahan saat menghapus data pendaftar.');
+  }
+}
+
+// 5.3. Hapus Banyak Pendaftar Sekaligus (Bulk Delete)
+async function confirmBulkDelete() {
+  const checked = [...document.querySelectorAll('.reg-checkbox:checked')];
+  const ids = checked.map(cb => Number(cb.value)).filter(v => v > 0);
+
+  if (ids.length === 0) {
+    alert('Silakan pilih minimal satu pendaftar dengan mencentang kotak checklist.');
+    return;
+  }
+
+  if (!confirm(`⚠️ KONFIRMASI HAPUS MASSAL:\n\nApakah Anda yakin ingin menghapus ${ids.length} data pendaftar yang dipilih?\n\nTindakan ini bersifat permanen dan tidak dapat dibatalkan.`)) {
+    return;
+  }
+
+  try {
+    const res = await fetch(`api/admin.php?action=bulk_delete_registrations&token=${encodeURIComponent(authToken)}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`
+      },
+      body: JSON.stringify({ ids })
+    });
+    const data = await res.json();
+
+    if (data.status === 'ok') {
+      alert(data.message || 'Pendaftar terpilih berhasil dihapus.');
+      cancelSelection();
+      await loadRegistrations();
+      await loadReports();
+    } else {
+      alert(data.message || 'Gagal menghapus pendaftar terpilih.');
+    }
+  } catch (err) {
+    console.error('Error bulk deleting registrations:', err);
+    alert('Terjadi kesalahan saat menghapus data terpilih.');
+  }
 }
 
 // 6. Modal Verifikasi Bukti Bayar
@@ -811,6 +937,224 @@ async function deleteUser(userId, username) {
   }
 }
 
+// ==========================================
+// PENGUMPULAN PROYEK MANAGEMENT LOGIC
+// ==========================================
+
+let activeDashboardTab = 'registrations';
+
+function switchDashboardTab(tabName) {
+  activeDashboardTab = tabName;
+  const btnRegs = document.getElementById('tab-btn-regs');
+  const btnProjects = document.getElementById('tab-btn-projects');
+  const viewRegs = document.getElementById('view-registrations');
+  const viewProjects = document.getElementById('view-submissions');
+
+  if (tabName === 'projects') {
+    btnRegs.className = 'px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 transition flex items-center gap-2';
+    btnProjects.className = 'px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold bg-emerald-600 text-white shadow-sm transition flex items-center gap-2';
+    viewRegs.classList.add('hidden');
+    viewProjects.classList.remove('hidden');
+    loadProjectSubmissions();
+  } else {
+    btnRegs.className = 'px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold bg-orange-600 text-white shadow-sm transition flex items-center gap-2';
+    btnProjects.className = 'px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 transition flex items-center gap-2';
+    viewRegs.classList.remove('hidden');
+    viewProjects.classList.add('hidden');
+  }
+  if (window.lucide) lucide.createIcons();
+}
+
+async function loadProjectSubmissions() {
+  const tbody = document.getElementById('projects-table-body');
+  if (!tbody) return;
+
+  const branch = document.getElementById('proj-filter-branch').value;
+  const gradeCat = document.getElementById('proj-filter-grade').value;
+  const status = document.getElementById('proj-filter-status').value;
+  const search = document.getElementById('proj-filter-search').value.trim();
+
+  tbody.innerHTML = '<tr><td colspan="9" class="p-8 text-center text-slate-400"><i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2 text-emerald-600"></i>Memuat data pengumpulan proyek...</td></tr>';
+  if (window.lucide) lucide.createIcons();
+
+  try {
+    const url = `api/admin.php?action=get_project_submissions&token=${encodeURIComponent(authToken)}&branch=${encodeURIComponent(branch)}&grade_category=${encodeURIComponent(gradeCat)}&status=${encodeURIComponent(status)}&search=${encodeURIComponent(search)}`;
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (data.status === 'ok') {
+      const stats = data.stats || {};
+      document.getElementById('proj-stat-total').textContent = stats.total || 0;
+      document.getElementById('proj-stat-scratch').textContent = stats.total_scratch || 0;
+      document.getElementById('proj-stat-microbit').textContent = stats.total_microbit || 0;
+      document.getElementById('proj-stat-erboblox').textContent = stats.total_erboblox || 0;
+      document.getElementById('proj-stat-revision').textContent = stats.total_allow_revision || 0;
+
+      const badgeCount = document.getElementById('badge-projects-count');
+      if (badgeCount) badgeCount.textContent = stats.total || 0;
+
+      const submissions = data.submissions || [];
+      document.getElementById('proj-pagination-info').textContent = `Menampilkan ${submissions.length} proyek yang terkumpul`;
+
+      if (submissions.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="p-8 text-center text-slate-400">Belum ada peserta yang mengumpulkan proyek untuk filter ini.</td></tr>';
+        return;
+      }
+
+      let html = '';
+      submissions.forEach((sub, idx) => {
+        const isAllowRev = Number(sub.allow_revision) === 1;
+        const versionBadge = sub.version > 1 
+          ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-100 text-blue-800">Versi ${sub.version} (Revisi)</span>`
+          : `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700">Versi 1</span>`;
+
+        const revStatusBadge = isAllowRev
+          ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 animate-pulse">Izin Revisi Aktif</span>`
+          : `<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800">Terkunci (Final)</span>`;
+
+        // File download button
+        let fileBtn = '<span class="text-slate-400 italic">Tanpa file (Erboblox)</span>';
+        if (sub.project_file_path) {
+          const sizeKb = sub.project_file_size ? `${(sub.project_file_size / (1024 * 1024)).toFixed(2)} MB` : '';
+          fileBtn = `
+            <a href="${sub.project_file_path}" download class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-orange-50 hover:bg-orange-100 text-orange-700 font-extrabold text-[11px] border border-orange-200 transition" title="Unduh Berkas Proyek">
+              <i data-lucide="download" class="w-3.5 h-3.5"></i>
+              <span>Unduh File (${sizeKb})</span>
+            </a>
+          `;
+        }
+
+        // Video Links
+        let videoLinks = `
+          <a href="${sub.video_url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-red-600 hover:text-red-700 font-bold text-xs hover:underline">
+            <i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i> Video Utama
+          </a>
+        `;
+        if (sub.backup_video_url) {
+          videoLinks += `
+            <a href="${sub.backup_video_url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-slate-500 hover:text-slate-700 text-[11px] hover:underline block mt-1">
+              <i data-lucide="link" class="w-3 h-3"></i> Video Cadangan
+            </a>
+          `;
+        }
+
+        html += `
+          <tr class="hover:bg-slate-50/70 transition">
+            <td class="p-3.5 pl-5 font-bold text-slate-400">${idx + 1}</td>
+            <td class="p-3.5 whitespace-nowrap">
+              <span class="font-mono font-black text-orange-600 block text-xs">${sub.reg_code}</span>
+              <span class="text-[10px] text-slate-400 block">${sub.submitted_at || '-'}</span>
+            </td>
+            <td class="p-3.5">
+              <strong class="font-extrabold text-slate-900 block text-xs">${sub.participant_name}</strong>
+              <span class="text-[11px] text-slate-600 block">${sub.school_name}</span>
+              <span class="text-[10px] text-slate-400 block">WA: ${sub.phone || '-'}</span>
+            </td>
+            <td class="p-3.5 whitespace-nowrap">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-bold bg-orange-50 text-orange-800 border border-orange-200 block mb-1">
+                ${sub.branch}
+              </span>
+              <span class="text-[10px] font-semibold text-slate-500">${sub.grade_category}</span>
+            </td>
+            <td class="p-3.5 max-w-xs">
+              <strong class="text-xs font-bold text-slate-900 block truncate" title="${sub.project_title}">${sub.project_title}</strong>
+              <p class="text-[11px] text-slate-500 line-clamp-2 mt-0.5 leading-relaxed" title="${sub.project_description}">${sub.project_description}</p>
+            </td>
+            <td class="p-3.5 whitespace-nowrap">${fileBtn}</td>
+            <td class="p-3.5 whitespace-nowrap">${videoLinks}</td>
+            <td class="p-3.5 whitespace-nowrap space-y-1">
+              <div>${versionBadge}</div>
+              <div>${revStatusBadge}</div>
+            </td>
+            <td class="p-3.5 pr-5 text-right whitespace-nowrap no-print space-x-1">
+              <button
+                type="button"
+                onclick="toggleProjectRevision(${sub.id}, ${isAllowRev ? 1 : 0}, '${sub.reg_code}', '${sub.participant_name.replace(/'/g, "\\'")}')"
+                class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold ${isAllowRev ? 'bg-amber-100 hover:bg-amber-200 text-amber-900' : 'bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200'} transition"
+                title="${isAllowRev ? 'Kunci kembali formulir peserta' : 'Beri izin peserta mengunggah ulang / merevisi karya'}"
+              >
+                <i data-lucide="${isAllowRev ? 'lock' : 'unlock'}" class="w-3.5 h-3.5"></i>
+                <span>${isAllowRev ? 'Kunci Revisi' : 'Beri Izin Revisi'}</span>
+              </button>
+              <button
+                type="button"
+                onclick="deleteProjectSubmission(${sub.id}, '${sub.reg_code}', '${sub.participant_name.replace(/'/g, "\\'")}')"
+                class="p-1.5 text-slate-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition"
+                title="Hapus data proyek ini"
+              >
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = html;
+      if (window.lucide) lucide.createIcons();
+    }
+  } catch (err) {
+    tbody.innerHTML = '<tr><td colspan="9" class="p-6 text-center text-red-600 text-xs">Gagal memuat data pengumpulan proyek.</td></tr>';
+  }
+}
+
+async function toggleProjectRevision(id, currentAllow, regCode, name) {
+  const willAllow = currentAllow === 0;
+  const actionPrompt = willAllow 
+    ? `Beri izin peserta ${name} (${regCode}) untuk mengunggah ulang / merevisi proyek?\n\n(Opsional) Berikan catatan arahan revisi untuk peserta:`
+    : `Kunci kembali formulir proyek peserta ${name} (${regCode})?`;
+
+  const notes = willAllow ? prompt(actionPrompt, '') : '';
+  if (willAllow && notes === null) return; // User cancel
+
+  try {
+    const res = await fetch(`api/admin.php?action=toggle_project_revision&token=${encodeURIComponent(authToken)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: id,
+        allow_revision: willAllow ? 1 : 0,
+        admin_notes: notes || ''
+      })
+    });
+    const data = await res.json();
+    if (data.status === 'ok') {
+      alert(data.message);
+      loadProjectSubmissions();
+    } else {
+      alert(data.message || 'Gagal mengubah status izin revisi.');
+    }
+  } catch (err) {
+    alert('Terjadi kesalahan saat mengubah izin revisi.');
+  }
+}
+
+async function deleteProjectSubmission(id, regCode, name) {
+  if (!confirm(`Hapus permanen berkas dan data pengumpulan proyek untuk peserta ${name} (${regCode})?\n\nPerhatian: Tindakan ini tidak dapat dibatalkan.`)) {
+    return;
+  }
+
+  try {
+    const res = await fetch(`api/admin.php?action=delete_project_submission&token=${encodeURIComponent(authToken)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: id })
+    });
+    const data = await res.json();
+    if (data.status === 'ok') {
+      alert(data.message);
+      loadProjectSubmissions();
+    } else {
+      alert(data.message || 'Gagal menghapus proyek.');
+    }
+  } catch (err) {
+    alert('Terjadi kesalahan saat menghapus data proyek.');
+  }
+}
+
+function exportProjectCSV() {
+  window.location.href = `api/admin.php?action=export_project_submissions&token=${encodeURIComponent(authToken)}`;
+}
+
 // Global Window Bindings untuk memastikan fungsi inline onclick HTML selalu dapat diakses
 window.openNewCompModal = openNewCompModal;
 window.closeNewCompModal = closeNewCompModal;
@@ -829,8 +1173,19 @@ window.loadReports = loadReports;
 window.loadRegistrations = loadRegistrations;
 window.exportCSV = exportCSV;
 window.logoutAdmin = logoutAdmin;
+window.deleteSingleRegistration = deleteSingleRegistration;
+window.confirmBulkDelete = confirmBulkDelete;
+window.toggleSelectAll = toggleSelectAll;
+window.updateSelectedCount = updateSelectedCount;
+window.cancelSelection = cancelSelection;
 
-// Event Listeners Filter
+window.switchDashboardTab = switchDashboardTab;
+window.loadProjectSubmissions = loadProjectSubmissions;
+window.toggleProjectRevision = toggleProjectRevision;
+window.deleteProjectSubmission = deleteProjectSubmission;
+window.exportProjectCSV = exportProjectCSV;
+
+// Event Listeners Filter Registrasi
 document.getElementById('filter-branch').addEventListener('change', loadRegistrations);
 document.getElementById('filter-status').addEventListener('change', loadRegistrations);
 document.getElementById('filter-partner').addEventListener('change', loadRegistrations);
@@ -840,4 +1195,15 @@ document.getElementById('filter-search').addEventListener('input', () => {
   searchTimeout = setTimeout(loadRegistrations, 300);
 });
 
+// Event Listeners Filter Proyek
+document.getElementById('proj-filter-branch').addEventListener('change', loadProjectSubmissions);
+document.getElementById('proj-filter-grade').addEventListener('change', loadProjectSubmissions);
+document.getElementById('proj-filter-status').addEventListener('change', loadProjectSubmissions);
+let projSearchTimeout;
+document.getElementById('proj-filter-search').addEventListener('input', () => {
+  clearTimeout(projSearchTimeout);
+  projSearchTimeout = setTimeout(loadProjectSubmissions, 300);
+});
+
 document.addEventListener('DOMContentLoaded', checkAuth);
+

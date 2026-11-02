@@ -2,6 +2,7 @@
 uploads/
 uploads/*
 
-# Raw oversized banner working files in root
+# Raw oversized banner & uncompressed PDF working files in root
 /landscapelomba.png
 /herobanner.jpeg
+/Juknis Lomba Erlass Competition.pdf

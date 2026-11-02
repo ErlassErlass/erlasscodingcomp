@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal Penjurian Karya (Blind Review) - Erlass Competition 2026</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS & Lucide Icons -->
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.577.0/dist/umd/lucide.min.js"></script>
+  
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #1e293b; }
+    .display-font { font-family: 'Fredoka', sans-serif; }
+    
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-800 flex flex-col">
+
+  <!-- ========================================== -->
+  <!-- 1. AUTH SCREEN / LOGIN DEWAN JURI           -->
+  <!-- ========================================== -->
+  <div id="auth-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-4">
+    <div class="bg-white text-slate-800 rounded-3xl p-6 sm:p-10 max-w-md w-full shadow-2xl border border-slate-100 text-center relative overflow-hidden">
+      <div class="absolute -top-12 -right-12 w-36 h-36 bg-orange-500/10 rounded-full blur-2xl pointer-events-none"></div>
+      <div class="absolute -bottom-12 -left-12 w-36 h-36 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none"></div>
+
+      <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-400 text-white mx-auto flex items-center justify-center mb-4 shadow-lg shadow-orange-500/20">
+        <i data-lucide="award" class="w-8 h-8"></i>
+      </div>
+      
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold bg-orange-100 text-orange-800 mb-2">
+        <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+        <span>Portal Penjurian Resmi</span>
+      </div>
+
+      <h3 class="display-font text-2xl font-bold text-slate-900">Erlass Competition 2026</h3>
+      <p class="text-xs text-slate-500 mt-1 mb-6">Masuk menggunakan akun Dewan Juri. Penjurian menggunakan sistem <strong>Blind Review</strong> untuk menjamin objektivitas 100%.</p>
+      
+      <form id="auth-form" class="space-y-4 text-left">
+        <div id="auth-error" class="hidden text-xs font-semibold text-red-600 bg-red-50 p-3 rounded-xl border border-red-200"></div>
+        
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1" for="username-input">Username Juri</label>
+          <div class="relative">
+            <i data-lucide="user-check" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5"></i>
+            <input 
+              type="text" 
+              id="username-input" 
+              placeholder="Contoh: juri1" 
+              required 
+              autocomplete="username"
+              class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 text-slate-900 bg-slate-50 font-medium"
+            >
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1" for="password-input">Password Akun</label>
+          <div class="relative">
+            <i data-lucide="key-round" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5"></i>
+            <input 
+              type="password" 
+              id="password-input" 
+              placeholder="Masukkan password juri..." 
+              required 
+              autocomplete="current-password"
+              class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 text-slate-900 bg-slate-50 font-medium"
+            >
+            <button 
+              type="button" 
+              id="toggle-pwd-btn"
+              onclick="togglePasswordVisibility()" 
+              class="absolute right-3 top-3 text-slate-400 hover:text-slate-600"
+            >
+              <i data-lucide="eye" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <button 
+          type="submit" 
+          id="login-submit-btn" 
+          class="w-full py-3 rounded-xl font-bold text-white bg-orange-600 hover:bg-orange-700 transition shadow-lg shadow-orange-600/25 text-sm flex items-center justify-center gap-2 mt-2"
+        >
+          <i data-lucide="log-in" class="w-4 h-4"></i>
+          <span>Masuk Ruang Penjurian</span>
+        </button>
+      </form>
+
+      <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+        <span>Kerahasiaan Peserta Dijamin</span>
+        <a href="index.html" class="text-orange-600 font-bold hover:underline flex items-center gap-1">
+          <span>Portal Utama</span>
+          <i data-lucide="arrow-right" class="w-3 h-3"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ========================================== -->
+  <!-- 2. MAIN JUDGING STUDIO WORKSPACE          -->
+  <!-- ========================================== -->
+  <div id="judging-studio" class="hidden flex-1 flex flex-col min-h-screen">
+    
+    <!-- TOP NAVIGATION BAR (Clean Light Theme) -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-40 px-4 sm:px-6 py-3 shadow-sm">
+      <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+        
+        <!-- Logo & Brand -->
+        <div class="flex items-center gap-3">
+          <a href="index.html" class="flex items-center gap-2 group">
+            <span class="w-9 h-9 rounded-xl bg-gradient-to-tr from-orange-500 to-amber-400 text-white flex items-center justify-center font-black shadow-md shadow-orange-500/20 group-hover:scale-105 transition">
+              <i data-lucide="award" class="w-5 h-5"></i>
+            </span>
+            <div>
+              <div class="display-font font-bold text-sm tracking-wide text-slate-900 leading-tight">Erlass Competition 2026</div>
+              <div class="text-[10px] text-orange-600 font-bold tracking-wider uppercase">Studio Penjurian Juri</div>
+            </div>
+          </a>
+
+          <!-- Blind Review Mode Badge -->
+          <div class="hidden md:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-xs">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-600"></i>
+            <span>Blind Review Aktif (Nama & Sekolah Dirahasiakan)</span>
+          </div>
+        </div>
+
+        <!-- Right Side: Juri Info & Action Tools -->
+        <div class="flex items-center gap-2 sm:gap-3">
+          
+          <!-- Leaderboard Button -->
+          <button 
+            type="button" 
+            onclick="openLeaderboardModal()" 
+            class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 transition flex items-center gap-1.5 shadow-xs"
+            title="Lihat Rekapitulasi & Peringkat Sementara"
+          >
+            <i data-lucide="trophy" class="w-3.5 h-3.5 text-amber-600"></i>
+            <span class="hidden sm:inline">Rekap & Peringkat</span>
+          </button>
+
+          <!-- User Info Pill -->
+          <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs">
+            <span class="w-6 h-6 rounded-lg bg-orange-100 text-orange-700 flex items-center justify-center font-bold text-[10px]">
+              <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
+            </span>
+            <div class="text-left leading-tight hidden xs:block">
+              <div id="judge-display-name" class="font-bold text-slate-800 text-[11px]">Dewan Juri</div>
+              <div class="text-[9px] text-slate-400 font-medium">Juri Penilai Resmi</div>
+            </div>
+          </div>
+
+          <!-- Ganti Password -->
+          <button 
+            type="button" 
+            onclick="openChangePwdModal()" 
+            class="p-2 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100 border border-slate-200 transition"
+            title="Ganti Password"
+          >
+            <i data-lucide="key-round" class="w-4 h-4"></i>
+          </button>
+
+          <!-- Logout -->
+          <button 
+            type="button" 
+            onclick="logoutJudge()" 
+            class="p-2 rounded-xl text-slate-500 hover:text-red-600 hover:bg-red-50 border border-slate-200 transition"
+            title="Keluar dari Akun Juri"
+          >
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+      </div>
+    </header>
+
+
+    <!-- SUB-BAR: QUEUE STATS, FILTER & PARTICIPANT CAROUSEL (Light Theme) -->
+    <div class="bg-white/80 border-b border-slate-200 px-4 sm:px-6 py-3 backdrop-blur-sm">
+      <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+        
+        <!-- Filter Controls -->
+        <div class="flex flex-wrap items-center gap-2">
+          
+          <!-- Filter Cabang -->
+          <select 
+            id="filter-branch" 
+            onchange="applyFilters()" 
+            class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-50 border border-slate-200 text-slate-700 focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
+          >
+            <option value="">Semua Cabang</option>
+            <option value="Scratch Coding">Scratch Coding</option>
+            <option value="Micro:bit">Micro:bit</option>
+            <option value="Erboblox">Erboblox</option>
+          </select>
+
+          <!-- Filter Jenjang -->
+          <select 
+            id="filter-grade" 
+            onchange="applyFilters()" 
+            class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-50 border border-slate-200 text-slate-700 focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
+          >
+            <option value="">Semua Jenjang</option>
+            <option value="Kelas 1-3">Kelas 1-3 SD</option>
+            <option value="Kelas 4-6">Kelas 4-6 SD</option>
+            <option value="SMP">SMP / Kelas 7-9</option>
+          </select>
+
+          <!-- Filter Status Nilai Tabs -->
+          <div class="inline-flex rounded-xl p-0.5 bg-slate-100 border border-slate-200 text-xs">
+            <button 
+              type="button" 
+              onclick="setStatusFilter('')" 
+              id="filter-tab-all"
+              class="px-3 py-1 rounded-lg font-bold text-slate-800 bg-white shadow-xs transition"
+            >Semua (<span id="count-all">0</span>)</button>
+            <button 
+              type="button" 
+              onclick="setStatusFilter('unscored')" 
+              id="filter-tab-unscored"
+              class="px-3 py-1 rounded-lg font-bold text-slate-500 hover:text-slate-900 transition"
+            >Belum Dinilai (<span id="count-unscored">0</span>)</button>
+            <button 
+              type="button" 
+              onclick="setStatusFilter('scored')" 
+              id="filter-tab-scored"
+              class="px-3 py-1 rounded-lg font-bold text-slate-500 hover:text-slate-900 transition"
+            >Sudah Dinilai (<span id="count-scored">0</span>)</button>
+          </div>
+
+        </div>
+
+        <!-- Participant Carousel & Progress -->
+        <div class="flex items-center justify-between md:justify-end gap-3">
+          
+          <!-- Progress bar -->
+          <div class="hidden lg:flex items-center gap-2">
+            <div class="text-[11px] text-slate-500 font-bold">Progres Saya:</div>
+            <div class="w-28 bg-slate-200 rounded-full h-2 overflow-hidden">
+              <div id="progress-bar-fill" class="bg-gradient-to-r from-orange-500 to-emerald-500 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+            <span id="progress-bar-text" class="text-[11px] font-black text-slate-700">0%</span>
+          </div>
+
+          <!-- Carousel Paging Buttons -->
+          <div class="flex items-center gap-1.5 bg-slate-100 border border-slate-200 p-1 rounded-xl">
+            <button 
+              type="button" 
+              onclick="navigateSubmission(-1)" 
+              id="prev-btn"
+              class="p-1 rounded-lg hover:bg-white text-slate-600 disabled:opacity-40 disabled:cursor-not-allowed transition"
+              title="Peserta Sebelumnya"
+            >
+              <i data-lucide="chevron-left" class="w-4 h-4"></i>
+            </button>
+            
+            <select 
+              id="participant-dropdown-selector" 
+              onchange="selectSubmissionById(this.value)" 
+              class="bg-transparent text-xs font-bold text-slate-700 focus:outline-none px-1 cursor-pointer max-w-[200px] truncate"
+            >
+              <option value="">Memuat peserta...</option>
+            </select>
+
+            <button 
+              type="button" 
+              onclick="navigateSubmission(1)" 
+              id="next-btn"
+              class="p-1 rounded-lg hover:bg-white text-slate-600 disabled:opacity-40 disabled:cursor-not-allowed transition"
+              title="Peserta Berikutnya"
+            >
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- MAIN WORKSPACE: SPLIT SCREEN (PREVIEW VS SCORING) -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6">
+      
+      <!-- EMPTY STATE / NO SUBMISSIONS FOUND -->
+      <div id="empty-state" class="hidden text-center py-20 bg-white rounded-3xl border border-slate-200 shadow-sm">
+        <div class="w-16 h-16 rounded-2xl bg-slate-100 text-slate-400 mx-auto flex items-center justify-center mb-3">
+          <i data-lucide="inbox" class="w-8 h-8"></i>
+        </div>
+        <h4 class="text-base font-bold text-slate-800">Tidak Ada Karya yang Sesuai Filter</h4>
+        <p class="text-xs text-slate-400 mt-1 max-w-sm mx-auto">Silakan ubah filter cabang, jenjang, atau status penilaian di bagian atas untuk menampilkan karya lainnya.</p>
+      </div>
+
+      <!-- ACTIVE WORKSPACE GRID -->
+      <div id="active-workspace" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- ============================================== -->
+        <!-- LEFT COLUMN: PREVIEW KARYA PESERTA (7 Cols)   -->
+        <!-- ============================================== -->
+        <div class="lg:col-span-7 space-y-4">
+          
+          <!-- Participant Anonymous Card Header -->
+          <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-sm">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span id="current-blind-code" class="text-lg sm:text-xl font-black text-slate-900 display-font tracking-wide">Peserta #E-XXXX-XXXX</span>
+                  <span id="current-scored-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-50 text-amber-800 border border-amber-200">
+                    Belum Dinilai
+                  </span>
+                </div>
+                
+                <h2 id="current-project-title" class="text-sm sm:text-base font-extrabold text-orange-600 mt-1">
+                  Judul Proyek Memuat...
+                </h2>
+
+                <div class="flex flex-wrap items-center gap-2 mt-2 text-[11px] text-slate-500">
+                  <span class="inline-flex items-center gap-1 font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-md">
+                    <i data-lucide="tag" class="w-3 h-3 text-orange-600"></i>
+                    <span id="current-branch-label">Scratch Coding</span>
+                  </span>
+                  <span>•</span>
+                  <span class="inline-flex items-center gap-1 font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-md">
+                    <i data-lucide="graduation-cap" class="w-3 h-3 text-amber-600"></i>
+                    <span id="current-grade-label">Kelas 4-6</span>
+                  </span>
+                  <span>•</span>
+                  <span class="inline-flex items-center gap-1">
+                    <i data-lucide="calendar" class="w-3 h-3"></i>
+                    <span id="current-submitted-at">Diunggah: -</span>
+                  </span>
+                  <span id="current-version-badge" class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 text-[10px] font-black">v1</span>
+                </div>
+              </div>
+
+              <!-- Anonymous Avatar Badge -->
+              <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-orange-50 to-amber-50 border border-orange-200 text-orange-600 flex items-center justify-center shadow-xs" title="Identitas peserta 100% dirahasiakan (Blind Review)">
+                <i data-lucide="user-x" class="w-6 h-6"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- TABS CONTAINER: BALOK KODE / VIDEO / SINOPSIS -->
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            
+            <!-- TAB BUTTONS -->
+            <div class="flex items-center border-b border-slate-200 bg-slate-50/80 px-4 pt-2 gap-2">
+              <button 
+                type="button" 
+                onclick="switchContentTab('blocks')" 
+                id="tab-btn-blocks"
+                class="px-4 py-2.5 rounded-t-xl text-xs font-bold bg-white text-orange-600 border-t-2 border-orange-500 shadow-xs transition flex items-center gap-2"
+              >
+                <i data-lucide="puzzle" class="w-4 h-4"></i>
+                <span>Pratinjau Balok Kode</span>
+              </button>
+
+              <button 
+                type="button" 
+                onclick="switchContentTab('video')" 
+                id="tab-btn-video"
+                class="px-4 py-2.5 rounded-t-xl text-xs font-bold text-slate-500 hover:text-slate-800 transition flex items-center gap-2"
+              >
+                <i data-lucide="play-circle" class="w-4 h-4"></i>
+                <span>Video Presentasi</span>
+              </button>
+
+              <button 
+                type="button" 
+                onclick="switchContentTab('description')" 
+                id="tab-btn-description"
+                class="px-4 py-2.5 rounded-t-xl text-xs font-bold text-slate-500 hover:text-slate-800 transition flex items-center gap-2"
+              >
+                <i data-lucide="file-text" class="w-4 h-4"></i>
+                <span>Sinopsis & Cara Main</span>
+              </button>
+            </div>
+
+            <!-- TAB 1 CONTENT: BALOK KODE & INTERACTIVE PREVIEW -->
+            <div id="tab-content-blocks" class="p-4 space-y-4">
+              
+              <!-- Toolbar Balok Kode -->
+              <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                <div class="flex items-center gap-2">
+                  <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mr-1">Aksi:</span>
+                  
+                  <!-- Open in Scratch 3.0 Editor (New Tab) -->
+                  <a 
+                    id="btn-open-editor-tab"
+                    href="#"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-orange-600 hover:bg-orange-700 text-white transition flex items-center gap-1.5 shadow-sm"
+                    title="Buka kanvas balok kode lengkap di Scratch 3.0 Workspace"
+                  >
+                    <i data-lucide="code-2" class="w-3.5 h-3.5"></i>
+                    <span>Buka Editor Balok Kode ↗</span>
+                  </a>
+                </div>
+
+                <!-- External Action Links -->
+                <div class="flex items-center gap-2">
+                  <a 
+                    id="btn-open-external" 
+                    href="#" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 transition shadow-xs"
+                    title="Buka pratinjau penuh di tab baru"
+                  >
+                    <i data-lucide="external-link" class="w-3.5 h-3.5 text-orange-600"></i>
+                    <span>Layar Penuh</span>
+                  </a>
+
+                  <a 
+                    id="btn-download-clean-file" 
+                    href="#" 
+                    download
+                    class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition shadow-sm"
+                    title="Unduh berkas proyek murni"
+                  >
+                    <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                    <span>Unduh Berkas</span>
+                  </a>
+                </div>
+              </div>
+
+              <!-- IFRAME PREVIEW CONTAINER (Light Border) -->
+              <div class="relative bg-slate-900 rounded-xl overflow-hidden border border-slate-200 min-h-[460px] sm:min-h-[500px] flex flex-col justify-center items-center shadow-inner">
+                
+                <!-- Loading Spinner -->
+                <div id="preview-loader" class="absolute inset-0 z-10 bg-slate-900/80 backdrop-blur-xs flex flex-col items-center justify-center text-white">
+                  <i data-lucide="loader-2" class="w-8 h-8 text-orange-500 animate-spin mb-2"></i>
+                  <span class="text-xs font-bold">Memuat Balok Kode & Komponen Proyek...</span>
+                </div>
+
+                <!-- Iframe Element -->
+                <iframe 
+                  id="preview-iframe" 
+                  src="about:blank" 
+                  class="w-full h-[500px] border-0" 
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                  allowfullscreen
+                  style="color-scheme: auto;"
+                ></iframe>
+
+                <!-- Fallback notice for Micro:bit -->
+                <div id="microbit-fallback" class="hidden p-8 text-center space-y-3 bg-white w-full h-full flex flex-col items-center justify-center">
+                  <div class="w-16 h-16 rounded-2xl bg-purple-50 text-purple-600 mx-auto flex items-center justify-center border border-purple-200">
+                    <i data-lucide="cpu" class="w-8 h-8"></i>
+                  </div>
+                  <h4 class="text-base font-bold text-slate-800">Karya Microsoft MakeCode Micro:bit (.hex)</h4>
+                  <p class="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
+                    Berkas Micro:bit (.hex) memuat instruksi program balok MakeCode lengkap beserta simulasi perangkat keras. Klik tombol di bawah untuk membuka simulasi balok di MakeCode atau unduh berkas proyek.
+                  </p>
+                  <div class="flex items-center justify-center gap-3 pt-3">
+                    <a 
+                      href="https://makecode.microbit.org/#editor" 
+                      target="_blank" 
+                      class="px-4 py-2.5 rounded-xl text-xs font-bold bg-purple-600 hover:bg-purple-700 text-white transition flex items-center gap-2 shadow-sm"
+                    >
+                      <i data-lucide="external-link" class="w-4 h-4"></i>
+                      <span>Buka di Microsoft MakeCode Simulator</span>
+                    </a>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- SCRATCH AUTOMATED CODE INSPECTION CARD (ZipArchive Summary) -->
+              <div id="scratch-stats-container" class="bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-3">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2 text-xs font-extrabold text-slate-800">
+                    <i data-lucide="activity" class="w-4 h-4 text-emerald-600"></i>
+                    <span>Analisis Algoritma & Balok (Inspeksi Otomatis)</span>
+                  </div>
+                  <button 
+                    type="button" 
+                    onclick="toggleSpriteBreakdown()" 
+                    id="btn-toggle-sprites"
+                    class="text-[11px] font-bold text-orange-600 hover:underline flex items-center gap-1"
+                  >
+                    <span>Rincian Sprite</span>
+                    <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
+                  </button>
+                </div>
+
+                <!-- Stats Badges (Light Card) -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-center">
+                  <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-xs">
+                    <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Total Target</div>
+                    <div id="stat-total-targets" class="text-base font-black text-slate-800 mt-0.5">-</div>
+                  </div>
+                  <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-xs">
+                    <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Total Balok Kode</div>
+                    <div id="stat-total-blocks" class="text-base font-black text-orange-600 mt-0.5">-</div>
+                  </div>
+                  <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-xs">
+                    <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Kostum Grafis</div>
+                    <div id="stat-total-costumes" class="text-base font-black text-amber-600 mt-0.5">-</div>
+                  </div>
+                  <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-xs">
+                    <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Efek Suara</div>
+                    <div id="stat-total-sounds" class="text-base font-black text-emerald-600 mt-0.5">-</div>
+                  </div>
+                </div>
+
+                <!-- Expandable Sprite List Table -->
+                <div id="sprite-breakdown-table" class="hidden pt-2 border-t border-slate-200 overflow-x-auto max-h-48 overflow-y-auto">
+                  <table class="w-full text-left text-[11px] text-slate-700">
+                    <thead class="text-[10px] text-slate-400 uppercase bg-slate-100 border-b border-slate-200">
+                      <tr>
+                        <th class="py-1.5 px-3">Nama Sprite / Objek</th>
+                        <th class="py-1.5 px-3 text-center">Tipe</th>
+                        <th class="py-1.5 px-3 text-right">Jml Balok</th>
+                        <th class="py-1.5 px-3 text-right">Kostum</th>
+                        <th class="py-1.5 px-3 text-right">Audio</th>
+                      </tr>
+                    </thead>
+                    <tbody id="sprite-tbody" class="divide-y divide-slate-100 bg-white">
+                      <!-- Rendered by JS -->
+                    </tbody>
+                  </table>
+                </div>
+
+              </div>
+
+            </div>
+
+            <!-- TAB 2 CONTENT: VIDEO PRESENTASI -->
+            <div id="tab-content-video" class="hidden p-4 space-y-4">
+              <div class="bg-slate-50 rounded-xl p-3 border border-slate-200 flex items-center justify-between text-xs">
+                <div class="flex items-center gap-2">
+                  <i data-lucide="video" class="w-4 h-4 text-orange-600"></i>
+                  <span class="font-bold text-slate-800">Tautan Video Presentasi & Demo Karya</span>
+                </div>
+                <a 
+                  id="btn-video-direct" 
+                  href="#" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-1 text-orange-600 font-bold hover:underline"
+                >
+                  <span>Buka di Tab Baru</span>
+                  <i data-lucide="external-link" class="w-3 h-3"></i>
+                </a>
+              </div>
+
+              <!-- 16:9 Responsive Video Player -->
+              <div class="relative bg-slate-900 rounded-xl overflow-hidden border border-slate-200 aspect-video flex items-center justify-center shadow-inner">
+                <iframe 
+                  id="video-player-iframe" 
+                  src="about:blank" 
+                  class="w-full h-full border-0" 
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                  allowfullscreen
+                ></iframe>
+                
+                <div id="video-error-state" class="hidden p-6 text-center space-y-2 bg-white text-slate-700 w-full h-full flex flex-col items-center justify-center">
+                  <i data-lucide="alert-circle" class="w-8 h-8 text-amber-500 mx-auto"></i>
+                  <div class="text-xs font-bold text-slate-800">Pratinjau video tidak dapat disematkan langsung</div>
+                  <p class="text-[11px] text-slate-500">Silakan klik tombol "Buka di Tab Baru" di atas untuk menonton video di YouTube / Google Drive.</p>
+                </div>
+              </div>
+
+              <!-- Backup Video Link (if available) -->
+              <div id="backup-video-box" class="hidden p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs flex items-center justify-between">
+                <span class="text-slate-500 font-medium">Tautan Cadangan:</span>
+                <a id="btn-backup-video-link" href="#" target="_blank" class="text-amber-700 font-bold hover:underline flex items-center gap-1">
+                  <span>Buka Tautan Cadangan</span>
+                  <i data-lucide="external-link" class="w-3 h-3"></i>
+                </a>
+              </div>
+
+              <!-- Scoring Reminder Note for Video -->
+              <div class="p-3.5 rounded-xl bg-orange-50 border border-orange-200 text-[11px] text-orange-900 leading-relaxed flex items-start gap-2.5">
+                <i data-lucide="info" class="w-4 h-4 text-orange-600 shrink-0 mt-0.5"></i>
+                <div>
+                  <strong>Panduan Penilaian Video (Bobot 10%):</strong> Perhatikan artikulasi peserta, kemampuan menerangkan alur logika program yang dibuat, demonstrasi jalannya game/aplikasi, serta kepercayaan diri peserta saat presentasi.
+                </div>
+              </div>
+
+            </div>
+
+            <!-- TAB 3 CONTENT: DESKRIPSI & SINOPSIS -->
+            <div id="tab-content-description" class="hidden p-5 space-y-4">
+              <div>
+                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Sinopsis & Deskripsi Karya</h4>
+                <div id="current-project-desc" class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-700 leading-relaxed whitespace-pre-line font-medium min-h-[140px]">
+                  Memuat deskripsi karya...
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- ============================================== -->
+        <!-- RIGHT COLUMN: FORMULIR PENJURIAN (5 Cols)     -->
+        <!-- ============================================== -->
+        <div class="lg:col-span-5 space-y-4">
+          
+          <form id="scoring-form" class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-sm space-y-5 sticky top-20">
+            
+            <!-- Scoring Header & Live Total Score -->
+            <div class="border-b border-slate-100 pb-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="display-font text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <i data-lucide="clipboard-check" class="w-5 h-5 text-orange-600"></i>
+                    <span>Rubrik Penilaian</span>
+                  </h3>
+                  <p class="text-[11px] text-slate-400 font-medium">5 Kriteria Terbobot (Total 100%)</p>
+                </div>
+
+                <!-- Big Final Score Pill -->
+                <div class="text-right">
+                  <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Nilai Akhir</div>
+                  <div class="flex items-baseline justify-end gap-1">
+                    <span id="display-total-score" class="display-font text-2xl sm:text-3xl font-black text-orange-600">0.00</span>
+                    <span class="text-xs font-bold text-slate-400">/ 100</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Qualitative Grade Badge -->
+              <div class="mt-2.5 flex items-center justify-between text-[11px]">
+                <span id="grade-predicate" class="px-3 py-1 rounded-full font-extrabold bg-slate-100 text-slate-600 border border-slate-200 shadow-xs">
+                  Belum Dinilai
+                </span>
+                <span id="last-saved-time" class="text-slate-400 text-[10px] font-medium"></span>
+              </div>
+            </div>
+
+            <!-- RUBRIC 1: LOGIKA PEMROGRAMAN & ALGORITMA (30%) -->
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
+              <div class="flex flex-wrap items-center justify-between gap-1">
+                <div class="flex items-center gap-1.5">
+                  <span class="w-5 h-5 rounded-full bg-orange-600 text-white flex items-center justify-center text-[10px] font-black">1</span>
+                  <span class="text-xs font-bold text-slate-800">Logika & Algoritma</span>
+                  <span class="px-1.5 py-0.5 rounded bg-orange-100 text-orange-800 text-[10px] font-extrabold border border-orange-200">Bobot 30%</span>
+                </div>
+                <div class="text-[11px] font-bold text-slate-500">
+                  Poin: <span id="contrib-logic" class="text-orange-600 font-black">0.00</span> <span class="text-[10px] text-slate-400">/ 30.00 pts</span>
+                </div>
+              </div>
+              
+              <p class="text-[10px] text-slate-500 leading-snug">
+                Kompleksitas algoritma, struktur perulangan (loop), percabangan logika (if/else), variabel, sensor, dan efisiensi susunan balok.
+              </p>
+
+              <div class="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-200/60">
+                <div class="flex items-center gap-1">
+                  <span class="text-[10px] font-bold text-slate-400 mr-0.5">Preset:</span>
+                  <button type="button" onclick="setScorePreset('logic', 70)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-orange-50 hover:text-orange-600 text-slate-600 border border-slate-200 transition">70</button>
+                  <button type="button" onclick="setScorePreset('logic', 80)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-orange-50 hover:text-orange-600 text-slate-600 border border-slate-200 transition">80</button>
+                  <button type="button" onclick="setScorePreset('logic', 85)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-orange-50 hover:text-orange-600 text-slate-600 border border-slate-200 transition">85</button>
+                  <button type="button" onclick="setScorePreset('logic', 90)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-orange-50 hover:text-orange-600 text-slate-600 border border-slate-200 transition">90</button>
+                  <button type="button" onclick="setScorePreset('logic', 95)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-orange-50 hover:text-orange-600 text-slate-600 border border-slate-200 transition">95</button>
+                  <button type="button" onclick="setScorePreset('logic', 100)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-orange-50 hover:text-orange-600 text-slate-600 border border-slate-200 transition">100</button>
+                </div>
+
+                <div class="flex items-center gap-1.5 ml-auto">
+                  <button type="button" onclick="adjustScoreStep('logic', -1)" class="w-7 h-7 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black text-xs flex items-center justify-center transition shadow-xs" title="Kurangi 1">-</button>
+                  <input 
+                    type="number" 
+                    id="score-logic-input" 
+                    min="0" 
+                    max="100" 
+                    step="0.5" 
+                    value="0" 
+                    oninput="syncScoreInput('logic', this.value)"
+                    class="w-16 px-2 py-1 rounded-lg text-xs font-black text-center bg-white border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500 shadow-xs"
+                  >
+                  <button type="button" onclick="adjustScoreStep('logic', 1)" class="w-7 h-7 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black text-xs flex items-center justify-center transition shadow-xs" title="Tambah 1">+</button>
+                  <span class="text-xs font-bold text-slate-400">/ 100</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- RUBRIC 2: KREATIVITAS & ORISINALITAS (25%) -->
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
+              <div class="flex flex-wrap items-center justify-between gap-1">
+                <div class="flex items-center gap-1.5">
+                  <span class="w-5 h-5 rounded-full bg-amber-500 text-white flex items-center justify-center text-[10px] font-black">2</span>
+                  <span class="text-xs font-bold text-slate-800">Kreativitas & Orisinalitas</span>
+                  <span class="px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 text-[10px] font-extrabold border border-amber-200">Bobot 25%</span>
+                </div>
+                <div class="text-[11px] font-bold text-slate-500">
+                  Poin: <span id="contrib-creativity" class="text-amber-600 font-black">0.00</span> <span class="text-[10px] text-slate-400">/ 25.00 pts</span>
+                </div>
+              </div>
+              
+              <p class="text-[10px] text-slate-500 leading-snug">
+                Keunikan konsep ide, inovasi mekanik gameplay / interaktivitas, originalitas alur, serta pemecahan masalah kreatif.
+              </p>
+
+              <div class="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-200/60">
+                <div class="flex items-center gap-1">
+                  <span class="text-[10px] font-bold text-slate-400 mr-0.5">Preset:</span>
+                  <button type="button" onclick="setScorePreset('creativity', 70)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-amber-50 hover:text-amber-600 text-slate-600 border border-slate-200 transition">70</button>
+                  <button type="button" onclick="setScorePreset('creativity', 80)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-amber-50 hover:text-amber-600 text-slate-600 border border-slate-200 transition">80</button>
+                  <button type="button" onclick="setScorePreset('creativity', 85)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-amber-50 hover:text-amber-600 text-slate-600 border border-slate-200 transition">85</button>
+                  <button type="button" onclick="setScorePreset('creativity', 90)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-amber-50 hover:text-amber-600 text-slate-600 border border-slate-200 transition">90</button>
+                  <button type="button" onclick="setScorePreset('creativity', 95)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-amber-50 hover:text-amber-600 text-slate-600 border border-slate-200 transition">95</button>
+                  <button type="button" onclick="setScorePreset('creativity', 100)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-amber-50 hover:text-amber-600 text-slate-600 border border-slate-200 transition">100</button>
+                </div>
+
+                <div class="flex items-center gap-1.5 ml-auto">
+                  <button type="button" onclick="adjustScoreStep('creativity', -1)" class="w-7 h-7 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black text-xs flex items-center justify-center transition shadow-xs" title="Kurangi 1">-</button>
+                  <input 
+                    type="number" 
+                    id="score-creativity-input" 
+                    min="0" 
+                    max="100" 
+                    step="0.5" 
+                    value="0" 
+                    oninput="syncScoreInput('creativity', this.value)"
+                    class="w-16 px-2 py-1 rounded-lg text-xs font-black text-center bg-white border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500 shadow-xs"
+                  >
+                  <button type="button" onclick="adjustScoreStep('creativity', 1)" class="w-7 h-7 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black text-xs flex items-center justify-center transition shadow-xs" title="Tambah 1">+</button>
+                  <span class="text-xs font-bold text-slate-400">/ 100</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- RUBRIC 3: KESESUAIAN TEMA & FUNGSIONALITAS (20%) -->
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
+              <div class="flex flex-wrap items-center justify-between gap-1">
+                <div class="flex items-center gap-1.5">
+                  <span class="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-black">3</span>
+                  <span class="text-xs font-bold text-slate-800">Tema & Fungsionalitas</span>
+                  <span class="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-extrabold border border-emerald-200">Bobot 20%</span>
+                </div>
+                <div class="text-[11px] font-bold text-slate-500">
+                  Poin: <span id="contrib-theme" class="text-emerald-600 font-black">0.00</span> <span class="text-[10px] text-slate-400">/ 20.00 pts</span>
+                </div>
+              </div>
+              
+              <p class="text-[10px] text-slate-500 leading-snug">
+                Relevansi dengan tema kompetisi, pesan yang disampaikan, stabilitas program (bebas bug/glitch fatal saat dijalankan).
+              </p>
+
+              <div class="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-200/60">
+                <div class="flex items-center gap-1">
+                  <span class="text-[10px] font-bold text-slate-400 mr-0.5">Preset:</span>
+                  <button type="button" onclick="setScorePreset('theme', 70)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-emerald-50 hover:text-emerald-600 text-slate-600 border border-slate-200 transition">70</button>
+                  <button type="button" onclick="setScorePreset('theme', 80)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-emerald-50 hover:text-emerald-600 text-slate-600 border border-slate-200 transition">80</button>
+                  <button type="button" onclick="setScorePreset('theme', 85)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-emerald-50 hover:text-emerald-600 text-slate-600 border border-slate-200 transition">85</button>
+                  <button type="button" onclick="setScorePreset('theme', 90)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-emerald-50 hover:text-emerald-600 text-slate-600 border border-slate-200 transition">90</button>
+                  <button type="button" onclick="setScorePreset('theme', 95)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-emerald-50 hover:text-emerald-600 text-slate-600 border border-slate-200 transition">95</button>
+                  <button type="button" onclick="setScorePreset('theme', 100)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-emerald-50 hover:text-emerald-600 text-slate-600 border border-slate-200 transition">100</button>
+                </div>
+
+                <div class="flex items-center gap-1.5 ml-auto">
+                  <button type="button" onclick="adjustScoreStep('theme', -1)" class="w-7 h-7 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black text-xs flex items-center justify-center transition shadow-xs" title="Kurangi 1">-</button>
+                  <input 
+                    type="number" 
+                    id="score-theme-input" 
+                    min="0" 
+                    max="100" 
+                    step="0.5" 
+                    value="0" 
+                    oninput="syncScoreInput('theme', this.value)"
+                    class="w-16 px-2 py-1 rounded-lg text-xs font-black text-center bg-white border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500 shadow-xs"
+                  >
+                  <button type="button" onclick="adjustScoreStep('theme', 1)" class="w-7 h-7 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black text-xs flex items-center justify-center transition shadow-xs" title="Tambah 1">+</button>
+                  <span class="text-xs font-bold text-slate-400">/ 100</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- RUBRIC 4: ESTETIKA, DESAIN UI & GERAK (15%) -->
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
+              <div class="flex flex-wrap items-center justify-between gap-1">
+                <div class="flex items-center gap-1.5">
+                  <span class="w-5 h-5 rounded-full bg-cyan-600 text-white flex items-center justify-center text-[10px] font-black">4</span>
+                  <span class="text-xs font-bold text-slate-800">Estetika, Desain UI & Gerak</span>
+                  <span class="px-1.5 py-0.5 rounded bg-cyan-100 text-cyan-800 text-[10px] font-extrabold border border-cyan-200">Bobot 15%</span>
+                </div>
+                <div class="text-[11px] font-bold text-slate-500">
+                  Poin: <span id="contrib-design" class="text-cyan-600 font-black">0.00</span> <span class="text-[10px] text-slate-400">/ 15.00 pts</span>
+                </div>
+              </div>
+              
+              <p class="text-[10px] text-slate-500 leading-snug">
+                Kerapian visual grafis, tata letak antarmuka (UI), animasi kehalusan gerak sprite, sinkronisasi audio dan efek suara.
+              </p>
+
+              <div class="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-200/60">
+                <div class="flex items-center gap-1">
+                  <span class="text-[10px] font-bold text-slate-400 mr-0.5">Preset:</span>
+                  <button type="button" onclick="setScorePreset('design', 70)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-cyan-50 hover:text-cyan-600 text-slate-600 border border-slate-200 transition">70</button>
+                  <button type="button" onclick="setScorePreset('design', 80)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-cyan-50 hover:text-cyan-600 text-slate-600 border border-slate-200 transition">80</button>
+                  <button type="button" onclick="setScorePreset('design', 85)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-cyan-50 hover:text-cyan-600 text-slate-600 border border-slate-200 transition">85</button>
+                  <button type="button" onclick="setScorePreset('design', 90)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-cyan-50 hover:text-cyan-600 text-slate-600 border border-slate-200 transition">90</button>
+                  <button type="button" onclick="setScorePreset('design', 95)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-cyan-50 hover:text-cyan-600 text-slate-600 border border-slate-200 transition">95</button>
+                  <button type="button" onclick="setScorePreset('design', 100)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-cyan-50 hover:text-cyan-600 text-slate-600 border border-slate-200 transition">100</button>
+                </div>
+
+                <div class="flex items-center gap-1.5 ml-auto">
+                  <button type="button" onclick="adjustScoreStep('design', -1)" class="w-7 h-7 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black text-xs flex items-center justify-center transition shadow-xs" title="Kurangi 1">-</button>
+                  <input 
+                    type="number" 
+                    id="score-design-input" 
+                    min="0" 
+                    max="100" 
+                    step="0.5" 
+                    value="0" 
+                    oninput="syncScoreInput('design', this.value)"
+                    class="w-16 px-2 py-1 rounded-lg text-xs font-black text-center bg-white border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500 shadow-xs"
+                  >
+                  <button type="button" onclick="adjustScoreStep('design', 1)" class="w-7 h-7 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black text-xs flex items-center justify-center transition shadow-xs" title="Tambah 1">+</button>
+                  <span class="text-xs font-bold text-slate-400">/ 100</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- RUBRIC 5: PRESENTASI & PEMAHAMAN PESERTA (10%) -->
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
+              <div class="flex flex-wrap items-center justify-between gap-1">
+                <div class="flex items-center gap-1.5">
+                  <span class="w-5 h-5 rounded-full bg-violet-600 text-white flex items-center justify-center text-[10px] font-black">5</span>
+                  <span class="text-xs font-bold text-slate-800">Presentasi & Pemahaman</span>
+                  <span class="px-1.5 py-0.5 rounded bg-violet-100 text-violet-800 text-[10px] font-extrabold border border-violet-200">Bobot 10%</span>
+                </div>
+                <div class="text-[11px] font-bold text-slate-500">
+                  Poin: <span id="contrib-presentation" class="text-violet-600 font-black">0.00</span> <span class="text-[10px] text-slate-400">/ 10.00 pts</span>
+                </div>
+              </div>
+              
+              <p class="text-[10px] text-slate-500 leading-snug">
+                Penguasaan konsep saat menerangkan di video, kejelasan artikulasi, sistematika presentasi, dan kepercayaan diri.
+              </p>
+
+              <div class="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-200/60">
+                <div class="flex items-center gap-1">
+                  <span class="text-[10px] font-bold text-slate-400 mr-0.5">Preset:</span>
+                  <button type="button" onclick="setScorePreset('presentation', 70)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-violet-50 hover:text-violet-600 text-slate-600 border border-slate-200 transition">70</button>
+                  <button type="button" onclick="setScorePreset('presentation', 80)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-violet-50 hover:text-violet-600 text-slate-600 border border-slate-200 transition">80</button>
+                  <button type="button" onclick="setScorePreset('presentation', 85)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-violet-50 hover:text-violet-600 text-slate-600 border border-slate-200 transition">85</button>
+                  <button type="button" onclick="setScorePreset('presentation', 90)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-violet-50 hover:text-violet-600 text-slate-600 border border-slate-200 transition">90</button>
+                  <button type="button" onclick="setScorePreset('presentation', 95)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-violet-50 hover:text-violet-600 text-slate-600 border border-slate-200 transition">95</button>
+                  <button type="button" onclick="setScorePreset('presentation', 100)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-violet-50 hover:text-violet-600 text-slate-600 border border-slate-200 transition">100</button>
+                </div>
+
+                <div class="flex items-center gap-1.5 ml-auto">
+                  <button type="button" onclick="adjustScoreStep('presentation', -1)" class="w-7 h-7 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black text-xs flex items-center justify-center transition shadow-xs" title="Kurangi 1">-</button>
+                  <input 
+                    type="number" 
+                    id="score-presentation-input" 
+                    min="0" 
+                    max="100" 
+                    step="0.5" 
+                    value="0" 
+                    oninput="syncScoreInput('presentation', this.value)"
+                    class="w-16 px-2 py-1 rounded-lg text-xs font-black text-center bg-white border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500 shadow-xs"
+                  >
+                  <button type="button" onclick="adjustScoreStep('presentation', 1)" class="w-7 h-7 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black text-xs flex items-center justify-center transition shadow-xs" title="Tambah 1">+</button>
+                  <span class="text-xs font-bold text-slate-400">/ 100</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- CATATAN DEWAN JURI -->
+            <div class="space-y-1.5 pt-1">
+              <label class="block text-xs font-bold text-slate-700" for="judge-notes-input">
+                Catatan & Evaluasi Konstruktif Juri (Opsional)
+              </label>
+              <textarea 
+                id="judge-notes-input" 
+                rows="3" 
+                placeholder="Berikan apresiasi, poin kekuatan karya, atau saran pengembangan untuk peserta..."
+                class="w-full px-3 py-2 rounded-xl text-xs bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500 placeholder-slate-400"
+              ></textarea>
+            </div>
+
+            <!-- ACTION BUTTONS -->
+            <div class="space-y-2 pt-2">
+              <button 
+                type="button" 
+                id="btn-save-score"
+                onclick="submitScore(false)" 
+                class="w-full py-3 rounded-xl font-extrabold text-white bg-orange-600 hover:bg-orange-700 transition shadow-lg shadow-orange-600/25 text-xs sm:text-sm flex items-center justify-center gap-2"
+              >
+                <i data-lucide="check-circle" class="w-4 h-4"></i>
+                <span>Simpan Penilaian Karya Ini</span>
+              </button>
+
+              <button 
+                type="button" 
+                id="btn-save-and-next"
+                onclick="submitScore(true)" 
+                class="w-full py-2.5 rounded-xl font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition text-xs flex items-center justify-center gap-2"
+              >
+                <i data-lucide="arrow-right-circle" class="w-4 h-4 text-emerald-600"></i>
+                <span>Simpan & Lanjut ke Peserta Berikutnya</span>
+              </button>
+            </div>
+
+          </form>
+
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+
+  <!-- ========================================== -->
+  <!-- 3. MODAL REKAPITULASI & PERINGKAT (LEADERBOARD) -->
+  <!-- ========================================== -->
+  <div id="leaderboard-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4">
+    <div class="bg-white text-slate-800 rounded-3xl p-5 sm:p-7 max-w-4xl w-full border border-slate-200 shadow-2xl flex flex-col max-h-[90vh]">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+        <div class="flex items-center gap-2.5">
+          <span class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold">
+            <i data-lucide="trophy" class="w-5 h-5"></i>
+          </span>
+          <div>
+            <h3 class="display-font text-base sm:text-lg font-bold text-slate-900">Rekapitulasi Nilai & Peringkat Sementara</h3>
+            <p class="text-[11px] text-slate-500">Diurutkan berdasarkan Rata-rata Nilai Akhir Dewan Juri</p>
+          </div>
+        </div>
+
+        <button 
+          type="button" 
+          onclick="closeLeaderboardModal()" 
+          class="p-2 rounded-xl text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition"
+        >
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Filters & CSV Export -->
+      <div class="flex flex-wrap items-center justify-between gap-3 py-3 border-b border-slate-100">
+        <div class="flex items-center gap-2">
+          <select 
+            id="lb-filter-branch" 
+            onchange="loadLeaderboard()"
+            class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-50 border border-slate-200 text-slate-700 focus:outline-none"
+          >
+            <option value="">Semua Cabang</option>
+            <option value="Scratch Coding">Scratch Coding</option>
+            <option value="Micro:bit">Micro:bit</option>
+            <option value="Erboblox">Erboblox</option>
+          </select>
+
+          <select 
+            id="lb-filter-grade" 
+            onchange="loadLeaderboard()"
+            class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-50 border border-slate-200 text-slate-700 focus:outline-none"
+          >
+            <option value="">Semua Jenjang</option>
+            <option value="Kelas 1-3">Kelas 1-3 SD</option>
+            <option value="Kelas 4-6">Kelas 4-6 SD</option>
+            <option value="SMP">SMP</option>
+          </select>
+        </div>
+
+        <button 
+          type="button" 
+          onclick="exportJudgingCSV()" 
+          class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition flex items-center gap-1.5 shadow-sm"
+        >
+          <i data-lucide="download" class="w-3.5 h-3.5"></i>
+          <span>Unduh Berita Acara (CSV)</span>
+        </button>
+      </div>
+
+      <!-- Table Container -->
+      <div class="overflow-x-auto flex-1 my-2">
+        <table class="w-full text-left text-xs text-slate-700">
+          <thead class="text-[10px] uppercase font-bold text-slate-500 bg-slate-50 border-b border-slate-200">
+            <tr>
+              <th class="py-2.5 px-3 text-center">Rank</th>
+              <th class="py-2.5 px-3">Kode Samaran</th>
+              <th class="py-2.5 px-3">Cabang & Kategori</th>
+              <th class="py-2.5 px-3">Judul Karya</th>
+              <th class="py-2.5 px-2 text-center">Penilai</th>
+              <th class="py-2.5 px-2 text-right">Logika</th>
+              <th class="py-2.5 px-2 text-right">Kreatif</th>
+              <th class="py-2.5 px-2 text-right">Tema</th>
+              <th class="py-2.5 px-2 text-right">Estetika</th>
+              <th class="py-2.5 px-2 text-right">Pres.</th>
+              <th class="py-2.5 px-3 text-right font-black text-orange-600">NILAI AKHIR</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboard-tbody" class="divide-y divide-slate-100 font-medium">
+            <tr>
+              <td colspan="11" class="py-10 text-center text-slate-400">Memuat rekap nilai...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="border-t border-slate-100 pt-3 flex items-center justify-between text-[11px] text-slate-500">
+        <span>Sistem Blind Review: Identitas asli peserta hanya tampil pada level Superadmin.</span>
+        <button 
+          type="button" 
+          onclick="closeLeaderboardModal()" 
+          class="px-4 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition"
+        >
+          Tutup
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ========================================== -->
+  <!-- 4. MODAL GANTI PASSWORD JURI               -->
+  <!-- ========================================== -->
+  <div id="change-pwd-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4">
+    <div class="bg-white text-slate-800 rounded-3xl p-6 max-w-sm w-full border border-slate-200 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+        <h4 class="font-bold text-sm text-slate-900 flex items-center gap-2">
+          <i data-lucide="key-round" class="w-4 h-4 text-orange-600"></i>
+          <span>Ganti Password Juri</span>
+        </h4>
+        <button type="button" onclick="closeChangePwdModal()" class="text-slate-400 hover:text-slate-800">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <form id="change-pwd-form" onsubmit="submitChangePassword(event)" class="space-y-3 text-xs">
+        <div>
+          <label class="block text-slate-700 font-bold mb-1">Password Lama</label>
+          <input 
+            type="password" 
+            id="old-pwd-input" 
+            required 
+            class="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500"
+          >
+        </div>
+        <div>
+          <label class="block text-slate-700 font-bold mb-1">Password Baru (Min 6 Karakter)</label>
+          <input 
+            type="password" 
+            id="new-pwd-input" 
+            required 
+            minlength="6" 
+            class="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500"
+          >
+        </div>
+        <button 
+          type="submit" 
+          class="w-full py-2.5 rounded-xl font-bold text-white bg-orange-600 hover:bg-orange-700 transition text-xs mt-2 shadow-sm"
+        >
+          Perbarui Password
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Custom Scripts -->
+  <script src="js/penjurian.js?v=20261102_3"></script>
+</body>
+</html>
