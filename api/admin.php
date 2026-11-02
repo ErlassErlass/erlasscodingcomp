@@ -1208,7 +1208,8 @@ if ($action === 'save_project_score') {
 if ($action === 'get_judging_leaderboard') {
     $branch   = trim($_GET['branch'] ?? '');
     $gradeCat = trim($_GET['grade_category'] ?? '');
-    $isSuperAdmin = ($currentAdmin['role'] === 'superadmin');
+    $search   = trim($_GET['search'] ?? '');
+    $isPrivileged = in_array($currentAdmin['role'] ?? '', ['superadmin', 'panitia'], true);
 
     $sql = "
         SELECT 
@@ -1242,6 +1243,14 @@ if ($action === 'get_judging_leaderboard') {
         $params[] = $gradeCat;
         $params[] = "%$gradeCat%";
     }
+    if ($search !== '') {
+        $sql .= " AND (p.reg_code LIKE ? OR p.participant_name LIKE ? OR p.school_name LIKE ? OR p.project_title LIKE ?)";
+        $sTerm = "%$search%";
+        $params[] = $sTerm;
+        $params[] = $sTerm;
+        $params[] = $sTerm;
+        $params[] = $sTerm;
+    }
 
     $sql .= " GROUP BY p.id HAVING judge_count > 0 ORDER BY final_score DESC, judge_count DESC";
 
@@ -1249,10 +1258,41 @@ if ($action === 'get_judging_leaderboard') {
     $stmt->execute($params);
     $rows = $stmt->fetchAll();
 
+    // Ambil rincian skor per juri untuk setiap proyek yang terdaftar
+    $subIds = array_column($rows, 'id');
+    $scoresBySub = [];
+    if (!empty($subIds)) {
+        $inPlaceholders = implode(',', array_fill(0, count($subIds), '?'));
+        $stmtScores = $pdo->prepare("
+            SELECT 
+                submission_id, judge_id, judge_name,
+                score_logic, score_creativity, score_theme, score_design, score_presentation,
+                total_score, judge_notes, updated_at
+            FROM project_scores 
+            WHERE submission_id IN ($inPlaceholders)
+            ORDER BY id ASC
+        ");
+        $stmtScores->execute($subIds);
+        while ($sc = $stmtScores->fetch()) {
+            $scoresBySub[$sc['submission_id']][] = [
+                'judge_id' => (int)$sc['judge_id'],
+                'judge_name' => $sc['judge_name'],
+                'score_logic' => (float)$sc['score_logic'],
+                'score_creativity' => (float)$sc['score_creativity'],
+                'score_theme' => (float)$sc['score_theme'],
+                'score_design' => (float)$sc['score_design'],
+                'score_presentation' => (float)$sc['score_presentation'],
+                'total_score' => (float)$sc['total_score'],
+                'judge_notes' => $sc['judge_notes'],
+                'scored_at' => $sc['updated_at']
+            ];
+        }
+    }
+
     $leaderboard = [];
     foreach ($rows as $idx => $r) {
         $pTitle = $r['project_title'];
-        if (!$isSuperAdmin) {
+        if (!$isPrivileged) {
             $stripped = preg_replace('/\s*(by|oleh|karya|ciptaan|dibuat oleh)\s+.*$/iu', '', $pTitle);
             if (!empty(trim($stripped))) {
                 $pTitle = trim($stripped);
@@ -1273,10 +1313,11 @@ if ($action === 'get_judging_leaderboard') {
             'avg_theme' => (float)$r['avg_theme'],
             'avg_design' => (float)$r['avg_design'],
             'avg_presentation' => (float)$r['avg_presentation'],
-            'final_score' => (float)$r['final_score']
+            'final_score' => (float)$r['final_score'],
+            'judge_scores' => $scoresBySub[$r['id']] ?? []
         ];
 
-        if ($isSuperAdmin) {
+        if ($isPrivileged) {
             $item['participant_name'] = $r['participant_name'];
             $item['school_name'] = $r['school_name'];
         } else {
@@ -1287,9 +1328,24 @@ if ($action === 'get_judging_leaderboard') {
         $leaderboard[] = $item;
     }
 
+    // Statistik keseluruhan penjurian
+    $totalSubs = (int)($pdo->query("SELECT COUNT(*) FROM project_submissions")->fetchColumn() ?: 0);
+    $totalReviewed = (int)($pdo->query("SELECT COUNT(DISTINCT submission_id) FROM project_scores")->fetchColumn() ?: 0);
+    $totalJudges = (int)($pdo->query("SELECT COUNT(*) FROM admin_users WHERE role = 'juri'")->fetchColumn() ?: 0);
+    $activeJudges = (int)($pdo->query("SELECT COUNT(DISTINCT judge_id) FROM project_scores")->fetchColumn() ?: 0);
+    $highestScore = !empty($leaderboard) ? $leaderboard[0]['final_score'] : 0;
+
     send_json([
         'status' => 'ok',
-        'leaderboard' => $leaderboard
+        'leaderboard' => $leaderboard,
+        'stats' => [
+            'total_submissions' => $totalSubs,
+            'total_reviewed' => $totalReviewed,
+            'total_unreviewed' => max(0, $totalSubs - $totalReviewed),
+            'total_judges' => $totalJudges,
+            'active_judges' => $activeJudges,
+            'highest_score' => (float)$highestScore
+        ]
     ]);
 }
 
@@ -1297,7 +1353,7 @@ if ($action === 'get_judging_leaderboard') {
 if ($action === 'export_judging_csv') {
     $branch   = trim($_GET['branch'] ?? '');
     $gradeCat = trim($_GET['grade_category'] ?? '');
-    $isSuperAdmin = ($currentAdmin['role'] === 'superadmin');
+    $isPrivileged = in_array($currentAdmin['role'] ?? '', ['superadmin', 'panitia'], true);
 
     $sql = "
         SELECT 
@@ -1342,7 +1398,7 @@ if ($action === 'export_judging_csv') {
     fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF)); // UTF-8 BOM
 
     $headers = ['Peringkat', 'Kode Peserta'];
-    if ($isSuperAdmin) {
+    if ($isPrivileged) {
         $headers[] = 'Nama Peserta';
         $headers[] = 'Asal Sekolah';
     }
@@ -1355,7 +1411,7 @@ if ($action === 'export_judging_csv') {
 
     foreach ($rows as $idx => $r) {
         $pTitle = $r['project_title'];
-        if (!$isSuperAdmin) {
+        if (!$isPrivileged) {
             $stripped = preg_replace('/\s*(by|oleh|karya|ciptaan|dibuat oleh)\s+.*$/iu', '', $pTitle);
             if (!empty(trim($stripped))) {
                 $pTitle = trim($stripped);
@@ -1363,7 +1419,7 @@ if ($action === 'export_judging_csv') {
         }
 
         $line = [$idx + 1, $r['reg_code']];
-        if ($isSuperAdmin) {
+        if ($isPrivileged) {
             $line[] = $r['participant_name'];
             $line[] = $r['school_name'];
         }

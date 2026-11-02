@@ -167,6 +167,45 @@
         </div>
       </section>
 
+      <!-- NAVIGATION TABS -->
+      <div class="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-3 no-print">
+        <button 
+          type="button" 
+          id="tab-btn-regs" 
+          onclick="switchAdminView('registrations')" 
+          class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-orange-600 text-white shadow-sm transition flex items-center gap-2"
+        >
+          <i data-lucide="users" class="w-4 h-4"></i>
+          <span>Data Pendaftar</span>
+          <span id="badge-regs-count" class="px-2 py-0.5 rounded-full text-[10px] font-black bg-white/20 text-white">0</span>
+        </button>
+
+        <button 
+          type="button" 
+          id="tab-btn-projects" 
+          onclick="switchAdminView('projects')" 
+          class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 transition flex items-center gap-2"
+        >
+          <i data-lucide="folder-code" class="w-4 h-4 text-emerald-600"></i>
+          <span>Pengumpulan Proyek</span>
+          <span id="badge-projects-count" class="px-2 py-0.5 rounded-full text-[10px] font-black bg-slate-100 text-slate-700 border border-slate-200">0</span>
+        </button>
+
+        <button 
+          type="button" 
+          id="tab-btn-judging" 
+          onclick="switchAdminView('judging')" 
+          class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 transition flex items-center gap-2"
+        >
+          <i data-lucide="award" class="w-4 h-4 text-amber-500"></i>
+          <span>Dashboard & Rekap Penilaian</span>
+          <span id="badge-judging-count" class="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-800 border border-amber-200">Live</span>
+        </button>
+      </div>
+
+      <!-- VIEW 1: DATA REGISTRASI & PENDAFTARAN -->
+      <div id="view-registrations" class="space-y-6">
+
       <!-- SECTION 1: RINGKASAN EKSEKUTIF / METRICS CARDS -->
       <section>
         <div class="flex items-center justify-between mb-3 no-print">
@@ -332,6 +371,250 @@
           <span class="text-slate-400">Klik "Verifikasi" untuk menyetujui atau menolak pendaftaran umum</span>
         </div>
       </section>
+      </div><!-- End of view-registrations -->
+
+      <!-- VIEW 2: PENGUMPULAN KARYA PROYEK -->
+      <div id="view-submissions" class="hidden space-y-6">
+        
+        <!-- Metrics Cards Proyek -->
+        <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
+          <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm">
+            <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Total Proyek Terkumpul</span>
+            <p id="proj-stat-total" class="text-2xl sm:text-3xl font-black text-slate-900 mt-1">0</p>
+            <span class="text-[10px] text-slate-400 mt-1 block">Semua berkas masuk</span>
+          </div>
+
+          <div class="bg-white rounded-2xl p-4 border border-orange-200 shadow-sm bg-gradient-to-br from-orange-50/40 to-white">
+            <span class="text-[11px] font-bold text-orange-700 uppercase tracking-wider block">Scratch Coding (.sb3)</span>
+            <p id="proj-stat-scratch" class="text-2xl sm:text-3xl font-black text-orange-600 mt-1">0</p>
+            <span class="text-[10px] text-orange-600/80 mt-1 block">Game & animasi Scratch</span>
+          </div>
+
+          <div class="bg-white rounded-2xl p-4 border border-purple-200 shadow-sm bg-gradient-to-br from-purple-50/40 to-white">
+            <span class="text-[11px] font-bold text-purple-700 uppercase tracking-wider block">Micro:bit (.hex)</span>
+            <p id="proj-stat-microbit" class="text-2xl sm:text-3xl font-black text-purple-600 mt-1">0</p>
+            <span class="text-[10px] text-purple-600/80 mt-1 block">Microsoft MakeCode hex</span>
+          </div>
+
+          <div class="bg-white rounded-2xl p-4 border border-amber-200 shadow-sm bg-gradient-to-br from-amber-50/40 to-white">
+            <span class="text-[11px] font-bold text-amber-700 uppercase tracking-wider block">Erboblox Robotics</span>
+            <p id="proj-stat-erboblox" class="text-2xl sm:text-3xl font-black text-amber-600 mt-1">0</p>
+            <span class="text-[10px] text-amber-600/80 mt-1 block">Robotik & Video Demo</span>
+          </div>
+
+          <div class="bg-white rounded-2xl p-4 border border-blue-200 shadow-sm bg-gradient-to-br from-blue-50/40 to-white">
+            <span class="text-[11px] font-bold text-blue-700 uppercase tracking-wider block">Izin Revisi Aktif</span>
+            <p id="proj-stat-revision" class="text-2xl sm:text-3xl font-black text-blue-600 mt-1">0</p>
+            <span class="text-[10px] text-blue-600/80 mt-1 block">Diberi izin upload ulang</span>
+          </div>
+        </div>
+
+        <!-- Tabel Proyek & Filter -->
+        <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="p-4 sm:p-5 border-b border-slate-100 bg-slate-50/50 flex flex-wrap items-center justify-between gap-3 no-print">
+            <div>
+              <h3 class="font-extrabold text-base text-slate-900">Daftar Pengumpulan Karya Proyek</h3>
+              <p class="text-xs text-slate-500">Periksa file kode, link video demonstrasi, dan kelola izin kunci/revisi peserta.</p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+              <div class="relative flex-1 sm:w-64">
+                <i data-lucide="search" class="w-4 h-4 absolute left-3 top-3 text-slate-400"></i>
+                <input id="proj-filter-search" oninput="loadProjectSubmissions()" type="text" placeholder="Cari nama, kode, judul..." class="w-full pl-9 pr-3 py-2 text-xs bg-white border border-slate-200 rounded-xl outline-none focus:border-orange-500">
+              </div>
+
+              <select id="proj-filter-branch" onchange="loadProjectSubmissions()" class="text-xs bg-white border border-slate-200 rounded-xl px-3 py-2 outline-none font-semibold text-slate-700">
+                <option value="">Semua Cabang</option>
+                <option value="Scratch Coding">Scratch Coding</option>
+                <option value="Micro:bit">Micro:bit</option>
+                <option value="Erboblox Robotics">Erboblox Robotics</option>
+              </select>
+
+              <select id="proj-filter-grade" onchange="loadProjectSubmissions()" class="text-xs bg-white border border-slate-200 rounded-xl px-3 py-2 outline-none font-semibold text-slate-700">
+                <option value="">Semua Jenjang</option>
+                <option value="Kelas 1-3">Kelas 1-3 SD</option>
+                <option value="Kelas 4-6">Kelas 4-6 SD</option>
+                <option value="SMP 7-9">SMP / Kelas 7-9</option>
+              </select>
+
+              <select id="proj-filter-status" onchange="loadProjectSubmissions()" class="text-xs bg-white border border-slate-200 rounded-xl px-3 py-2 outline-none font-semibold text-slate-700">
+                <option value="">Semua Status Revisi</option>
+                <option value="submitted">Terkunci (Final)</option>
+                <option value="allow_revision">Izin Revisi Terbuka</option>
+              </select>
+
+              <button type="button" onclick="exportProjectCSV()" class="px-3 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition flex items-center gap-1.5 shadow-sm">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                <span>Unduh CSV Proyek</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-700">
+              <thead class="bg-slate-100/80 text-[11px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
+                <tr>
+                  <th class="py-3 px-4">No</th>
+                  <th class="py-3 px-4">Peserta & Waktu</th>
+                  <th class="py-3 px-4">Sekolah</th>
+                  <th class="py-3 px-4">Cabang & Jenjang</th>
+                  <th class="py-3 px-4">Judul Karya</th>
+                  <th class="py-3 px-4">Berkas Proyek</th>
+                  <th class="py-3 px-4">Video Presentasi</th>
+                  <th class="py-3 px-4">Versi & Status Kunci</th>
+                  <th class="py-3 px-4 text-right no-print">Aksi Panitia</th>
+                </tr>
+              </thead>
+              <tbody id="projects-table-body" class="divide-y divide-slate-100">
+                <tr>
+                  <td colspan="9" class="py-8 text-center text-slate-400">Memuat data proyek...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="p-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 no-print">
+            <span id="proj-pagination-info">Menampilkan 0 proyek yang terkumpul</span>
+            <span class="text-slate-400">Buka kunci revisi bila peserta membutuhkan perbaikan berkas sebelum batas pengumpulan.</span>
+          </div>
+        </section>
+      </div>
+
+      <!-- VIEW 3: DASHBOARD & REKAP PENILAIAN DEWAN JURI -->
+      <div id="view-judging" class="hidden space-y-6">
+        
+        <!-- Header Banner Penjurian -->
+        <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 rounded-2xl p-5 text-white shadow-md flex flex-wrap items-center justify-between gap-4 no-print">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-2xl bg-amber-400/20 text-amber-400 flex items-center justify-center font-black shrink-0 border border-amber-400/30 shadow-inner">
+              <i data-lucide="trophy" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-400/20 text-amber-300 border border-amber-400/30 uppercase tracking-wider mb-1">
+                <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                <span>Executive Judging Monitor</span>
+              </div>
+              <h2 class="display-font text-lg sm:text-xl font-bold tracking-wide text-white">Dashboard Penilaian Karya & Rekapitulasi Juri</h2>
+              <p class="text-xs text-slate-300 mt-0.5">Monitoring skor 5 rubrik dari 8 dewan juri, data unmasked (nama & sekolah terbuka), serta rekapitulasi peringkat resmi.</p>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <a href="penjurian.html" target="_blank" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-white/10 hover:bg-white/20 text-white border border-white/20 transition flex items-center gap-1.5 shadow-xs">
+              <i data-lucide="award" class="w-4 h-4 text-orange-400"></i>
+              <span>Portal Dewan Juri ↗</span>
+            </a>
+            <button type="button" onclick="exportJudgingAdminCSV()" class="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition flex items-center gap-1.5 shadow-md">
+              <i data-lucide="download" class="w-4 h-4"></i>
+              <span>Unduh Berita Acara (Excel / CSV)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Metric Cards Penjurian -->
+        <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
+          <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm">
+            <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Karya Terkumpul</span>
+            <p id="jdg-stat-total" class="text-2xl sm:text-3xl font-black text-slate-900 mt-1">0</p>
+            <span class="text-[10px] text-slate-400 mt-1 block">Total karya siap dinilai</span>
+          </div>
+
+          <div class="bg-white rounded-2xl p-4 border border-emerald-200 shadow-sm bg-gradient-to-br from-emerald-50/40 to-white">
+            <span class="text-[11px] font-bold text-emerald-700 uppercase tracking-wider block">Sudah Dinilai Juri</span>
+            <p id="jdg-stat-reviewed" class="text-2xl sm:text-3xl font-black text-emerald-600 mt-1">0</p>
+            <span class="text-[10px] text-emerald-600/80 mt-1 block">Minimal 1 reviu juri</span>
+          </div>
+
+          <div class="bg-white rounded-2xl p-4 border border-amber-200 shadow-sm bg-gradient-to-br from-amber-50/40 to-white">
+            <span class="text-[11px] font-bold text-amber-700 uppercase tracking-wider block">Menunggu Dinilai</span>
+            <p id="jdg-stat-unreviewed" class="text-2xl sm:text-3xl font-black text-amber-600 mt-1">0</p>
+            <span class="text-[10px] text-amber-600/80 mt-1 block">Belum ada reviu</span>
+          </div>
+
+          <div class="bg-white rounded-2xl p-4 border border-indigo-200 shadow-sm bg-gradient-to-br from-indigo-50/40 to-white">
+            <span class="text-[11px] font-bold text-indigo-700 uppercase tracking-wider block">Dewan Juri Aktif</span>
+            <p id="jdg-stat-judges" class="text-2xl sm:text-3xl font-black text-indigo-600 mt-1">0 / 8</p>
+            <span class="text-[10px] text-indigo-600/80 mt-1 block">Juri telah memberi nilai</span>
+          </div>
+
+          <div class="bg-white rounded-2xl p-4 border border-orange-200 shadow-sm bg-gradient-to-br from-orange-50/40 to-white">
+            <span class="text-[11px] font-bold text-orange-700 uppercase tracking-wider block">Skor Tertinggi Saat Ini</span>
+            <p id="jdg-stat-highest" class="text-2xl sm:text-3xl font-black text-orange-600 mt-1">0.00</p>
+            <span class="text-[10px] text-orange-600/80 mt-1 block">Rata-rata akumulasi</span>
+          </div>
+        </div>
+
+        <!-- Tabel Leaderboard & Filter Penjurian -->
+        <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="p-4 sm:p-5 border-b border-slate-100 bg-slate-50/50 flex flex-wrap items-center justify-between gap-3 no-print">
+            <div>
+              <h3 class="font-extrabold text-base text-slate-900 flex items-center gap-2">
+                <i data-lucide="bar-chart-3" class="w-4 h-4 text-orange-600"></i>
+                <span>Tabel Peringkat & Rekapitulasi Nilai Dewan Juri</span>
+              </h3>
+              <p class="text-xs text-slate-500">Peringkat dihitung dari rata-rata nilai dewan juri dengan 5 bobot kriteria resmi.</p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+              <div class="relative flex-1 sm:w-64">
+                <i data-lucide="search" class="w-4 h-4 absolute left-3 top-3 text-slate-400"></i>
+                <input id="jdg-filter-search" oninput="loadJudgingDashboard()" type="text" placeholder="Cari nama, sekolah, judul, kode..." class="w-full pl-9 pr-3 py-2 text-xs bg-white border border-slate-200 rounded-xl outline-none focus:border-orange-500">
+              </div>
+
+              <select id="jdg-filter-branch" onchange="loadJudgingDashboard()" class="text-xs bg-white border border-slate-200 rounded-xl px-3 py-2 outline-none font-semibold text-slate-700">
+                <option value="">Semua Cabang</option>
+                <option value="Scratch Coding">Scratch Coding</option>
+                <option value="Micro:bit">Micro:bit</option>
+                <option value="Erboblox Robotics">Erboblox Robotics</option>
+              </select>
+
+              <select id="jdg-filter-grade" onchange="loadJudgingDashboard()" class="text-xs bg-white border border-slate-200 rounded-xl px-3 py-2 outline-none font-semibold text-slate-700">
+                <option value="">Semua Jenjang</option>
+                <option value="Kelas 1-3">Kelas 1-3 SD</option>
+                <option value="Kelas 4-6">Kelas 4-6 SD</option>
+                <option value="SMP 7-9">SMP / Kelas 7-9</option>
+              </select>
+
+              <button type="button" onclick="loadJudgingDashboard()" class="p-2 rounded-xl text-slate-600 hover:text-orange-600 bg-white border border-slate-200 transition" title="Segarkan Leaderboard">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-700">
+              <thead class="bg-slate-100/80 text-[11px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
+                <tr>
+                  <th class="py-3 px-3 text-center">Rank</th>
+                  <th class="py-3 px-3">Kode & Tanggal</th>
+                  <th class="py-3 px-3">Nama Peserta</th>
+                  <th class="py-3 px-3">Asal Sekolah</th>
+                  <th class="py-3 px-3">Cabang & Jenjang</th>
+                  <th class="py-3 px-3">Judul Karya</th>
+                  <th class="py-3 px-2 text-center">Jml Juri</th>
+                  <th class="py-3 px-2 text-right">Logika (30%)</th>
+                  <th class="py-3 px-2 text-right">Kreatif (25%)</th>
+                  <th class="py-3 px-2 text-right">Tema (20%)</th>
+                  <th class="py-3 px-2 text-right">Desain (15%)</th>
+                  <th class="py-3 px-2 text-right">Pres. (10%)</th>
+                  <th class="py-3 px-3 text-right font-black text-orange-600">NILAI AKHIR</th>
+                  <th class="py-3 px-3 text-center no-print">Rincian Juri</th>
+                </tr>
+              </thead>
+              <tbody id="judging-table-body" class="divide-y divide-slate-100 font-medium">
+                <tr>
+                  <td colspan="14" class="py-8 text-center text-slate-400">Memuat rekapitulasi penilaian dewan juri...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="p-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 no-print">
+            <span id="jdg-pagination-info">Menampilkan 0 hasil penilaian</span>
+            <span class="text-slate-400">Klik "Rincian Juri" untuk melihat lembar skor dan catatan feedback dari masing-masing juri.</span>
+          </div>
+        </section>
+      </div>
     </main>
   </div>
 
@@ -612,6 +895,49 @@
     </div>
   </div>
 
-  <script src="js/admin.js?v=20261005_11"></script>
+  <!-- MODAL RINCIAN NILAI DEWAN JURI -->
+  <div id="score-details-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 backdrop-blur-sm p-4 hidden no-print">
+    <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-3xl w-full shadow-2xl border border-slate-100 text-left max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
+        <div>
+          <div class="flex items-center gap-2">
+            <h3 class="display-font text-lg font-bold text-slate-900">Lembar Penilaian Dewan Juri</h3>
+            <span id="sdm-reg-code" class="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-orange-100 text-orange-800">E-1026-XXXX</span>
+          </div>
+          <p id="sdm-meta-info" class="text-xs text-slate-500 mt-1">Nama Peserta • Asal Sekolah • Cabang</p>
+        </div>
+        <button type="button" onclick="closeScoreDetailsModal()" class="text-slate-400 hover:text-slate-600 p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Project Summary Pill -->
+      <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 mb-4 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div>
+          <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Judul Karya Proyek:</span>
+          <strong id="sdm-project-title" class="text-sm font-extrabold text-slate-900">Judul Karya</strong>
+        </div>
+        <div class="text-right">
+          <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Nilai Rata-rata Akhir:</span>
+          <span id="sdm-final-score" class="display-font text-xl font-black text-orange-600">0.00</span>
+          <span class="text-slate-400 font-bold">/ 100</span>
+        </div>
+      </div>
+
+      <!-- Scrollable Cards of Individual Judge Reviews -->
+      <div class="flex-1 overflow-y-auto space-y-3 pr-1" id="sdm-judge-cards-container">
+        <!-- Rendered by JS -->
+      </div>
+
+      <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+        <span>Kriteria Terbobot: Logika (30%), Kreativitas (25%), Tema (20%), Desain (15%), Presentasi (10%)</span>
+        <button type="button" onclick="closeScoreDetailsModal()" class="px-4 py-2 rounded-xl font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition">
+          Tutup
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/admin.js?v=20261102_15"></script>
 </body>
 </html>

@@ -301,6 +301,9 @@ function renderReports(data) {
   document.getElementById('stat-public').textContent = m.total_public;
   document.getElementById('stat-revenue').textContent = 'Rp ' + Number(m.total_revenue).toLocaleString('id-ID');
 
+  const badgeRegs = document.getElementById('badge-regs-count');
+  if (badgeRegs) badgeRegs.textContent = m.total_registered;
+
   // Render Cabang Breakdown
   const branchContainer = document.getElementById('branch-breakdown');
   branchContainer.innerHTML = '';
@@ -943,26 +946,48 @@ async function deleteUser(userId, username) {
 
 let activeDashboardTab = 'registrations';
 
-function switchDashboardTab(tabName) {
-  activeDashboardTab = tabName;
+let activeAdminView = 'registrations'; // 'registrations', 'projects', 'judging'
+let judgingLeaderboardData = [];
+
+function switchAdminView(viewName) {
+  activeAdminView = viewName;
   const btnRegs = document.getElementById('tab-btn-regs');
   const btnProjects = document.getElementById('tab-btn-projects');
+  const btnJudging = document.getElementById('tab-btn-judging');
+
   const viewRegs = document.getElementById('view-registrations');
   const viewProjects = document.getElementById('view-submissions');
+  const viewJudging = document.getElementById('view-judging');
 
-  if (tabName === 'projects') {
-    btnRegs.className = 'px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 transition flex items-center gap-2';
-    btnProjects.className = 'px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold bg-emerald-600 text-white shadow-sm transition flex items-center gap-2';
-    viewRegs.classList.add('hidden');
-    viewProjects.classList.remove('hidden');
+  // Reset semua tombol ke style inaktif
+  [btnRegs, btnProjects, btnJudging].forEach(btn => {
+    if (btn) btn.className = 'px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 transition flex items-center gap-2';
+  });
+
+  // Sembunyikan semua view
+  if (viewRegs) viewRegs.classList.add('hidden');
+  if (viewProjects) viewProjects.classList.add('hidden');
+  if (viewJudging) viewJudging.classList.add('hidden');
+
+  if (viewName === 'projects') {
+    if (btnProjects) btnProjects.className = 'px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold bg-emerald-600 text-white shadow-sm transition flex items-center gap-2';
+    if (viewProjects) viewProjects.classList.remove('hidden');
     loadProjectSubmissions();
+  } else if (viewName === 'judging') {
+    if (btnJudging) btnJudging.className = 'px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-sm transition flex items-center gap-2';
+    if (viewJudging) viewJudging.classList.remove('hidden');
+    loadJudgingDashboard();
   } else {
-    btnRegs.className = 'px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold bg-orange-600 text-white shadow-sm transition flex items-center gap-2';
-    btnProjects.className = 'px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 transition flex items-center gap-2';
-    viewRegs.classList.remove('hidden');
-    viewProjects.classList.add('hidden');
+    if (btnRegs) btnRegs.className = 'px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold bg-orange-600 text-white shadow-sm transition flex items-center gap-2';
+    if (viewRegs) viewRegs.classList.remove('hidden');
+    loadRegistrations();
   }
+
   if (window.lucide) lucide.createIcons();
+}
+
+function switchDashboardTab(tabName) {
+  switchAdminView(tabName);
 }
 
 async function loadProjectSubmissions() {
@@ -1155,6 +1180,196 @@ function exportProjectCSV() {
   window.location.href = `api/admin.php?action=export_project_submissions&token=${encodeURIComponent(authToken)}`;
 }
 
+// 10. Dashboard & Rekap Penilaian Dewan Juri
+async function loadJudgingDashboard() {
+  const tbody = document.getElementById('judging-table-body');
+  if (!tbody) return;
+
+  const branch = document.getElementById('jdg-filter-branch')?.value || '';
+  const gradeCat = document.getElementById('jdg-filter-grade')?.value || '';
+  const search = (document.getElementById('jdg-filter-search')?.value || '').trim();
+
+  tbody.innerHTML = '<tr><td colspan="14" class="p-8 text-center text-slate-400"><i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2 text-amber-500"></i>Memuat rekapitulasi penilaian dewan juri...</td></tr>';
+  if (window.lucide) lucide.createIcons();
+
+  try {
+    const url = `api/admin.php?action=get_judging_leaderboard&token=${encodeURIComponent(authToken)}&branch=${encodeURIComponent(branch)}&grade_category=${encodeURIComponent(gradeCat)}&search=${encodeURIComponent(search)}`;
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (data.status === 'ok') {
+      const stats = data.stats || {};
+      const statTotalEl = document.getElementById('jdg-stat-total');
+      const statRevEl = document.getElementById('jdg-stat-reviewed');
+      const statUnrevEl = document.getElementById('jdg-stat-unreviewed');
+      const statJudgesEl = document.getElementById('jdg-stat-judges');
+      const statHighEl = document.getElementById('jdg-stat-highest');
+
+      if (statTotalEl) statTotalEl.textContent = stats.total_submissions || 0;
+      if (statRevEl) statRevEl.textContent = stats.total_reviewed || 0;
+      if (statUnrevEl) statUnrevEl.textContent = stats.total_unreviewed || 0;
+      if (statJudgesEl) statJudgesEl.textContent = `${stats.active_judges || 0} / ${stats.total_judges || 8}`;
+      if (statHighEl) statHighEl.textContent = (stats.highest_score || 0).toFixed(2);
+
+      const badgeCount = document.getElementById('badge-judging-count');
+      if (badgeCount) badgeCount.textContent = `${stats.total_reviewed || 0} Dinilai`;
+
+      judgingLeaderboardData = data.leaderboard || [];
+      const infoEl = document.getElementById('jdg-pagination-info');
+      if (infoEl) infoEl.textContent = `Menampilkan ${judgingLeaderboardData.length} karya berperingkat`;
+
+      if (judgingLeaderboardData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="14" class="p-8 text-center text-slate-400">Belum ada karya yang selesai dinilai dewan juri pada filter ini.</td></tr>';
+        return;
+      }
+
+      let html = '';
+      judgingLeaderboardData.forEach((r, idx) => {
+        let rankBadge = '';
+        if (idx === 0) rankBadge = '<span class="w-6 h-6 rounded-full bg-amber-400 text-amber-950 font-black inline-flex items-center justify-center text-[10px] shadow-xs">1</span>';
+        else if (idx === 1) rankBadge = '<span class="w-6 h-6 rounded-full bg-slate-200 text-slate-800 font-black inline-flex items-center justify-center text-[10px] shadow-xs">2</span>';
+        else if (idx === 2) rankBadge = '<span class="w-6 h-6 rounded-full bg-amber-600 text-white font-black inline-flex items-center justify-center text-[10px] shadow-xs">3</span>';
+        else rankBadge = `<span class="text-xs font-bold text-slate-500">${idx + 1}</span>`;
+
+        let predicate = '';
+        const fs = parseFloat(r.final_score || 0);
+        if (fs >= 90) predicate = '<span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-emerald-100 text-emerald-800">Istimewa (A+)</span>';
+        else if (fs >= 80) predicate = '<span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-emerald-50 text-emerald-700">Sangat Baik (A)</span>';
+        else if (fs >= 70) predicate = '<span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-amber-100 text-amber-800">Baik (B)</span>';
+        else if (fs >= 60) predicate = '<span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-orange-100 text-orange-800">Cukup (C)</span>';
+        else predicate = '<span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-red-100 text-red-800">Pembinaan (D)</span>';
+
+        html += `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="py-3 px-3 text-center">${rankBadge}</td>
+            <td class="py-3 px-3 whitespace-nowrap">
+              <span class="font-mono font-black text-orange-600 block text-xs">${escapeHtml(r.reg_code)}</span>
+              <span class="text-[10px] text-slate-400 block">${escapeHtml(r.blind_code)}</span>
+            </td>
+            <td class="py-3 px-3 font-extrabold text-slate-900">${escapeHtml(r.participant_name || '-')}</td>
+            <td class="py-3 px-3 text-slate-600 text-[11px]">${escapeHtml(r.school_name || '-')}</td>
+            <td class="py-3 px-3 text-slate-600">
+              <span class="font-bold text-slate-800">${escapeHtml(r.branch)}</span>
+              <span class="text-[10px] text-slate-400 block">${escapeHtml(r.grade_category)}</span>
+            </td>
+            <td class="py-3 px-3 font-bold text-slate-900 max-w-[180px] truncate" title="${escapeHtml(r.project_title)}">${escapeHtml(r.project_title)}</td>
+            <td class="py-3 px-2 text-center text-slate-600 font-bold">${r.judge_count} juri</td>
+            <td class="py-3 px-2 text-right text-slate-600 font-semibold">${parseFloat(r.avg_logic || 0).toFixed(1)}</td>
+            <td class="py-3 px-2 text-right text-slate-600 font-semibold">${parseFloat(r.avg_creativity || 0).toFixed(1)}</td>
+            <td class="py-3 px-2 text-right text-slate-600 font-semibold">${parseFloat(r.avg_theme || 0).toFixed(1)}</td>
+            <td class="py-3 px-2 text-right text-slate-600 font-semibold">${parseFloat(r.avg_design || 0).toFixed(1)}</td>
+            <td class="py-3 px-2 text-right text-slate-600 font-semibold">${parseFloat(r.avg_presentation || 0).toFixed(1)}</td>
+            <td class="py-3 px-3 text-right">
+              <span class="display-font font-black text-orange-600 text-sm block leading-none">${parseFloat(r.final_score || 0).toFixed(2)}</span>
+              <div class="mt-1">${predicate}</div>
+            </td>
+            <td class="py-3 px-3 text-center no-print">
+              <button 
+                type="button" 
+                onclick="openScoreDetailsModal(${r.id})" 
+                class="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 transition inline-flex items-center gap-1 shadow-2xs"
+                title="Lihat Lembar Nilai Juri"
+              >
+                <i data-lucide="clipboard-list" class="w-3.5 h-3.5 text-amber-600"></i>
+                <span>Rincian</span>
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+      if (window.lucide) lucide.createIcons();
+    }
+  } catch (err) {
+    console.error('Error loading judging dashboard:', err);
+    tbody.innerHTML = '<tr><td colspan="14" class="p-8 text-center text-red-500">Gagal memuat rekap nilai penjurian. Periksa koneksi internet.</td></tr>';
+  }
+}
+
+function openScoreDetailsModal(submissionId) {
+  const item = judgingLeaderboardData.find(s => s.id === submissionId);
+  if (!item) return;
+
+  const modal = document.getElementById('score-details-modal');
+  document.getElementById('sdm-reg-code').textContent = item.reg_code;
+  document.getElementById('sdm-meta-info').textContent = `${item.participant_name} • ${item.school_name} • ${item.branch} (${item.grade_category})`;
+  document.getElementById('sdm-project-title').textContent = item.project_title;
+  document.getElementById('sdm-final-score').textContent = item.final_score.toFixed(2);
+
+  const container = document.getElementById('sdm-judge-cards-container');
+  const judgeScores = item.judge_scores || [];
+
+  if (judgeScores.length === 0) {
+    container.innerHTML = '<div class="p-6 text-center text-slate-400 bg-slate-50 rounded-2xl">Belum ada dewan juri yang menyelesaikan penilaian karya ini.</div>';
+  } else {
+    let cardsHtml = '';
+    judgeScores.forEach((js, idx) => {
+      cardsHtml += `
+        <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-2.5">
+          <div class="flex flex-wrap items-center justify-between border-b border-slate-100 pb-2 gap-2">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-lg bg-orange-100 text-orange-700 flex items-center justify-center font-bold text-xs">
+                ${idx + 1}
+              </span>
+              <strong class="text-xs font-black text-slate-800">${escapeHtml(js.judge_name || ('Juri #' + js.judge_id))}</strong>
+              <span class="text-[10px] text-slate-400 font-medium">(${js.scored_at || '-'})</span>
+            </div>
+            <div class="text-right">
+              <span class="text-xs font-black text-orange-600">${js.total_score.toFixed(2)}</span>
+              <span class="text-[10px] text-slate-400 font-bold">/ 100</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-5 gap-2 text-center text-[10px]">
+            <div class="bg-slate-50 p-2 rounded-xl border border-slate-100">
+              <div class="text-slate-400 font-bold uppercase text-[9px]">Logika (30%)</div>
+              <div class="font-black text-slate-800 text-xs mt-0.5">${js.score_logic.toFixed(1)}</div>
+            </div>
+            <div class="bg-slate-50 p-2 rounded-xl border border-slate-100">
+              <div class="text-slate-400 font-bold uppercase text-[9px]">Kreatif (25%)</div>
+              <div class="font-black text-slate-800 text-xs mt-0.5">${js.score_creativity.toFixed(1)}</div>
+            </div>
+            <div class="bg-slate-50 p-2 rounded-xl border border-slate-100">
+              <div class="text-slate-400 font-bold uppercase text-[9px]">Tema (20%)</div>
+              <div class="font-black text-slate-800 text-xs mt-0.5">${js.score_theme.toFixed(1)}</div>
+            </div>
+            <div class="bg-slate-50 p-2 rounded-xl border border-slate-100">
+              <div class="text-slate-400 font-bold uppercase text-[9px]">Desain (15%)</div>
+              <div class="font-black text-slate-800 text-xs mt-0.5">${js.score_design.toFixed(1)}</div>
+            </div>
+            <div class="bg-slate-50 p-2 rounded-xl border border-slate-100">
+              <div class="text-slate-400 font-bold uppercase text-[9px]">Pres. (10%)</div>
+              <div class="font-black text-slate-800 text-xs mt-0.5">${js.score_presentation.toFixed(1)}</div>
+            </div>
+          </div>
+
+          <div class="pt-1">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Catatan & Saran Juri:</span>
+            <div class="p-2.5 rounded-xl bg-slate-50 text-[11px] text-slate-700 italic border border-slate-100 leading-relaxed">
+              ${escapeHtml(js.judge_notes) || '<span class="text-slate-400 not-italic">Tidak ada catatan teks dari juri.</span>'}
+            </div>
+          </div>
+        </div>
+      `;
+    });
+    container.innerHTML = cardsHtml;
+  }
+
+  modal.classList.remove('hidden');
+  if (window.lucide) lucide.createIcons();
+}
+
+function closeScoreDetailsModal() {
+  const modal = document.getElementById('score-details-modal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function exportJudgingAdminCSV() {
+  const branch = document.getElementById('jdg-filter-branch')?.value || '';
+  const gradeCat = document.getElementById('jdg-filter-grade')?.value || '';
+  window.location.href = `api/admin.php?action=export_judging_csv&branch=${encodeURIComponent(branch)}&grade_category=${encodeURIComponent(gradeCat)}&token=${encodeURIComponent(authToken)}`;
+}
+
 // Global Window Bindings untuk memastikan fungsi inline onclick HTML selalu dapat diakses
 window.openNewCompModal = openNewCompModal;
 window.closeNewCompModal = closeNewCompModal;
@@ -1179,30 +1394,42 @@ window.toggleSelectAll = toggleSelectAll;
 window.updateSelectedCount = updateSelectedCount;
 window.cancelSelection = cancelSelection;
 
+window.switchAdminView = switchAdminView;
 window.switchDashboardTab = switchDashboardTab;
 window.loadProjectSubmissions = loadProjectSubmissions;
 window.toggleProjectRevision = toggleProjectRevision;
 window.deleteProjectSubmission = deleteProjectSubmission;
 window.exportProjectCSV = exportProjectCSV;
+window.loadJudgingDashboard = loadJudgingDashboard;
+window.openScoreDetailsModal = openScoreDetailsModal;
+window.closeScoreDetailsModal = closeScoreDetailsModal;
+window.exportJudgingAdminCSV = exportJudgingAdminCSV;
 
 // Event Listeners Filter Registrasi
-document.getElementById('filter-branch').addEventListener('change', loadRegistrations);
-document.getElementById('filter-status').addEventListener('change', loadRegistrations);
-document.getElementById('filter-partner').addEventListener('change', loadRegistrations);
+document.getElementById('filter-branch')?.addEventListener('change', loadRegistrations);
+document.getElementById('filter-status')?.addEventListener('change', loadRegistrations);
+document.getElementById('filter-partner')?.addEventListener('change', loadRegistrations);
 let searchTimeout;
-document.getElementById('filter-search').addEventListener('input', () => {
+document.getElementById('filter-search')?.addEventListener('input', () => {
   clearTimeout(searchTimeout);
   searchTimeout = setTimeout(loadRegistrations, 300);
 });
 
 // Event Listeners Filter Proyek
-document.getElementById('proj-filter-branch').addEventListener('change', loadProjectSubmissions);
-document.getElementById('proj-filter-grade').addEventListener('change', loadProjectSubmissions);
-document.getElementById('proj-filter-status').addEventListener('change', loadProjectSubmissions);
+document.getElementById('proj-filter-branch')?.addEventListener('change', loadProjectSubmissions);
+document.getElementById('proj-filter-grade')?.addEventListener('change', loadProjectSubmissions);
+document.getElementById('proj-filter-status')?.addEventListener('change', loadProjectSubmissions);
 let projSearchTimeout;
-document.getElementById('proj-filter-search').addEventListener('input', () => {
+document.getElementById('proj-filter-search')?.addEventListener('input', () => {
   clearTimeout(projSearchTimeout);
   projSearchTimeout = setTimeout(loadProjectSubmissions, 300);
+});
+
+// Event Listeners Filter Penjurian
+let jdgSearchTimeout;
+document.getElementById('jdg-filter-search')?.addEventListener('input', () => {
+  clearTimeout(jdgSearchTimeout);
+  jdgSearchTimeout = setTimeout(loadJudgingDashboard, 300);
 });
 
 document.addEventListener('DOMContentLoaded', checkAuth);
