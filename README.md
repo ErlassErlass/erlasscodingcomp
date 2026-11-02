@@ -119,3 +119,4 @@ Database: `erlass_competition` (MySQL / MariaDB)
 - **Pengumpulan Proyek:** [https://erlasscompetition.erlass.academy/kumpul-proyek.html](https://erlasscompetition.erlass.academy/kumpul-proyek.html)
 - **Dashboard Panitia:** [https://erlasscompetition.erlass.academy/admin.html](https://erlasscompetition.erlass.academy/admin.html)
 - **Studio Penjurian Juri:** [https://erlasscompetition.erlass.academy/penjurian.html](https://erlasscompetition.erlass.academy/penjurian.html)
+

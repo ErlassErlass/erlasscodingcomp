@@ -68,3 +68,4 @@ Untuk mencegah perubahan berkas tanpa izin di tengah proses penjurian:
    }
    ```
    Hal ini memungkinkan engine web runtime eksternal seperti TurboWarp (`turbowarp.org/embed.html`) dan Microsoft MakeCode mengunduh dan menjalankan berkas `.sb3`/`.hex` secara langsung di browser tanpa pemblokiran keamanan lintas-domain.
+

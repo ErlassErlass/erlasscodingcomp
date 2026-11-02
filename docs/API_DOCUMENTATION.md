@@ -126,3 +126,4 @@ Endpoint administratif memerlukan token sesi (`?token=...` atau header `Authoriz
   Mengunduh Berita Acara Rekapitulasi Nilai Dewan Juri dalam format CSV.
 - **`GET ?action=stream_project_file&id={sub_id}`**:
   Menyajikan aliran biner berkas proyek dengan header CORS (`Access-Control-Allow-Origin: *`) dan nama berkas bersih yang disamarkan (`Proyek_E-XXXX-XXXX.sb3`).
+

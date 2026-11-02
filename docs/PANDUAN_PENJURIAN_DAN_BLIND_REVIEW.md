@@ -112,3 +112,4 @@ Sistem menggunakan 5 kriteria resmi tanpa *slider*, mengutamakan kecepatan dan p
 2. Muncul modal rekapitulasi yang mengurutkan karya berdasarkan rata-rata skor dewan juri tertinggi (*descending*).
 3. Juri dapat memfilter berdasarkan cabang dan jenjang tertentu.
 4. Klik **"Unduh Berita Acara (CSV)"** untuk mengunduh rekapitulasi penilaian resmi dalam format berkas *spreadsheet*.
+
