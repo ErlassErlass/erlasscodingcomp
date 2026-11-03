@@ -120,10 +120,12 @@ Endpoint administratif memerlukan token sesi (`?token=...` atau header `Authoriz
     ```
   - **Perhitungan Terbobot Resmi (100%)**:
     `Total = (Logika * 0.3) + (Kreatif * 0.25) + (Tema * 0.2) + (Estetika * 0.15) + (Presentasi * 0.1)`
-- **`GET ?action=get_judging_leaderboard&branch=&grade_category=`**:
-  Mengambil rekapitulasi nilai peringkat peserta berdasarkan rata-rata skor dewan juri (`AVG(total_score)`). Identitas peserta disamarkan untuk juri.
+- **`GET ?action=get_judging_leaderboard&branch=&grade_category=&search=`**:
+  Mengambil rekapitulasi nilai peringkat peserta berdasarkan rata-rata skor dewan juri (`AVG(total_score)`).
+  - **Jika diakses Dewan Juri (Role `juri`)**: Data nama peserta dan asal sekolah disamarkan secara ketat (*Blind Review*).
+  - **Jika diakses Panitia / Superadmin (`isPrivileged = true`)**: Mengembalikan data lengkap (`participant_name`, `school_name`) serta array `judge_scores` yang memuat rincian nilai tiap dewan juri individual (skor 5 rubrik, total skor, catatan juri, dan waktu penilaian).
 - **`GET ?action=export_judging_csv&branch=&grade_category=`**:
-  Mengunduh Berita Acara Rekapitulasi Nilai Dewan Juri dalam format CSV.
+  Mengunduh Berita Acara Rekapitulasi Nilai Dewan Juri dalam format CSV. Identitas peserta otomatis terbuka bagi panitia/superadmin dan disamarkan bagi dewan juri.
 - **`GET ?action=stream_project_file&id={sub_id}`**:
   Menyajikan aliran biner berkas proyek dengan header CORS (`Access-Control-Allow-Origin: *`) dan nama berkas bersih yang disamarkan (`Proyek_E-XXXX-XXXX.sb3`).
 

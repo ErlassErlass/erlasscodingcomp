@@ -19,12 +19,22 @@ Untuk memastikan penilaian berjalan secara adil, profesional, dan bebas dari bia
 
 ---
 
-## 🔑 2. Akses & Login Dewan Juri
+## 🔑 2. Akses & Akun Dewan Juri (8 Juri Resmi)
 
 1. Buka tautan: [https://erlasscompetition.erlass.academy/penjurian.html](https://erlasscompetition.erlass.academy/penjurian.html)
-2. Masukkan **Username** dan **Password** yang telah diterbitkan oleh Sekretariat Panitia.
-   - Akun Pengujian Internal: `juri1` / `[PASSWORD_RESMI]`
+2. Masukkan **Username** dan **Password** resmi Dewan Juri.
+   - Telah disediakan **8 Akun Dewan Juri Aktif**:
+     - **Dewan Juri 1**: `juri1`
+     - **Dewan Juri 2**: `juri2`
+     - **Dewan Juri 3**: `juri3`
+     - **Dewan Juri 4**: `juri4`
+     - **Dewan Juri 5**: `juri5`
+     - **Dewan Juri 6**: `juri6`
+     - **Dewan Juri 7**: `juri7`
+     - **Dewan Juri 8**: `juri8`
+   - *Password Standar*: `[PASSWORD_RESMI]` *(dapat diubah mandiri melalui sistem jika diperlukan)*.
 3. Klik tombol **"Masuk Ruang Penjurian"**.
+4. **Keamanan Hak Akses**: Seluruh akun juri memiliki role `juri` dan **dibatasi secara ketat** dari halaman admin (`admin.html`). Sistem akan otomatis mengarahkan juri kembali ke `penjurian.html` jika mencoba membuka halaman panitia.
 
 ---
 
@@ -106,10 +116,44 @@ Sistem menggunakan 5 kriteria resmi tanpa *slider*, mengutamakan kecepatan dan p
 
 ---
 
-## 🏆 6. Rekapitulasi Nilai & Berita Acara (CSV)
+## 🏆 6. Rekapitulasi Nilai & Berita Acara Dewan Juri (CSV)
 
-1. Klik tombol **"Rekap & Peringkat"** pada bilah navigasi atas.
+1. Klik tombol **"Rekap & Peringkat"** pada bilah navigasi atas studio penjurian.
 2. Muncul modal rekapitulasi yang mengurutkan karya berdasarkan rata-rata skor dewan juri tertinggi (*descending*).
 3. Juri dapat memfilter berdasarkan cabang dan jenjang tertentu.
-4. Klik **"Unduh Berita Acara (CSV)"** untuk mengunduh rekapitulasi penilaian resmi dalam format berkas *spreadsheet*.
+4. Identitas nama dan sekolah peserta **tetap disamarkan secara aman** bagi juri (menampilkan `Peserta #E-XXXX-XXXX`).
+5. Klik **"Unduh Berita Acara (CSV)"** untuk mengunduh rekapitulasi penilaian resmi dalam format berkas *spreadsheet*.
+
+---
+
+## 👔 7. Dashboard Penilaian Eksekutif Panitia & Admin (`admin.html`)
+
+Panitia dan Superadmin memiliki dashboard khusus untuk memantau proses penilaian secara menyeluruh dan transparan di `admin.html` pada **Tab 3: "Penilaian & Rekap Nilai Juri"**:
+
+1. **Akses Data Terbuka (Unmasked Identity)**:
+   - Berbeda dari juri, panitia dan superadmin dapat melihat **Nama Lengkap Peserta**, **Asal Sekolah**, dan **Judul Proyek Lengkap**.
+2. **Metrik & Analisis 5 Rubrik Terpisah**:
+   - Menampilkan rata-rata skor per rubrik secara rinci:
+     - Logika Pemrograman (30%)
+     - Kreativitas (25%)
+     - Kesesuaian Tema (20%)
+     - Desain & UI (15%)
+     - Presentasi Video (10%)
+   - Menampilkan Skor Akhir Akumulasi (`AVG(total_score)`).
+3. **Indikator Partisipasi Juri**:
+   - Kolom **Juri Menilai**: Menampilkan jumlah juri yang telah memberikan nilai terhadap karya tersebut (contoh: `Badge 8 Juri`).
+4. **Modal Rincian Nilai Per Juri**:
+   - Klik tombol **"Lihat Nilai Juri"** pada baris peserta mana pun.
+   - Sistem akan membuka popup modal yang merinci nilai dari **setiap dewan juri secara individual**:
+     - Nama Dewan Juri (misal: *Dewan Juri 1, Dewan Juri 2, dst.*)
+     - Nilai pada masing-masing dari 5 rubrik
+     - Total skor terbobot yang diberikan oleh juri tersebut
+     - Catatan / evaluasi kualitatif juri
+     - Waktu penilaian dilakukan.
+5. **Pencarian & Filter Cepat**:
+   - Pencarian real-time berdasarkan Nama Peserta, Asal Sekolah, Kode Registrasi, atau Judul Karya.
+   - Filter dropdown berdasarkan Cabang Lomba dan Kategori Jenjang.
+6. **Ekspor Rekapitulasi Lengkap ke CSV**:
+   - Tombol **"Ekspor CSV Penilaian"** menghasilkan Berita Acara Lengkap dengan nama asli peserta, asal sekolah, rata-rata 5 rubrik, dan skor akhir untuk keperluan rapat pleno panitia.
+
 

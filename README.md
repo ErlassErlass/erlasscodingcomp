@@ -22,11 +22,12 @@ Sistem terpadu pendaftaran peserta, pengumpulan karya proyek, manajemen panitia,
 - **Sistem Izin Revisi Mandiri**: Penguncian otomatis setelah karya terkumpul. Revisi karya hanya dapat dilakukan jika panitia memberikan izin revisi (*allow revision*) melalui dashboard admin.
 
 ### 3. Dashboard Panitia & Manajemen (`admin.html`)
-- **Dual Tab Management**:
+- **Triple Tab Management**:
   - Tab 1: **Data Pendaftar** (Metrik peserta, filter cabang/status, verifikasi bukti transfer, bulk delete peserta).
   - Tab 2: **Pengumpulan Proyek** (Daftar karya terkumpul, inspeksi berkas, izin revisi, catatan arahan revisi panitia, ekspor CSV proyek).
+  - Tab 3: **Penilaian & Rekap Nilai Juri** (Dashboard eksekutif skor dewan juri: nama asli peserta & sekolah terbuka, rata-rata 5 rubrik penilaian, total skor akhir, filter cabang/jenjang, modal popup rincian nilai individual per juri, dan ekspor Berita Acara resmi ke CSV).
 - **Multi-Event Switching**: Mendukung pengelolaan multi-tahun kompetisi (2026, 2027, dst.) dalam satu database.
-- **Manajemen Akun Panitia & Juri**: Dukungan role `superadmin`, `panitia`, dan `juri`.
+- **Manajemen Akun Panitia & Juri**: Dukungan akun superadmin, panitia, serta 8 Dewan Juri resmi (`juri1` - `juri8`).
 
 ### 4. Studio Penjurian Resmi - Blind Review (`penjurian.html`)
 - **100% Light Theme**: Tampilan bersih, elegan, dan kontras tinggi selaras dengan identitas visual Erlass Academy.
