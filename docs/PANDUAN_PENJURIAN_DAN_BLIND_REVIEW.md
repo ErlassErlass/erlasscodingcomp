@@ -32,7 +32,7 @@ Untuk memastikan penilaian berjalan secara adil, profesional, dan bebas dari bia
      - **Dewan Juri 6**: `juri6`
      - **Dewan Juri 7**: `juri7`
      - **Dewan Juri 8**: `juri8`
-   - *Password Standar*: `[PASSWORD_RESMI]` *(dapat diubah mandiri melalui sistem jika diperlukan)*.
+   - *Password*: Diberikan dan didistribusikan secara privat oleh Sekretariat Panitia *(dapat diubah mandiri melalui tombol Ganti Password)*.
 3. Klik tombol **"Masuk Ruang Penjurian"**.
 4. **Keamanan Hak Akses**: Seluruh akun juri memiliki role `juri` dan **dibatasi secara ketat** dari halaman admin (`admin.html`). Sistem akan otomatis mengarahkan juri kembali ke `penjurian.html` jika mencoba membuka halaman panitia.
 

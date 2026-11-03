@@ -18,10 +18,24 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {
     exit;
 }
 
-$db_host = 'localhost';
-$db_name = 'erlass_competition';
-$db_user = 'DB_USER_HERE';
-$db_pass = 'DB_PASSWORD_HERE';
+// Muat konfigurasi database dari berkas lokal jika tersedia
+$localConfigFile = __DIR__ . '/../config.local.php';
+if (file_exists($localConfigFile)) {
+    $dbConfig = require $localConfigFile;
+} else {
+    $dbConfig = [
+        'db_host' => getenv('DB_HOST') ?: 'localhost',
+        'db_name' => getenv('DB_NAME') ?: 'erlass_competition',
+        'db_user' => getenv('DB_USER') ?: 'DB_USER',
+        'db_pass' => getenv('DB_PASS') ?: 'DB_PASS',
+        'fallback_tokens' => []
+    ];
+}
+
+$db_host = $dbConfig['db_host'] ?? 'localhost';
+$db_name = $dbConfig['db_name'] ?? 'erlass_competition';
+$db_user = $dbConfig['db_user'] ?? '';
+$db_pass = $dbConfig['db_pass'] ?? '';
 
 try {
     $pdo = new PDO("mysql:host=$db_host;dbname=$db_name;charset=utf8mb4", $db_user, $db_pass, [
@@ -43,11 +57,12 @@ function send_json($data, $code = 200) {
 }
 
 function verify_admin_token($token) {
-    global $pdo;
+    global $pdo, $dbConfig;
     if (empty($token) || strlen($token) < 8) return false;
     
-    // Fallback key if needed
-    if ($token === 'DB_PASSWORD_HERE' || $token === 'Erlass101.' || $token === 'Erlass@2026' || $token === 'competition-auth-2026') {
+    // Fallback key if explicitly configured in config.local.php
+    $validFallbacks = $dbConfig['fallback_tokens'] ?? [];
+    if (!empty($validFallbacks) && in_array($token, $validFallbacks, true)) {
         return [
             'id' => 1,
             'username' => 'admin',

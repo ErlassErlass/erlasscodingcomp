@@ -2,6 +2,11 @@
 uploads/
 uploads/*
 
+# Server Local Configurations (Credentials)
+config.local.php
+.env
+*.local.php
+
 # Raw oversized banner & uncompressed PDF working files in root
 /landscapelomba.png
 /herobanner.jpeg
