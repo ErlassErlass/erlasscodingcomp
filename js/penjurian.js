@@ -919,11 +919,11 @@ function recalculateTotalScore() {
   const cDesign = design * 0.15;
   const cPresentation = presentation * 0.10;
 
-  document.getElementById('contrib-logic').textContent = `${cLogic.toFixed(2)} pts`;
-  document.getElementById('contrib-creativity').textContent = `${cCreativity.toFixed(2)} pts`;
-  document.getElementById('contrib-theme').textContent = `${cTheme.toFixed(2)} pts`;
-  document.getElementById('contrib-design').textContent = `${cDesign.toFixed(2)} pts`;
-  document.getElementById('contrib-presentation').textContent = `${cPresentation.toFixed(2)} pts`;
+  document.getElementById('contrib-logic').textContent = cLogic.toFixed(2);
+  document.getElementById('contrib-creativity').textContent = cCreativity.toFixed(2);
+  document.getElementById('contrib-theme').textContent = cTheme.toFixed(2);
+  document.getElementById('contrib-design').textContent = cDesign.toFixed(2);
+  document.getElementById('contrib-presentation').textContent = cPresentation.toFixed(2);
 
   const total = cLogic + cCreativity + cTheme + cDesign + cPresentation;
   document.getElementById('display-total-score').textContent = total.toFixed(2);
@@ -949,6 +949,28 @@ function recalculateTotalScore() {
     gradeBadge.className = 'px-3 py-1 rounded-full font-extrabold bg-red-100 text-red-800 border border-red-200 shadow-xs';
     gradeBadge.textContent = 'Predikat: Perlu Pembinaan (D)';
   }
+
+  // Update visual state of quick preset buttons (highlight active preset if value matches)
+  updatePresetButtonHighlights();
+}
+
+function updatePresetButtonHighlights() {
+  const criteria = ['logic', 'creativity', 'theme', 'design', 'presentation'];
+  criteria.forEach(crit => {
+    const input = document.getElementById(`score-${crit}-input`);
+    const val = input ? parseFloat(input.value) : null;
+    const buttons = document.querySelectorAll(`.btn-preset[data-criterion="${crit}"]`);
+    buttons.forEach(btn => {
+      const btnVal = parseFloat(btn.dataset.val);
+      if (val !== null && !isNaN(val) && Math.abs(val - btnVal) < 0.001) {
+        btn.classList.add('bg-orange-600', 'text-white', 'border-orange-600', 'shadow-xs');
+        btn.classList.remove('bg-white', 'text-slate-600', 'border-slate-200', 'hover:bg-slate-100');
+      } else {
+        btn.classList.remove('bg-orange-600', 'text-white', 'border-orange-600', 'shadow-xs');
+        btn.classList.add('bg-white', 'text-slate-600', 'border-slate-200', 'hover:bg-slate-100');
+      }
+    });
+  });
 }
 
 // 10. Submit Score ke Backend API
@@ -1197,6 +1219,7 @@ window.toggleSpriteBreakdown = toggleSpriteBreakdown;
 window.syncScoreInput = syncScoreInput;
 window.setScorePreset = setScorePreset;
 window.adjustScoreStep = adjustScoreStep;
+window.updatePresetButtonHighlights = updatePresetButtonHighlights;
 window.submitScore = submitScore;
 window.openLeaderboardModal = openLeaderboardModal;
 window.closeLeaderboardModal = closeLeaderboardModal;

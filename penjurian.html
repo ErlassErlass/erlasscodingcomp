@@ -5,18 +5,44 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Portal Penjurian Karya (Blind Review) - Erlass Competition 2026</title>
   
-  <!-- Fonts -->
+  <!-- Fonts: Plus Jakarta Sans for UI + JetBrains Mono for Tabular Numerals -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <!-- Tailwind CSS & Lucide Icons -->
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.577.0/dist/umd/lucide.min.js"></script>
   
   <style>
-    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #1e293b; }
-    .display-font { font-family: 'Fredoka', sans-serif; }
+    body { 
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+      background-color: #f8fafc; 
+      color: #0f172a; 
+    }
+    .display-font { 
+      font-family: 'Plus Jakarta Sans', sans-serif; 
+      letter-spacing: -0.025em; 
+      font-weight: 800; 
+    }
+    .font-tabular { 
+      font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; 
+      font-variant-numeric: tabular-nums; 
+      font-feature-settings: "tnum"; 
+    }
+    
+    /* Tactile Micro-Physics for Buttons */
+    .btn-tactile {
+      transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .btn-tactile:active {
+      transform: scale(0.96) translateY(1px);
+    }
+
+    /* Diffusion Shadow for Executive Cards */
+    .card-diffusion {
+      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.04), 0 2px 6px -2px rgba(15, 23, 42, 0.02);
+    }
     
     /* Custom Scrollbars */
     ::-webkit-scrollbar {
@@ -35,7 +61,7 @@
     }
   </style>
 </head>
-<body class="min-h-screen bg-slate-50 text-slate-800 flex flex-col">
+<body class="min-h-[100dvh] bg-slate-50 text-slate-800 flex flex-col antialiased">
 
   <!-- ========================================== -->
   <!-- 1. AUTH SCREEN / LOGIN DEWAN JURI           -->
@@ -271,19 +297,19 @@
               onclick="setStatusFilter('')" 
               id="filter-tab-all"
               class="px-3 py-1 rounded-lg font-bold text-slate-800 bg-white shadow-xs transition"
-            >Semua (<span id="count-all">0</span>)</button>
+            >Semua (<span id="count-all" class="font-tabular">0</span>)</button>
             <button 
               type="button" 
               onclick="setStatusFilter('unscored')" 
               id="filter-tab-unscored"
               class="px-3 py-1 rounded-lg font-bold text-slate-500 hover:text-slate-900 transition"
-            >Belum Dinilai (<span id="count-unscored">0</span>)</button>
+            >Belum Dinilai (<span id="count-unscored" class="font-tabular">0</span>)</button>
             <button 
               type="button" 
               onclick="setStatusFilter('scored')" 
               id="filter-tab-scored"
               class="px-3 py-1 rounded-lg font-bold text-slate-500 hover:text-slate-900 transition"
-            >Sudah Dinilai (<span id="count-scored">0</span>)</button>
+            >Sudah Dinilai (<span id="count-scored" class="font-tabular">0</span>)</button>
           </div>
 
           <!-- Reset Filter Button -->
@@ -309,7 +335,7 @@
             <div class="w-24 bg-slate-200 rounded-full h-2 overflow-hidden">
               <div id="progress-bar-fill" class="bg-gradient-to-r from-orange-500 to-emerald-500 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
             </div>
-            <span id="progress-bar-text" class="text-[11px] font-black text-slate-700">0%</span>
+            <span id="progress-bar-text" class="text-[11px] font-black text-slate-700 font-tabular">0%</span>
           </div>
 
           <!-- Carousel Paging Buttons -->
@@ -318,7 +344,7 @@
               type="button" 
               onclick="navigateSubmission(-1)" 
               id="prev-btn"
-              class="p-1 rounded-lg hover:bg-white text-slate-600 disabled:opacity-40 disabled:cursor-not-allowed transition"
+              class="btn-tactile p-1 rounded-lg hover:bg-white text-slate-600 disabled:opacity-40 disabled:cursor-not-allowed transition"
               title="Peserta Sebelumnya (Alt + ←)"
             >
               <i data-lucide="chevron-left" class="w-4 h-4"></i>
@@ -332,14 +358,14 @@
               >
                 <option value="">Memuat peserta...</option>
               </select>
-              <span id="queue-indicator" class="text-[10px] font-extrabold text-slate-400 pr-1 whitespace-nowrap">0/0</span>
+              <span id="queue-indicator" class="text-[10px] font-extrabold text-slate-400 pr-1 whitespace-nowrap font-tabular">0/0</span>
             </div>
 
             <button 
               type="button" 
               onclick="navigateSubmission(1)" 
               id="next-btn"
-              class="p-1 rounded-lg hover:bg-white text-slate-600 disabled:opacity-40 disabled:cursor-not-allowed transition"
+              class="btn-tactile p-1 rounded-lg hover:bg-white text-slate-600 disabled:opacity-40 disabled:cursor-not-allowed transition"
               title="Peserta Berikutnya (Alt + →)"
             >
               <i data-lucide="chevron-right" class="w-4 h-4"></i>
@@ -377,7 +403,7 @@
             <div class="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <div class="flex items-center gap-2">
-                  <span id="current-blind-code" class="text-lg sm:text-xl font-black text-slate-900 display-font tracking-wide">Peserta #E-XXXX-XXXX</span>
+                  <span id="current-blind-code" class="text-lg sm:text-xl font-black text-slate-900 display-font tracking-wide font-tabular">Peserta #E-XXXX-XXXX</span>
                   <span id="current-scored-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-50 text-amber-800 border border-amber-200">
                     Belum Dinilai
                   </span>
@@ -640,19 +666,19 @@
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-center">
                   <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-xs">
                     <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Total Target</div>
-                    <div id="stat-total-targets" class="text-base font-black text-slate-800 mt-0.5">-</div>
+                    <div id="stat-total-targets" class="text-base font-black text-slate-800 font-tabular mt-0.5">-</div>
                   </div>
                   <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-xs">
                     <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Total Balok Kode</div>
-                    <div id="stat-total-blocks" class="text-base font-black text-orange-600 mt-0.5">-</div>
+                    <div id="stat-total-blocks" class="text-base font-black text-orange-600 font-tabular mt-0.5">-</div>
                   </div>
                   <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-xs">
                     <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Kostum Grafis</div>
-                    <div id="stat-total-costumes" class="text-base font-black text-amber-600 mt-0.5">-</div>
+                    <div id="stat-total-costumes" class="text-base font-black text-amber-600 font-tabular mt-0.5">-</div>
                   </div>
                   <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-xs">
                     <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Efek Suara</div>
-                    <div id="stat-total-sounds" class="text-base font-black text-emerald-600 mt-0.5">-</div>
+                    <div id="stat-total-sounds" class="text-base font-black text-emerald-600 font-tabular mt-0.5">-</div>
                   </div>
                 </div>
 
@@ -753,7 +779,7 @@
         <!-- ============================================== -->
         <div class="lg:col-span-5 space-y-4">
           
-          <form id="scoring-form" class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-sm space-y-5 sticky top-20">
+          <form id="scoring-form" class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 card-diffusion space-y-4 sticky top-20 max-h-[calc(100dvh-5.5rem)] overflow-y-auto pr-2">
             
             <!-- Scoring Header & Live Total Score -->
             <div class="border-b border-slate-100 pb-4">
@@ -770,8 +796,8 @@
                 <div class="text-right">
                   <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Nilai Akhir</div>
                   <div class="flex items-baseline justify-end gap-1">
-                    <span id="display-total-score" class="display-font text-2xl sm:text-3xl font-black text-orange-600">0.00</span>
-                    <span class="text-xs font-bold text-slate-400">/ 100</span>
+                    <span id="display-total-score" class="display-font font-tabular text-2xl sm:text-3xl font-black text-orange-600">0.00</span>
+                    <span class="text-xs font-bold font-tabular text-slate-400">/ 100</span>
                   </div>
                 </div>
               </div>
@@ -781,7 +807,7 @@
                 <span id="grade-predicate" class="px-3 py-1 rounded-full font-extrabold bg-slate-100 text-slate-600 border border-slate-200 shadow-xs">
                   Belum Dinilai
                 </span>
-                <span id="last-saved-time" class="text-slate-400 text-[10px] font-medium"></span>
+                <span id="last-saved-time" class="text-slate-400 text-[10px] font-medium font-tabular"></span>
               </div>
             </div>
 
@@ -789,12 +815,12 @@
             <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
               <div class="flex flex-wrap items-center justify-between gap-1">
                 <div class="flex items-center gap-1.5">
-                  <span class="w-5 h-5 rounded-full bg-orange-600 text-white flex items-center justify-center text-[10px] font-black">1</span>
+                  <span class="w-5 h-5 rounded-md bg-slate-900 text-white flex items-center justify-center text-[10px] font-black font-tabular">1</span>
                   <span class="text-xs font-bold text-slate-800">Logika & Algoritma</span>
-                  <span class="px-1.5 py-0.5 rounded bg-orange-100 text-orange-800 text-[10px] font-extrabold border border-orange-200">Bobot 30%</span>
+                  <span class="px-2 py-0.5 rounded-md bg-slate-200/70 text-slate-700 text-[10px] font-bold tracking-wide">Bobot 30%</span>
                 </div>
                 <div class="text-[11px] font-bold text-slate-500">
-                  Poin: <span id="contrib-logic" class="text-orange-600 font-black">0.00</span> <span class="text-[10px] text-slate-400">/ 30.00 pts</span>
+                  Poin: <span id="contrib-logic" class="text-orange-600 font-black font-tabular text-xs">0.00</span> <span class="text-[10px] font-tabular text-slate-400">/ 30.00 pts</span>
                 </div>
               </div>
               
@@ -805,16 +831,16 @@
               <div class="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-200/60">
                 <div class="flex items-center gap-1">
                   <span class="text-[10px] font-bold text-slate-400 mr-0.5">Preset:</span>
-                  <button type="button" onclick="setScorePreset('logic', 70)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-orange-50 hover:text-orange-600 text-slate-600 border border-slate-200 transition">70</button>
-                  <button type="button" onclick="setScorePreset('logic', 80)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-orange-50 hover:text-orange-600 text-slate-600 border border-slate-200 transition">80</button>
-                  <button type="button" onclick="setScorePreset('logic', 85)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-orange-50 hover:text-orange-600 text-slate-600 border border-slate-200 transition">85</button>
-                  <button type="button" onclick="setScorePreset('logic', 90)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-orange-50 hover:text-orange-600 text-slate-600 border border-slate-200 transition">90</button>
-                  <button type="button" onclick="setScorePreset('logic', 95)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-orange-50 hover:text-orange-600 text-slate-600 border border-slate-200 transition">95</button>
-                  <button type="button" onclick="setScorePreset('logic', 100)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-orange-50 hover:text-orange-600 text-slate-600 border border-slate-200 transition">100</button>
+                  <button type="button" onclick="setScorePreset('logic', 70)" data-criterion="logic" data-val="70" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">70</button>
+                  <button type="button" onclick="setScorePreset('logic', 80)" data-criterion="logic" data-val="80" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">80</button>
+                  <button type="button" onclick="setScorePreset('logic', 85)" data-criterion="logic" data-val="85" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">85</button>
+                  <button type="button" onclick="setScorePreset('logic', 90)" data-criterion="logic" data-val="90" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">90</button>
+                  <button type="button" onclick="setScorePreset('logic', 95)" data-criterion="logic" data-val="95" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">95</button>
+                  <button type="button" onclick="setScorePreset('logic', 100)" data-criterion="logic" data-val="100" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">100</button>
                 </div>
 
                 <div class="flex items-center gap-1.5 ml-auto">
-                  <button type="button" onclick="adjustScoreStep('logic', -1)" class="w-7 h-7 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black text-xs flex items-center justify-center transition shadow-xs" title="Kurangi 1">-</button>
+                  <button type="button" onclick="adjustScoreStep('logic', -1)" class="btn-tactile w-7 h-7 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black text-xs flex items-center justify-center transition shadow-xs" title="Kurangi 1">-</button>
                   <input 
                     type="number" 
                     id="score-logic-input" 
@@ -823,10 +849,10 @@
                     step="0.5" 
                     value="0" 
                     oninput="syncScoreInput('logic', this.value)"
-                    class="w-16 px-2 py-1 rounded-lg text-xs font-black text-center bg-white border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500 shadow-xs"
+                    class="font-tabular font-bold w-16 px-2 py-1 rounded-lg text-xs text-center bg-white border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500 shadow-xs"
                   >
-                  <button type="button" onclick="adjustScoreStep('logic', 1)" class="w-7 h-7 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black text-xs flex items-center justify-center transition shadow-xs" title="Tambah 1">+</button>
-                  <span class="text-xs font-bold text-slate-400">/ 100</span>
+                  <button type="button" onclick="adjustScoreStep('logic', 1)" class="btn-tactile w-7 h-7 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black text-xs flex items-center justify-center transition shadow-xs" title="Tambah 1">+</button>
+                  <span class="text-xs font-bold font-tabular text-slate-400">/ 100</span>
                 </div>
               </div>
             </div>
@@ -835,12 +861,12 @@
             <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
               <div class="flex flex-wrap items-center justify-between gap-1">
                 <div class="flex items-center gap-1.5">
-                  <span class="w-5 h-5 rounded-full bg-amber-500 text-white flex items-center justify-center text-[10px] font-black">2</span>
+                  <span class="w-5 h-5 rounded-md bg-slate-900 text-white flex items-center justify-center text-[10px] font-black font-tabular">2</span>
                   <span class="text-xs font-bold text-slate-800">Kreativitas & Orisinalitas</span>
-                  <span class="px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 text-[10px] font-extrabold border border-amber-200">Bobot 25%</span>
+                  <span class="px-2 py-0.5 rounded-md bg-slate-200/70 text-slate-700 text-[10px] font-bold tracking-wide">Bobot 25%</span>
                 </div>
                 <div class="text-[11px] font-bold text-slate-500">
-                  Poin: <span id="contrib-creativity" class="text-amber-600 font-black">0.00</span> <span class="text-[10px] text-slate-400">/ 25.00 pts</span>
+                  Poin: <span id="contrib-creativity" class="text-orange-600 font-black font-tabular text-xs">0.00</span> <span class="text-[10px] font-tabular text-slate-400">/ 25.00 pts</span>
                 </div>
               </div>
               
@@ -851,16 +877,16 @@
               <div class="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-200/60">
                 <div class="flex items-center gap-1">
                   <span class="text-[10px] font-bold text-slate-400 mr-0.5">Preset:</span>
-                  <button type="button" onclick="setScorePreset('creativity', 70)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-amber-50 hover:text-amber-600 text-slate-600 border border-slate-200 transition">70</button>
-                  <button type="button" onclick="setScorePreset('creativity', 80)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-amber-50 hover:text-amber-600 text-slate-600 border border-slate-200 transition">80</button>
-                  <button type="button" onclick="setScorePreset('creativity', 85)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-amber-50 hover:text-amber-600 text-slate-600 border border-slate-200 transition">85</button>
-                  <button type="button" onclick="setScorePreset('creativity', 90)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-amber-50 hover:text-amber-600 text-slate-600 border border-slate-200 transition">90</button>
-                  <button type="button" onclick="setScorePreset('creativity', 95)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-amber-50 hover:text-amber-600 text-slate-600 border border-slate-200 transition">95</button>
-                  <button type="button" onclick="setScorePreset('creativity', 100)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-amber-50 hover:text-amber-600 text-slate-600 border border-slate-200 transition">100</button>
+                  <button type="button" onclick="setScorePreset('creativity', 70)" data-criterion="creativity" data-val="70" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">70</button>
+                  <button type="button" onclick="setScorePreset('creativity', 80)" data-criterion="creativity" data-val="80" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">80</button>
+                  <button type="button" onclick="setScorePreset('creativity', 85)" data-criterion="creativity" data-val="85" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">85</button>
+                  <button type="button" onclick="setScorePreset('creativity', 90)" data-criterion="creativity" data-val="90" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">90</button>
+                  <button type="button" onclick="setScorePreset('creativity', 95)" data-criterion="creativity" data-val="95" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">95</button>
+                  <button type="button" onclick="setScorePreset('creativity', 100)" data-criterion="creativity" data-val="100" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">100</button>
                 </div>
 
                 <div class="flex items-center gap-1.5 ml-auto">
-                  <button type="button" onclick="adjustScoreStep('creativity', -1)" class="w-7 h-7 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black text-xs flex items-center justify-center transition shadow-xs" title="Kurangi 1">-</button>
+                  <button type="button" onclick="adjustScoreStep('creativity', -1)" class="btn-tactile w-7 h-7 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black text-xs flex items-center justify-center transition shadow-xs" title="Kurangi 1">-</button>
                   <input 
                     type="number" 
                     id="score-creativity-input" 
@@ -869,10 +895,10 @@
                     step="0.5" 
                     value="0" 
                     oninput="syncScoreInput('creativity', this.value)"
-                    class="w-16 px-2 py-1 rounded-lg text-xs font-black text-center bg-white border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500 shadow-xs"
+                    class="font-tabular font-bold w-16 px-2 py-1 rounded-lg text-xs text-center bg-white border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500 shadow-xs"
                   >
-                  <button type="button" onclick="adjustScoreStep('creativity', 1)" class="w-7 h-7 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black text-xs flex items-center justify-center transition shadow-xs" title="Tambah 1">+</button>
-                  <span class="text-xs font-bold text-slate-400">/ 100</span>
+                  <button type="button" onclick="adjustScoreStep('creativity', 1)" class="btn-tactile w-7 h-7 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black text-xs flex items-center justify-center transition shadow-xs" title="Tambah 1">+</button>
+                  <span class="text-xs font-bold font-tabular text-slate-400">/ 100</span>
                 </div>
               </div>
             </div>
@@ -881,12 +907,12 @@
             <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
               <div class="flex flex-wrap items-center justify-between gap-1">
                 <div class="flex items-center gap-1.5">
-                  <span class="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-black">3</span>
+                  <span class="w-5 h-5 rounded-md bg-slate-900 text-white flex items-center justify-center text-[10px] font-black font-tabular">3</span>
                   <span class="text-xs font-bold text-slate-800">Tema & Fungsionalitas</span>
-                  <span class="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-extrabold border border-emerald-200">Bobot 20%</span>
+                  <span class="px-2 py-0.5 rounded-md bg-slate-200/70 text-slate-700 text-[10px] font-bold tracking-wide">Bobot 20%</span>
                 </div>
                 <div class="text-[11px] font-bold text-slate-500">
-                  Poin: <span id="contrib-theme" class="text-emerald-600 font-black">0.00</span> <span class="text-[10px] text-slate-400">/ 20.00 pts</span>
+                  Poin: <span id="contrib-theme" class="text-orange-600 font-black font-tabular text-xs">0.00</span> <span class="text-[10px] font-tabular text-slate-400">/ 20.00 pts</span>
                 </div>
               </div>
               
@@ -897,16 +923,16 @@
               <div class="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-200/60">
                 <div class="flex items-center gap-1">
                   <span class="text-[10px] font-bold text-slate-400 mr-0.5">Preset:</span>
-                  <button type="button" onclick="setScorePreset('theme', 70)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-emerald-50 hover:text-emerald-600 text-slate-600 border border-slate-200 transition">70</button>
-                  <button type="button" onclick="setScorePreset('theme', 80)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-emerald-50 hover:text-emerald-600 text-slate-600 border border-slate-200 transition">80</button>
-                  <button type="button" onclick="setScorePreset('theme', 85)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-emerald-50 hover:text-emerald-600 text-slate-600 border border-slate-200 transition">85</button>
-                  <button type="button" onclick="setScorePreset('theme', 90)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-emerald-50 hover:text-emerald-600 text-slate-600 border border-slate-200 transition">90</button>
-                  <button type="button" onclick="setScorePreset('theme', 95)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-emerald-50 hover:text-emerald-600 text-slate-600 border border-slate-200 transition">95</button>
-                  <button type="button" onclick="setScorePreset('theme', 100)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-emerald-50 hover:text-emerald-600 text-slate-600 border border-slate-200 transition">100</button>
+                  <button type="button" onclick="setScorePreset('theme', 70)" data-criterion="theme" data-val="70" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">70</button>
+                  <button type="button" onclick="setScorePreset('theme', 80)" data-criterion="theme" data-val="80" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">80</button>
+                  <button type="button" onclick="setScorePreset('theme', 85)" data-criterion="theme" data-val="85" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">85</button>
+                  <button type="button" onclick="setScorePreset('theme', 90)" data-criterion="theme" data-val="90" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">90</button>
+                  <button type="button" onclick="setScorePreset('theme', 95)" data-criterion="theme" data-val="95" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">95</button>
+                  <button type="button" onclick="setScorePreset('theme', 100)" data-criterion="theme" data-val="100" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">100</button>
                 </div>
 
                 <div class="flex items-center gap-1.5 ml-auto">
-                  <button type="button" onclick="adjustScoreStep('theme', -1)" class="w-7 h-7 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black text-xs flex items-center justify-center transition shadow-xs" title="Kurangi 1">-</button>
+                  <button type="button" onclick="adjustScoreStep('theme', -1)" class="btn-tactile w-7 h-7 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black text-xs flex items-center justify-center transition shadow-xs" title="Kurangi 1">-</button>
                   <input 
                     type="number" 
                     id="score-theme-input" 
@@ -915,10 +941,10 @@
                     step="0.5" 
                     value="0" 
                     oninput="syncScoreInput('theme', this.value)"
-                    class="w-16 px-2 py-1 rounded-lg text-xs font-black text-center bg-white border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500 shadow-xs"
+                    class="font-tabular font-bold w-16 px-2 py-1 rounded-lg text-xs text-center bg-white border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500 shadow-xs"
                   >
-                  <button type="button" onclick="adjustScoreStep('theme', 1)" class="w-7 h-7 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black text-xs flex items-center justify-center transition shadow-xs" title="Tambah 1">+</button>
-                  <span class="text-xs font-bold text-slate-400">/ 100</span>
+                  <button type="button" onclick="adjustScoreStep('theme', 1)" class="btn-tactile w-7 h-7 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black text-xs flex items-center justify-center transition shadow-xs" title="Tambah 1">+</button>
+                  <span class="text-xs font-bold font-tabular text-slate-400">/ 100</span>
                 </div>
               </div>
             </div>
@@ -927,12 +953,12 @@
             <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
               <div class="flex flex-wrap items-center justify-between gap-1">
                 <div class="flex items-center gap-1.5">
-                  <span class="w-5 h-5 rounded-full bg-cyan-600 text-white flex items-center justify-center text-[10px] font-black">4</span>
+                  <span class="w-5 h-5 rounded-md bg-slate-900 text-white flex items-center justify-center text-[10px] font-black font-tabular">4</span>
                   <span class="text-xs font-bold text-slate-800">Estetika, Desain UI & Gerak</span>
-                  <span class="px-1.5 py-0.5 rounded bg-cyan-100 text-cyan-800 text-[10px] font-extrabold border border-cyan-200">Bobot 15%</span>
+                  <span class="px-2 py-0.5 rounded-md bg-slate-200/70 text-slate-700 text-[10px] font-bold tracking-wide">Bobot 15%</span>
                 </div>
                 <div class="text-[11px] font-bold text-slate-500">
-                  Poin: <span id="contrib-design" class="text-cyan-600 font-black">0.00</span> <span class="text-[10px] text-slate-400">/ 15.00 pts</span>
+                  Poin: <span id="contrib-design" class="text-orange-600 font-black font-tabular text-xs">0.00</span> <span class="text-[10px] font-tabular text-slate-400">/ 15.00 pts</span>
                 </div>
               </div>
               
@@ -943,16 +969,16 @@
               <div class="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-200/60">
                 <div class="flex items-center gap-1">
                   <span class="text-[10px] font-bold text-slate-400 mr-0.5">Preset:</span>
-                  <button type="button" onclick="setScorePreset('design', 70)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-cyan-50 hover:text-cyan-600 text-slate-600 border border-slate-200 transition">70</button>
-                  <button type="button" onclick="setScorePreset('design', 80)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-cyan-50 hover:text-cyan-600 text-slate-600 border border-slate-200 transition">80</button>
-                  <button type="button" onclick="setScorePreset('design', 85)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-cyan-50 hover:text-cyan-600 text-slate-600 border border-slate-200 transition">85</button>
-                  <button type="button" onclick="setScorePreset('design', 90)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-cyan-50 hover:text-cyan-600 text-slate-600 border border-slate-200 transition">90</button>
-                  <button type="button" onclick="setScorePreset('design', 95)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-cyan-50 hover:text-cyan-600 text-slate-600 border border-slate-200 transition">95</button>
-                  <button type="button" onclick="setScorePreset('design', 100)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-cyan-50 hover:text-cyan-600 text-slate-600 border border-slate-200 transition">100</button>
+                  <button type="button" onclick="setScorePreset('design', 70)" data-criterion="design" data-val="70" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">70</button>
+                  <button type="button" onclick="setScorePreset('design', 80)" data-criterion="design" data-val="80" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">80</button>
+                  <button type="button" onclick="setScorePreset('design', 85)" data-criterion="design" data-val="85" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">85</button>
+                  <button type="button" onclick="setScorePreset('design', 90)" data-criterion="design" data-val="90" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">90</button>
+                  <button type="button" onclick="setScorePreset('design', 95)" data-criterion="design" data-val="95" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">95</button>
+                  <button type="button" onclick="setScorePreset('design', 100)" data-criterion="design" data-val="100" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">100</button>
                 </div>
 
                 <div class="flex items-center gap-1.5 ml-auto">
-                  <button type="button" onclick="adjustScoreStep('design', -1)" class="w-7 h-7 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black text-xs flex items-center justify-center transition shadow-xs" title="Kurangi 1">-</button>
+                  <button type="button" onclick="adjustScoreStep('design', -1)" class="btn-tactile w-7 h-7 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black text-xs flex items-center justify-center transition shadow-xs" title="Kurangi 1">-</button>
                   <input 
                     type="number" 
                     id="score-design-input" 
@@ -961,10 +987,10 @@
                     step="0.5" 
                     value="0" 
                     oninput="syncScoreInput('design', this.value)"
-                    class="w-16 px-2 py-1 rounded-lg text-xs font-black text-center bg-white border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500 shadow-xs"
+                    class="font-tabular font-bold w-16 px-2 py-1 rounded-lg text-xs text-center bg-white border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500 shadow-xs"
                   >
-                  <button type="button" onclick="adjustScoreStep('design', 1)" class="w-7 h-7 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black text-xs flex items-center justify-center transition shadow-xs" title="Tambah 1">+</button>
-                  <span class="text-xs font-bold text-slate-400">/ 100</span>
+                  <button type="button" onclick="adjustScoreStep('design', 1)" class="btn-tactile w-7 h-7 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black text-xs flex items-center justify-center transition shadow-xs" title="Tambah 1">+</button>
+                  <span class="text-xs font-bold font-tabular text-slate-400">/ 100</span>
                 </div>
               </div>
             </div>
@@ -973,12 +999,12 @@
             <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
               <div class="flex flex-wrap items-center justify-between gap-1">
                 <div class="flex items-center gap-1.5">
-                  <span class="w-5 h-5 rounded-full bg-violet-600 text-white flex items-center justify-center text-[10px] font-black">5</span>
+                  <span class="w-5 h-5 rounded-md bg-slate-900 text-white flex items-center justify-center text-[10px] font-black font-tabular">5</span>
                   <span class="text-xs font-bold text-slate-800">Presentasi & Pemahaman</span>
-                  <span class="px-1.5 py-0.5 rounded bg-violet-100 text-violet-800 text-[10px] font-extrabold border border-violet-200">Bobot 10%</span>
+                  <span class="px-2 py-0.5 rounded-md bg-slate-200/70 text-slate-700 text-[10px] font-bold tracking-wide">Bobot 10%</span>
                 </div>
                 <div class="text-[11px] font-bold text-slate-500">
-                  Poin: <span id="contrib-presentation" class="text-violet-600 font-black">0.00</span> <span class="text-[10px] text-slate-400">/ 10.00 pts</span>
+                  Poin: <span id="contrib-presentation" class="text-orange-600 font-black font-tabular text-xs">0.00</span> <span class="text-[10px] font-tabular text-slate-400">/ 10.00 pts</span>
                 </div>
               </div>
               
@@ -989,16 +1015,16 @@
               <div class="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-200/60">
                 <div class="flex items-center gap-1">
                   <span class="text-[10px] font-bold text-slate-400 mr-0.5">Preset:</span>
-                  <button type="button" onclick="setScorePreset('presentation', 70)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-violet-50 hover:text-violet-600 text-slate-600 border border-slate-200 transition">70</button>
-                  <button type="button" onclick="setScorePreset('presentation', 80)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-violet-50 hover:text-violet-600 text-slate-600 border border-slate-200 transition">80</button>
-                  <button type="button" onclick="setScorePreset('presentation', 85)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-violet-50 hover:text-violet-600 text-slate-600 border border-slate-200 transition">85</button>
-                  <button type="button" onclick="setScorePreset('presentation', 90)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-violet-50 hover:text-violet-600 text-slate-600 border border-slate-200 transition">90</button>
-                  <button type="button" onclick="setScorePreset('presentation', 95)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-violet-50 hover:text-violet-600 text-slate-600 border border-slate-200 transition">95</button>
-                  <button type="button" onclick="setScorePreset('presentation', 100)" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white hover:bg-violet-50 hover:text-violet-600 text-slate-600 border border-slate-200 transition">100</button>
+                  <button type="button" onclick="setScorePreset('presentation', 70)" data-criterion="presentation" data-val="70" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">70</button>
+                  <button type="button" onclick="setScorePreset('presentation', 80)" data-criterion="presentation" data-val="80" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">80</button>
+                  <button type="button" onclick="setScorePreset('presentation', 85)" data-criterion="presentation" data-val="85" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">85</button>
+                  <button type="button" onclick="setScorePreset('presentation', 90)" data-criterion="presentation" data-val="90" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">90</button>
+                  <button type="button" onclick="setScorePreset('presentation', 95)" data-criterion="presentation" data-val="95" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">95</button>
+                  <button type="button" onclick="setScorePreset('presentation', 100)" data-criterion="presentation" data-val="100" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">100</button>
                 </div>
 
                 <div class="flex items-center gap-1.5 ml-auto">
-                  <button type="button" onclick="adjustScoreStep('presentation', -1)" class="w-7 h-7 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black text-xs flex items-center justify-center transition shadow-xs" title="Kurangi 1">-</button>
+                  <button type="button" onclick="adjustScoreStep('presentation', -1)" class="btn-tactile w-7 h-7 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black text-xs flex items-center justify-center transition shadow-xs" title="Kurangi 1">-</button>
                   <input 
                     type="number" 
                     id="score-presentation-input" 
@@ -1007,10 +1033,10 @@
                     step="0.5" 
                     value="0" 
                     oninput="syncScoreInput('presentation', this.value)"
-                    class="w-16 px-2 py-1 rounded-lg text-xs font-black text-center bg-white border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500 shadow-xs"
+                    class="font-tabular font-bold w-16 px-2 py-1 rounded-lg text-xs text-center bg-white border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500 shadow-xs"
                   >
-                  <button type="button" onclick="adjustScoreStep('presentation', 1)" class="w-7 h-7 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black text-xs flex items-center justify-center transition shadow-xs" title="Tambah 1">+</button>
-                  <span class="text-xs font-bold text-slate-400">/ 100</span>
+                  <button type="button" onclick="adjustScoreStep('presentation', 1)" class="btn-tactile w-7 h-7 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black text-xs flex items-center justify-center transition shadow-xs" title="Tambah 1">+</button>
+                  <span class="text-xs font-bold font-tabular text-slate-400">/ 100</span>
                 </div>
               </div>
             </div>
@@ -1024,7 +1050,7 @@
                 id="judge-notes-input" 
                 rows="3" 
                 placeholder="Berikan apresiasi, poin kekuatan karya, atau saran pengembangan untuk peserta..."
-                class="w-full px-3 py-2 rounded-xl text-xs bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500 placeholder-slate-400"
+                class="w-full px-3 py-2 rounded-xl text-xs bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500 placeholder-slate-400 transition"
               ></textarea>
             </div>
 
@@ -1034,7 +1060,7 @@
                 type="button" 
                 id="btn-save-score"
                 onclick="submitScore(false)" 
-                class="w-full py-3 rounded-xl font-extrabold text-white bg-orange-600 hover:bg-orange-700 transition shadow-lg shadow-orange-600/25 text-xs sm:text-sm flex items-center justify-center gap-2"
+                class="btn-tactile w-full py-3 rounded-xl font-extrabold text-white bg-orange-600 hover:bg-orange-700 transition shadow-lg shadow-orange-600/25 text-xs sm:text-sm flex items-center justify-center gap-2 cursor-pointer"
               >
                 <i data-lucide="check-circle" class="w-4 h-4"></i>
                 <span>Simpan Penilaian Karya Ini</span>
@@ -1044,7 +1070,7 @@
                 type="button" 
                 id="btn-save-and-next"
                 onclick="submitScore(true)" 
-                class="w-full py-2.5 rounded-xl font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition text-xs flex items-center justify-center gap-2"
+                class="btn-tactile w-full py-2.5 rounded-xl font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition text-xs flex items-center justify-center gap-2 cursor-pointer"
               >
                 <i data-lucide="arrow-right-circle" class="w-4 h-4 text-emerald-600"></i>
                 <span>Simpan & Lanjut ke Peserta Berikutnya</span>
