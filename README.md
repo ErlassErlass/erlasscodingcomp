@@ -39,7 +39,8 @@ Sistem terpadu pendaftaran peserta, pengumpulan karya proyek, manajemen panitia,
   - **Scratch (`.sb3`)**: Integrasi engine TurboWarp (`embed.html`) dengan dukungan CORS server.
   - **Tombol Editor Balok Kode ↗**: Membuka kanvas balok Scratch 3.0 visual lengkap di tab baru secara leluasa.
   - **Inspeksi Balok Otomatis (ZipArchive)**: Analisis metrik algoritma instan (Total Objek, Total Balok Kode, Kostum, Audio, dan rincian jumlah balok per sprite).
-  - **Micro:bit (`.hex`)**: Dukungan simulator Microsoft MakeCode.
+  - **Micro:bit (`.hex`)**: Integrasi tersemat Microsoft MakeCode Controller Mode (Simulator perangkat keras LED 5x5/tombol virtual + Kanvas balok kode otomatis dari berkas `.hex`).
+  - **Erboblox Robotics**: Integrasi tersemat Ichibot Block Studio (kanvas pemrograman visual robotik Blockly + video demonstrasi fisik).
   - **Video Player 16:9**: Player video presentasi tersemat langsung untuk YouTube dan Google Drive.
 - **Rubrik Penilaian 5 Kriteria Terbobot (Total 100%)**:
   1. Logika Pemrograman & Algoritma (**30%**)

@@ -464,26 +464,25 @@
                     target="_blank"
                     rel="noopener noreferrer"
                     class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-orange-600 hover:bg-orange-700 text-white transition flex items-center gap-1.5 shadow-sm"
-                    title="Buka kanvas balok kode lengkap di Scratch 3.0 Workspace"
+                    title="Buka kanvas balok kode lengkap di tab baru"
                   >
                     <i data-lucide="code-2" class="w-3.5 h-3.5"></i>
-                    <span>Buka Editor Balok Kode ↗</span>
+                    <span id="btn-open-editor-text">Buka Editor Balok Kode ↗</span>
                   </a>
                 </div>
 
                 <!-- External Action Links -->
                 <div class="flex items-center gap-2">
-                  <a 
-                    id="btn-open-external" 
-                    href="#" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 transition shadow-xs"
-                    title="Buka pratinjau penuh di tab baru"
+                  <button 
+                    type="button"
+                    id="btn-toggle-fullscreen" 
+                    onclick="togglePreviewFullscreen()"
+                    class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 transition shadow-xs cursor-pointer"
+                    title="Buka pratinjau dalam mode layar penuh monitor"
                   >
-                    <i data-lucide="external-link" class="w-3.5 h-3.5 text-orange-600"></i>
-                    <span>Layar Penuh</span>
-                  </a>
+                    <i id="icon-fullscreen" data-lucide="maximize" class="w-3.5 h-3.5 text-orange-600"></i>
+                    <span id="txt-fullscreen">Layar Penuh</span>
+                  </button>
 
                   <a 
                     id="btn-download-clean-file" 
@@ -499,36 +498,36 @@
               </div>
 
               <!-- IFRAME PREVIEW CONTAINER (Light Border) -->
-              <div class="relative bg-slate-900 rounded-xl overflow-hidden border border-slate-200 min-h-[460px] sm:min-h-[500px] flex flex-col justify-center items-center shadow-inner">
+              <div id="preview-container-box" class="relative bg-slate-900 rounded-xl overflow-hidden border border-slate-200 min-h-[500px] sm:min-h-[560px] lg:min-h-[620px] flex flex-col justify-center items-center shadow-inner">
                 
                 <!-- Loading Spinner -->
                 <div id="preview-loader" class="absolute inset-0 z-10 bg-slate-900/80 backdrop-blur-xs flex flex-col items-center justify-center text-white">
                   <i data-lucide="loader-2" class="w-8 h-8 text-orange-500 animate-spin mb-2"></i>
-                  <span class="text-xs font-bold">Memuat Balok Kode & Komponen Proyek...</span>
+                  <span id="preview-loader-text" class="text-xs font-bold">Memuat Balok Kode & Komponen Proyek...</span>
                 </div>
 
                 <!-- Iframe Element -->
                 <iframe 
                   id="preview-iframe" 
                   src="about:blank" 
-                  class="w-full h-[500px] border-0" 
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                  class="w-full h-[520px] sm:h-[580px] lg:h-[620px] border-0 bg-white" 
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; usb; serial" 
                   allowfullscreen
                   style="color-scheme: auto;"
                 ></iframe>
 
-                <!-- Fallback notice for Micro:bit -->
+                <!-- Fallback notice for Micro:bit (Hidden by default) -->
                 <div id="microbit-fallback" class="hidden p-8 text-center space-y-3 bg-white w-full h-full flex flex-col items-center justify-center">
                   <div class="w-16 h-16 rounded-2xl bg-purple-50 text-purple-600 mx-auto flex items-center justify-center border border-purple-200">
                     <i data-lucide="cpu" class="w-8 h-8"></i>
                   </div>
                   <h4 class="text-base font-bold text-slate-800">Karya Microsoft MakeCode Micro:bit (.hex)</h4>
                   <p class="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
-                    Berkas Micro:bit (.hex) memuat instruksi program balok MakeCode lengkap beserta simulasi perangkat keras. Klik tombol di bawah untuk membuka simulasi balok di MakeCode atau unduh berkas proyek.
+                    Berkas Micro:bit (.hex) memuat instruksi program balok MakeCode lengkap beserta simulasi perangkat keras. Jika simulator di atas mengalami kendala, klik tombol di bawah untuk membuka langsung di MakeCode.
                   </p>
                   <div class="flex items-center justify-center gap-3 pt-3">
                     <a 
-                      href="https://makecode.microbit.org/#editor" 
+                      href="https://makecode.microbit.org/" 
                       target="_blank" 
                       class="px-4 py-2.5 rounded-xl text-xs font-bold bg-purple-600 hover:bg-purple-700 text-white transition flex items-center gap-2 shadow-sm"
                     >
@@ -538,14 +537,14 @@
                   </div>
                 </div>
 
-                <!-- Fallback notice for Erboblox Robotics -->
+                <!-- Fallback notice for Erboblox Robotics (Hidden by default) -->
                 <div id="erboblox-fallback" class="hidden p-8 text-center space-y-3 bg-white w-full h-full flex flex-col items-center justify-center">
                   <div class="w-16 h-16 rounded-2xl bg-orange-50 text-orange-600 mx-auto flex items-center justify-center border border-orange-200">
                     <i data-lucide="bot" class="w-8 h-8"></i>
                   </div>
                   <h4 class="text-base font-bold text-slate-800">Karya Cabang Erboblox Robotics</h4>
                   <p class="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
-                    Sesuai petunjuk teknis kompetisi, karya robotik Erboblox dinilai secara komprehensif melalui demonstrasi alat dan perakitan mekanis pada <strong>Video Presentasi</strong>. Tidak ada unggahan berkas kode balok tersendiri.
+                    Sesuai petunjuk teknis kompetisi, karya robotik Erboblox dinilai secara komprehensif melalui demonstrasi alat dan perakitan mekanis pada <strong>Video Presentasi</strong>.
                   </p>
                   <div class="flex items-center justify-center gap-3 pt-3">
                     <button 
@@ -559,6 +558,64 @@
                   </div>
                 </div>
 
+              </div>
+
+              <!-- MICROBIT MAKECODE EMBED GUIDE CARD -->
+              <div id="microbit-guide-container" class="hidden bg-purple-50/70 rounded-xl p-4 border border-purple-200 text-slate-800 space-y-2.5">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2 text-xs font-extrabold text-purple-900">
+                    <i data-lucide="cpu" class="w-4 h-4 text-purple-600"></i>
+                    <span>Microsoft MakeCode Micro:bit (Simulator & Kanvas Balok Terintegrasi)</span>
+                  </div>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-200 text-purple-800">
+                    MakeCode Controller Mode
+                  </span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                  <div class="bg-white p-2.5 rounded-lg border border-purple-100 flex items-start gap-2 shadow-xs">
+                    <i data-lucide="gamepad-2" class="w-4 h-4 text-purple-600 shrink-0 mt-0.5"></i>
+                    <div>
+                      <strong class="font-bold text-slate-800 block text-[11px]">Simulator Micro:bit (Sisi Kiri)</strong>
+                      <span class="text-[11px] text-slate-500 leading-tight">Uji coba tombol virtual <strong>[A]</strong> dan <strong>[B]</strong>, pin sentuh, animasi lampu LED 5x5, dan simulasi sensor akselerometer/suhu secara interaktif.</span>
+                    </div>
+                  </div>
+                  <div class="bg-white p-2.5 rounded-lg border border-purple-100 flex items-start gap-2 shadow-xs">
+                    <i data-lucide="blocks" class="w-4 h-4 text-purple-600 shrink-0 mt-0.5"></i>
+                    <div>
+                      <strong class="font-bold text-slate-800 block text-[11px]">Kanvas Balok MakeCode (Sisi Kanan)</strong>
+                      <span class="text-[11px] text-slate-500 leading-tight">Periksa susunan balok logika pemrograman siswa (loop, percabangan <em>if/else</em>, variabel, sensor). Kanvas dapat di-zoom dan digeser bebas.</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ERBOBLOX ROBOTICS EMBED GUIDE CARD -->
+              <div id="erboblox-guide-container" class="hidden bg-orange-50/70 rounded-xl p-4 border border-orange-200 text-slate-800 space-y-2.5">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2 text-xs font-extrabold text-orange-950">
+                    <i data-lucide="bot" class="w-4 h-4 text-orange-600"></i>
+                    <span>Ichibot Block Studio (Erboblox Robotics)</span>
+                  </div>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-orange-200 text-orange-800">
+                    Blockly Studio
+                  </span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                  <div class="bg-white p-2.5 rounded-lg border border-orange-100 flex items-start gap-2 shadow-xs">
+                    <i data-lucide="code" class="w-4 h-4 text-orange-600 shrink-0 mt-0.5"></i>
+                    <div>
+                      <strong class="font-bold text-slate-800 block text-[11px]">Studio Balok Robotik Tersemat</strong>
+                      <span class="text-[11px] text-slate-500 leading-tight">Kanvas pemrograman robotika Ichibot / Erboblox (gerak motor roda, sensor garis, kendali delay, dan generator kode C/Arduino).</span>
+                    </div>
+                  </div>
+                  <div class="bg-white p-2.5 rounded-lg border border-orange-100 flex items-start gap-2 shadow-xs">
+                    <i data-lucide="video" class="w-4 h-4 text-orange-600 shrink-0 mt-0.5"></i>
+                    <div>
+                      <strong class="font-bold text-slate-800 block text-[11px]">Bukti Fisik di Video Presentasi</strong>
+                      <span class="text-[11px] text-slate-500 leading-tight">Robot Erboblox merupakan kit fisik di arena nyata. Nilai aksi manuver mekanis robot secara komprehensif melalui <strong>Tab Video</strong>.</span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <!-- SCRATCH AUTOMATED CODE INSPECTION CARD (ZipArchive Summary) -->

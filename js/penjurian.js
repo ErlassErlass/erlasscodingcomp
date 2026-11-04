@@ -445,25 +445,83 @@ function selectSubmissionByIndex(idx) {
   if (window.lucide) lucide.createIcons();
 }
 
-// 5. Code Preview (Official TurboWarp Embed, Microsoft MakeCode & Erboblox Robotics)
+// State for MakeCode Controller & Embedding
+let makeCodeReady = false;
+let pendingMakeCodeHex = null;
+let currentPreviewType = ''; // 'scratch', 'microbit', 'erboblox', 'other'
+let makeCodeRetryTimer = null;
+
+// Global Message Listener for MakeCode PXT Controller
+window.addEventListener('message', function(ev) {
+  const iframe = document.getElementById('preview-iframe');
+  if (!iframe || iframe.contentWindow !== ev.source) return;
+  
+  const msg = ev.data;
+  if (!msg) return;
+
+  // MakeCode controller signals readiness
+  if (msg.type === 'pxthost' && (msg.action === 'workspacesync' || msg.action === 'newproject')) {
+    makeCodeReady = true;
+    if (pendingMakeCodeHex) {
+      injectHexToMakeCode(pendingMakeCodeHex);
+    }
+  } else if (msg.type === 'pxteditor' && msg.action === 'simevent') {
+    // Simulator is active and running
+    const loader = document.getElementById('preview-loader');
+    if (loader) loader.classList.add('hidden');
+  }
+});
+
+function injectHexToMakeCode(hexPayload) {
+  const iframe = document.getElementById('preview-iframe');
+  const loader = document.getElementById('preview-loader');
+  if (!iframe || !iframe.contentWindow || !hexPayload) return;
+
+  try {
+    iframe.contentWindow.postMessage({
+      type: 'importfile',
+      filename: hexPayload.filename || 'Proyek_Microbit.hex',
+      parts: [hexPayload.content]
+    }, '*');
+    
+    // Sembunyikan loader setelah injeksi berhasil
+    setTimeout(() => {
+      if (loader) loader.classList.add('hidden');
+    }, 600);
+  } catch (err) {
+    console.warn('Gagal mengirim postMessage ke MakeCode:', err);
+    if (loader) loader.classList.add('hidden');
+  }
+}
+
+// 5. Code Preview (TurboWarp Embed, Microsoft MakeCode Controller & Ichibot Block Studio)
 function renderCodePreview(sub) {
   const iframe = document.getElementById('preview-iframe');
   const loader = document.getElementById('preview-loader');
+  const loaderText = document.getElementById('preview-loader-text');
   const microbitFallback = document.getElementById('microbit-fallback');
   const erbobloxFallback = document.getElementById('erboblox-fallback');
   const scratchStats = document.getElementById('scratch-stats-container');
+  const microbitGuide = document.getElementById('microbit-guide-container');
+  const erbobloxGuide = document.getElementById('erboblox-guide-container');
   const btnOpenEditor = document.getElementById('btn-open-editor-tab');
-  const btnOpenExternal = document.getElementById('btn-open-external');
+  const btnOpenEditorText = document.getElementById('btn-open-editor-text');
   const btnDownload = document.getElementById('btn-download-clean-file');
 
+  if (makeCodeRetryTimer) {
+    clearInterval(makeCodeRetryTimer);
+    makeCodeRetryTimer = null;
+  }
+
   loader.classList.remove('hidden');
+  if (loaderText) loaderText.textContent = 'Memuat Balok Kode & Komponen Proyek...';
   iframe.classList.remove('hidden');
   if (microbitFallback) microbitFallback.classList.add('hidden');
   if (erbobloxFallback) erbobloxFallback.classList.add('hidden');
 
   // Bersihkan sanitized file download link
   btnDownload.href = sub.stream_url;
-  btnDownload.setAttribute('download', sub.project_file_name);
+  btnDownload.setAttribute('download', sub.project_file_name || 'Proyek_Karya');
 
   const isScratch = (sub.file_ext === 'sb3' || (sub.branch && sub.branch.includes('Scratch')));
   const isMicrobit = (sub.file_ext === 'hex' || (sub.branch && sub.branch.includes('Micro:bit')));
@@ -472,15 +530,19 @@ function renderCodePreview(sub) {
   const targetFileUrl = sub.project_file_url || sub.stream_url;
 
   if (isScratch) {
+    currentPreviewType = 'scratch';
+    pendingMakeCodeHex = null;
+    makeCodeReady = false;
+
     if (scratchStats) scratchStats.classList.remove('hidden');
+    if (microbitGuide) microbitGuide.classList.add('hidden');
+    if (erbobloxGuide) erbobloxGuide.classList.add('hidden');
     if (btnDownload) btnDownload.classList.remove('hidden');
+
     if (btnOpenEditor) {
       btnOpenEditor.classList.remove('hidden');
       btnOpenEditor.href = `https://turbowarp.org/editor?project_url=${encodeURIComponent(targetFileUrl)}`;
-    }
-    if (btnOpenExternal) {
-      btnOpenExternal.classList.remove('hidden');
-      btnOpenExternal.href = `https://turbowarp.org/embed.html?project_url=${encodeURIComponent(targetFileUrl)}`;
+      if (btnOpenEditorText) btnOpenEditorText.textContent = 'Buka Editor TurboWarp ↗';
     }
 
     const embedUrl = `https://turbowarp.org/embed.html?project_url=${encodeURIComponent(targetFileUrl)}`;
@@ -492,46 +554,159 @@ function renderCodePreview(sub) {
     renderScratchInspector(sub.scratch_summary);
 
   } else if (isMicrobit) {
+    currentPreviewType = 'microbit';
     if (scratchStats) scratchStats.classList.add('hidden');
-    loader.classList.add('hidden');
-    iframe.classList.add('hidden');
-    if (microbitFallback) microbitFallback.classList.remove('hidden');
+    if (erbobloxGuide) erbobloxGuide.classList.add('hidden');
+    if (microbitGuide) microbitGuide.classList.remove('hidden');
+    if (btnDownload) btnDownload.classList.remove('hidden');
 
     if (btnOpenEditor) {
       btnOpenEditor.classList.remove('hidden');
-      btnOpenEditor.href = 'https://makecode.microbit.org/#editor';
+      btnOpenEditor.href = 'https://makecode.microbit.org/';
+      if (btnOpenEditorText) btnOpenEditorText.textContent = 'Buka MakeCode Tab Baru ↗';
     }
-    if (btnOpenExternal) {
-      btnOpenExternal.classList.remove('hidden');
-      btnOpenExternal.href = 'https://makecode.microbit.org/#editor';
-    }
-    if (btnDownload) btnDownload.classList.remove('hidden');
+
+    if (loaderText) loaderText.textContent = 'Memuat Microsoft MakeCode Simulator & Menginjeksi Balok...';
+
+    const makeCodeUrl = 'https://makecode.microbit.org/?controller=1&readonly=1&nocookiebanner=1';
+
+    // 1. Ambil isi teks biner hex dari server
+    fetch(sub.stream_url)
+      .then(r => {
+        if (!r.ok) throw new Error('Gagal mengunduh berkas hex dari server');
+        return r.text();
+      })
+      .then(hexText => {
+        pendingMakeCodeHex = {
+          filename: sub.project_file_name || 'Proyek_Microbit.hex',
+          content: hexText
+        };
+
+        // Jika MakeCode sudah terbuka dan ready
+        if (makeCodeReady && iframe.src.includes('makecode.microbit.org')) {
+          injectHexToMakeCode(pendingMakeCodeHex);
+        } else {
+          // Buka MakeCode di iframe jika belum
+          if (!iframe.src.includes('makecode.microbit.org')) {
+            iframe.src = makeCodeUrl;
+          }
+
+          // Polling retry sampai handshake MakeCode selesai
+          let attempts = 0;
+          makeCodeRetryTimer = setInterval(() => {
+            attempts++;
+            if (pendingMakeCodeHex && iframe.contentWindow) {
+              injectHexToMakeCode(pendingMakeCodeHex);
+            }
+            if (attempts >= 6 || makeCodeReady) {
+              clearInterval(makeCodeRetryTimer);
+              makeCodeRetryTimer = null;
+            }
+          }, 1500);
+        }
+      })
+      .catch(err => {
+        console.warn('Gagal memuat berkas hex:', err);
+        loader.classList.add('hidden');
+        if (microbitFallback) microbitFallback.classList.remove('hidden');
+      });
+
+    iframe.onload = () => {
+      setTimeout(() => {
+        if (pendingMakeCodeHex) {
+          injectHexToMakeCode(pendingMakeCodeHex);
+        }
+      }, 1000);
+    };
 
   } else if (isErboblox) {
+    currentPreviewType = 'erboblox';
+    pendingMakeCodeHex = null;
+    makeCodeReady = false;
+
     if (scratchStats) scratchStats.classList.add('hidden');
-    loader.classList.add('hidden');
-    iframe.classList.add('hidden');
-    if (erbobloxFallback) erbobloxFallback.classList.remove('hidden');
+    if (microbitGuide) microbitGuide.classList.add('hidden');
+    if (erbobloxGuide) erbobloxGuide.classList.remove('hidden');
 
-    if (btnOpenEditor) btnOpenEditor.classList.add('hidden');
-    if (btnOpenExternal) btnOpenExternal.classList.add('hidden');
-    if (btnDownload) btnDownload.classList.add('hidden');
-
-    // Otomatis arahkan ke tab video bila di tab balok karena Erboblox dinilai lewat video presentasi
-    const tabBlocks = document.getElementById('tab-content-blocks');
-    if (tabBlocks && !tabBlocks.classList.contains('hidden')) {
-      switchContentTab('video');
+    if (btnOpenEditor) {
+      btnOpenEditor.classList.remove('hidden');
+      btnOpenEditor.href = 'https://blockstudio.ichibot.id/';
+      if (btnOpenEditorText) btnOpenEditorText.textContent = 'Buka Ichibot Studio Tab Baru ↗';
     }
+
+    if (sub.project_file_path) {
+      if (btnDownload) btnDownload.classList.remove('hidden');
+    } else {
+      if (btnDownload) btnDownload.classList.add('hidden');
+    }
+
+    if (loaderText) loaderText.textContent = 'Memuat Ichibot Block Studio (Erboblox)...';
+
+    const erbobloxStudioUrl = 'https://blockstudio.ichibot.id/';
+    if (iframe.src !== erbobloxStudioUrl) {
+      iframe.src = erbobloxStudioUrl;
+    } else {
+      loader.classList.add('hidden');
+    }
+
+    iframe.onload = () => {
+      loader.classList.add('hidden');
+    };
 
   } else {
     // Default fallback
+    currentPreviewType = 'other';
+    pendingMakeCodeHex = null;
+    makeCodeReady = false;
+
     if (scratchStats) scratchStats.classList.add('hidden');
+    if (microbitGuide) microbitGuide.classList.add('hidden');
+    if (erbobloxGuide) erbobloxGuide.classList.add('hidden');
     loader.classList.add('hidden');
     if (btnOpenEditor) btnOpenEditor.href = sub.stream_url;
-    if (btnOpenExternal) btnOpenExternal.href = sub.stream_url;
     iframe.src = sub.stream_url;
   }
+
+  if (window.lucide) lucide.createIcons();
 }
+
+// 5b. Toggle Fullscreen Mode on Preview Box
+function togglePreviewFullscreen() {
+  const container = document.getElementById('preview-container-box');
+  const txt = document.getElementById('txt-fullscreen');
+  const icon = document.getElementById('icon-fullscreen');
+
+  if (!container) return;
+
+  if (!document.fullscreenElement) {
+    if (container.requestFullscreen) {
+      container.requestFullscreen();
+    } else if (container.webkitRequestFullscreen) {
+      container.webkitRequestFullscreen();
+    } else if (container.msRequestFullscreen) {
+      container.msRequestFullscreen();
+    }
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    }
+  }
+}
+
+document.addEventListener('fullscreenchange', () => {
+  const txt = document.getElementById('txt-fullscreen');
+  const icon = document.getElementById('icon-fullscreen');
+  if (document.fullscreenElement) {
+    if (txt) txt.textContent = 'Keluar Layar Penuh';
+    if (icon) icon.setAttribute('data-lucide', 'minimize');
+  } else {
+    if (txt) txt.textContent = 'Layar Penuh';
+    if (icon) icon.setAttribute('data-lucide', 'maximize');
+  }
+  if (window.lucide) lucide.createIcons();
+});
 
 // 6. Scratch Code Inspector Breakdown
 function renderScratchInspector(summary) {
@@ -1030,6 +1205,7 @@ window.exportJudgingCSV = exportJudgingCSV;
 window.openChangePwdModal = openChangePwdModal;
 window.closeChangePwdModal = closeChangePwdModal;
 window.submitChangePassword = submitChangePassword;
+window.togglePreviewFullscreen = togglePreviewFullscreen;
 
 // Inisialisasi saat DOM Loaded
 document.addEventListener('DOMContentLoaded', () => {

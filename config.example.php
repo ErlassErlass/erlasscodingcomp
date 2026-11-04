@@ -12,3 +12,4 @@ return [
         'SECRET_TOKEN_HERE'
     ]
 ];
+

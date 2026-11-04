@@ -72,8 +72,16 @@ Tersedia 3 tab konten interaktif:
     - Jumlah Efek Suara
     - Tabel rincian jumlah balok per sprite objek.
 - **Micro:bit (`.hex`)**:
-  - Tombol langsung untuk membuka simulator Microsoft MakeCode (`makecode.microbit.org`).
-  - Tombol unduh berkas `.hex` murni.
+  - **Simulator & Kanvas Balok MakeCode Terintegrasi (Controller Mode)**: Berkas `.hex` yang diunggah peserta secara otomatis diinjeksi ke engine resmi Microsoft MakeCode (`makecode.microbit.org/?controller=1`).
+  - **Sisi Kiri**: Simulator perangkat keras Micro:bit interaktif (lampu LED 5x5, tombol virtual [A] dan [B], pin sentuh, dan simulasi sensor akselerometer/suhu).
+  - **Sisi Kanan**: Kanvas Balok Kode MakeCode utuh (juri dapat menggeser, memperbesar/memperkecil kanvas, serta memeriksa struktur *loop*, *branching if/else*, dan variabel program siswa).
+  - **Tombol "Layar Penuh"**: Memperluas kanvas MakeCode ke seluruh layar monitor juri untuk kenyamanan membaca logika kode yang kompleks.
+  - **Tombol "Buka MakeCode Tab Baru ↗"**: Membuka editor MakeCode di jendela browser terpisah.
+  - **Tombol "Unduh Berkas"**: Mengunduh berkas `.hex` murni untuk di-flash ke hardware fisik jika diperlukan.
+- **Erboblox Robotics (`.ichibot` / Video Demo)**:
+  - **Studio Balok Robotik Tersemat**: Kanvas pemrograman visual Blockly resmi dari [ICHIBOT BLOCK STUDIO](https://blockstudio.ichibot.id/) tersemat langsung di dalam studio penjurian.
+  - **Inspeksi Balok Logika Robot**: Juri dapat meninjau blok pergerakan motor, pembacaan sensor garis, dan generator kode Arduino/C.
+  - **Verifikasi Fisik di Tab Video**: Menilai demonstrasi manuver robot fisik, ketepatan sensor, dan perakitan mekanis secara nyata pada Tab Video Presentasi.
 
 #### Tab 2: Video Presentasi
 - Pemutar video responsif rasio 16:9 yang otomatis menyematkan video dari tautan YouTube maupun Google Drive.
