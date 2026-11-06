@@ -26,11 +26,17 @@ Sistem terpadu pendaftaran peserta, pengumpulan karya proyek, manajemen panitia,
   - Tab 1: **Data Pendaftar** (Metrik peserta, filter cabang/status, verifikasi bukti transfer, bulk delete peserta).
   - Tab 2: **Pengumpulan Proyek** (Daftar karya terkumpul, inspeksi berkas, izin revisi, catatan arahan revisi panitia, ekspor CSV proyek).
   - Tab 3: **Penilaian & Rekap Nilai Juri** (Dashboard eksekutif skor dewan juri: nama asli peserta & sekolah terbuka, rata-rata 5 rubrik penilaian, total skor akhir, filter cabang/jenjang, modal popup rincian nilai individual per juri, dan ekspor Berita Acara resmi ke CSV).
+- **Unduh Template Peserta Manual**: Tombol *Template Peserta* di header untuk mendapatkan template spreadsheet `.xlsx` & `.csv`.
 - **Multi-Event Switching**: Mendukung pengelolaan multi-tahun kompetisi (2026, 2027, dst.) dalam satu database.
 - **Manajemen Akun Panitia & Juri**: Dukungan akun superadmin, panitia, serta 8 Dewan Juri resmi (`juri1` - `juri8`).
 
 ### 4. Studio Penjurian Resmi - Blind Review (`penjurian.html`)
-- **100% Light Theme**: Tampilan bersih, elegan, dan kontras tinggi selaras dengan identitas visual Erlass Academy.
+- **100% Light Theme & Design Taste Standards**:
+  - Tipografi eksekutif: Kombinasi **Plus Jakarta Sans** (`font-extrabold`, `tracking-tight`) untuk hirarki judul dan **JetBrains Mono** (`.font-tabular`) untuk angka stabil tanpa pergeseran layout.
+  - Skema warna monokromatik kontras tinggi dengan aksen oranye Erlass (`#ea580c`).
+  - Mikro-interaksi taktil (`.btn-tactile`) dengan efek pantulan pegas pada tombol aksi.
+  - Sorotan tombol preset nilai aktif secara otomatis (`70`, `80`, `85`, `90`, `95`, `100`).
+  - Ergonomi layar laptop (`max-h-[calc(100dvh-5.5rem)]`) memastikan tombol simpan selalu terlihat di resolusi 1366x768.
 - **Kerahasiaan Mutlak (Strict Blind Review)**:
   - Dewan Juri **tidak dapat melihat** nama murid, nama sekolah, nomor telepon, email, maupun daerah asal peserta.
   - Kode peserta disamarkan sebagai `Peserta #E-1026-XXXX`.
@@ -54,6 +60,18 @@ Sistem terpadu pendaftaran peserta, pengumpulan karya proyek, manajemen panitia,
 - **Rekapitulasi & Peringkat (Leaderboard)**:
   - Urutan peringkat berdasarkan rata-rata skor akhir juri.
   - Ekspor Berita Acara Rekap Nilai Juri ke format CSV.
+
+### 5. Sistem Import Manual Peserta Susulan (Excel & CSV)
+- **Template Excel & CSV Siap Pakai**:
+  - Lembar `DATA PESERTA`: Validasi dropdown pada kolom Jenis Kelamin, Kategori Jenjang, Cabang Lomba, dan Status Kemitraan.
+  - Lembar `PETUNJUK PENGISIAN`: Panduan rinci format data setiap kolom.
+- **Script CLI Importer (`scripts/import_peserta.php`)**:
+  - Mode simulasi tanpa simpan: `php scripts/import_peserta.php file.xlsx --dry-run`
+  - Mode simpan database: `php scripts/import_peserta.php file.xlsx`
+  - Generasi otomatis nomor registrasi sequence unik berurutan (`E-1126-XXXX`).
+  - Deteksi otomatis kemitraan sekolah dari database `partner_schools` dan `national_schools`.
+  - Integrasi otomatis ke antrean penjurian: jika judul proyek/video diisi, otomatis terdaftar di `project_submissions`.
+- **Dokumentasi Lengkap:** [docs/IMPORT_MANUAL_PESERTA.md](docs/IMPORT_MANUAL_PESERTA.md).
 
 ---
 
@@ -91,6 +109,8 @@ Database: `erlass_competition` (MySQL / MariaDB)
 ├── admin.html                 # Dashboard panitia & administrasi kompetisi
 ├── penjurian.html             # Studio penjurian dewan juri (Blind Review)
 ├── herobanner.jpeg            # Aset visual hero utama
+├── template_import_peserta.xlsx # Berkas template spreadsheet peserta
+├── template_import_peserta.csv  # Berkas template CSV peserta
 ├── Data Sekolah Se Indonesia/ # Dataset CSV sekolah per provinsi
 ├── api/
 │   ├── db.php                 # Koneksi database & fungsi helper sesi
@@ -102,12 +122,18 @@ Database: `erlass_competition` (MySQL / MariaDB)
 │   ├── Juknis_Lomba_Erlass_Competition_2026.pdf
 │   ├── PANDUAN_PENJURIAN_DAN_BLIND_REVIEW.md
 │   ├── SISTEM_PENGUMPULAN_PROYEK.md
+│   ├── IMPORT_MANUAL_PESERTA.md
 │   └── API_DOCUMENTATION.md
+├── downloads/
+│   ├── template_import_peserta.xlsx
+│   └── template_import_peserta.csv
 ├── js/
 │   ├── app.js                 # Logika pendaftaran & pencarian sekolah publik
 │   ├── kumpul-proyek.js       # Logika formulir pengumpulan proyek
 │   ├── admin.js               # Logika dashboard admin panitia
 │   └── penjurian.js           # Logika studio penjurian juri & scoring
+├── scripts/
+│   └── import_peserta.php     # CLI Importer data peserta manual (Excel/CSV)
 └── uploads/
     ├── proofs/                # Berkas bukti transfer pembayaran
     └── projects/              # Berkas proyek karya peserta (.sb3, .hex)
@@ -121,4 +147,6 @@ Database: `erlass_competition` (MySQL / MariaDB)
 - **Pengumpulan Proyek:** [https://erlasscompetition.erlass.academy/kumpul-proyek.html](https://erlasscompetition.erlass.academy/kumpul-proyek.html)
 - **Dashboard Panitia:** [https://erlasscompetition.erlass.academy/admin.html](https://erlasscompetition.erlass.academy/admin.html)
 - **Studio Penjurian Juri:** [https://erlasscompetition.erlass.academy/penjurian.html](https://erlasscompetition.erlass.academy/penjurian.html)
+- **Template Excel Peserta:** [https://erlasscompetition.erlass.academy/template_import_peserta.xlsx](https://erlasscompetition.erlass.academy/template_import_peserta.xlsx)
+- **Template CSV Peserta:** [https://erlasscompetition.erlass.academy/template_import_peserta.csv](https://erlasscompetition.erlass.academy/template_import_peserta.csv)
 

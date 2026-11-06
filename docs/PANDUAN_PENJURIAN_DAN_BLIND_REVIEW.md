@@ -107,9 +107,9 @@ Sistem menggunakan 5 kriteria resmi tanpa *slider*, mengutamakan kecepatan dan p
 | **5** | **Presentasi & Pemahaman Peserta** | **10%** | **10.00 pts** | Penguasaan konsep di video, artikulasi penjelasan alur program, demonstrasi jalannya aplikasi, dan kepercayaan diri. |
 
 ### Cara Menginput Nilai:
-1. **Input Angka**: Ketik nilai antara `0` sampai `100` pada kolom angka masing-masing kriteria.
-2. **Tombol Penyesuai Cepat (`-` dan `+`)**: Klik `-` untuk mengurangi 1 poin, atau `+` untuk menambah 1 poin.
-3. **Pilihan Nilai Preset**: Klik salah satu tombol preset standar (**`70`**, **`80`**, **`85`**, **`90`**, **`95`**, **`100`**) untuk mengisi angka secara instan.
+1. **Input Angka Presisi**: Ketik nilai antara `0` sampai `100` pada kolom angka masing-masing kriteria. Angka menggunakan font `JetBrains Mono` bertipe *Tabular Numerals* sehingga susunan kolom tidak bergeser saat nilai berubah.
+2. **Tombol Penyesuai Cepat (`-` dan `+`)**: Klik `-` untuk mengurangi 1 poin, atau `+` untuk menambah 1 poin, dilengkapi efek taktil mikro-fisika (`.btn-tactile`).
+3. **Pilihan Nilai Preset & Indikator Aktif**: Klik salah satu tombol preset standar (**`70`**, **`80`**, **`85`**, **`90`**, **`95`**, **`100`**) untuk mengisi angka secara instan. Tombol preset yang nilainya cocok dengan input otomatis menyala oranye (`bg-orange-600 text-white`) sebagai penanda visual nilai aktif.
 4. **Poin Kontribusi Otomatis**: Di samping judul kriteria akan langsung tertera poin kontribusi terbobot (contoh: nilai `90` pada Logika 30% menghasilkan `27.00 / 30.00 pts`).
 5. **Akumulasi Skor Akhir**: Terkalkulasi otomatis di bagian atas (skala `0.00` - `100.00`) beserta predikat mutu:
    - `90.00 - 100.00` : **Istimewa (A+)**
@@ -117,8 +117,9 @@ Sistem menggunakan 5 kriteria resmi tanpa *slider*, mengutamakan kecepatan dan p
    - `70.00 - 79.99`  : **Baik (B)**
    - `60.00 - 69.99`  : **Cukup (C)**
    - `< 60.00`        : **Perlu Pembinaan (D)**
-6. **Catatan Juri**: Masukkan evaluasi kualitatif atau masukan konstruktif untuk peserta (opsional).
-7. **Penyimpanan Nilai**:
+6. **Ergonomi Layar Laptop (Sticky Scroll)**: Kotak formulir penilaian terkunci secara fleksibel di sisi kanan dengan batas tinggi `max-h-[calc(100dvh-5.5rem)]` dan internal scroll, memastikan tombol aksi simpan tidak pernah terpotong di luar layar laptop resolusi standar (1366x768).
+7. **Catatan Juri**: Masukkan evaluasi kualitatif atau masukan konstruktif untuk peserta (opsional).
+8. **Penyimpanan Nilai**:
    - Klik **"Simpan Penilaian Karya Ini"** untuk menyimpan skor karya saat ini.
    - Klik **"Simpan & Lanjut ke Peserta Berikutnya"** untuk menyimpan dan otomatis berpindah ke karya yang belum dinilai berikutnya.
 
