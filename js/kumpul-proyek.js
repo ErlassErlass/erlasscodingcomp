@@ -370,3 +370,135 @@ function initSubmissionForm() {
     if (window.lucide) lucide.createIcons();
   }
 }
+
+// 6. Bantuan Lupa ID Peserta (Verifikasi Multi-Faktor Privat)
+let recoveredParticipant = null;
+
+function openForgotIdModal() {
+  const modal = document.getElementById('forgot-id-modal');
+  const formState = document.getElementById('forgot-id-form');
+  const successState = document.getElementById('forgot-id-success');
+  const errorBox = document.getElementById('forgot-id-error');
+
+  if (modal) {
+    modal.classList.remove('hidden');
+    formState.classList.remove('hidden');
+    successState.classList.add('hidden');
+    errorBox.classList.add('hidden');
+    errorBox.innerHTML = '';
+    
+    // Auto-fill nama dari input form jika ada
+    const existingName = document.getElementById('lookup-name').value.trim();
+    if (existingName) {
+      document.getElementById('forgot-name').value = existingName;
+    }
+    
+    document.getElementById('forgot-name').focus();
+    if (window.lucide) lucide.createIcons();
+  }
+}
+
+function closeForgotIdModal() {
+  const modal = document.getElementById('forgot-id-modal');
+  if (modal) {
+    modal.classList.add('hidden');
+  }
+}
+
+async function submitForgotIdVerification(e) {
+  e.preventDefault();
+  const errorBox = document.getElementById('forgot-id-error');
+  const btn = document.getElementById('btn-verify-forgot-id');
+
+  errorBox.classList.add('hidden');
+  errorBox.innerHTML = '';
+
+  const name = document.getElementById('forgot-name').value.trim();
+  const birthDate = document.getElementById('forgot-birth-date').value.trim();
+  const phone = document.getElementById('forgot-phone').value.trim();
+
+  if (!name || !birthDate || !phone) {
+    errorBox.innerHTML = 'Mohon lengkapi seluruh field verifikasi.';
+    errorBox.classList.remove('hidden');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Memverifikasi Identitas...';
+  if (window.lucide) lucide.createIcons();
+
+  try {
+    const formData = new FormData();
+    formData.append('action', 'recover_participant_id');
+    formData.append('participant_name', name);
+    formData.append('birth_date', birthDate);
+    formData.append('phone', phone);
+
+    const res = await fetch('api/public.php', {
+      method: 'POST',
+      body: formData
+    });
+    const data = await res.json();
+
+    if (data.status === 'ok' && data.data) {
+      recoveredParticipant = data.data;
+
+      // Render success card
+      document.getElementById('found-reg-code').textContent = recoveredParticipant.reg_code;
+      document.getElementById('found-name').textContent = recoveredParticipant.participant_name;
+      document.getElementById('found-school').textContent = recoveredParticipant.school_name;
+      document.getElementById('found-branch').textContent = `${recoveredParticipant.branch} (${recoveredParticipant.grade_category})`;
+      document.getElementById('found-masked-phone').textContent = recoveredParticipant.masked_phone;
+      
+      const badgeStatus = document.getElementById('found-badge-status');
+      if (recoveredParticipant.payment_status === 'verified' || recoveredParticipant.is_partner) {
+        badgeStatus.className = 'inline-block px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800';
+        badgeStatus.textContent = 'Terverifikasi (Siap Kumpul Proyek)';
+      } else {
+        badgeStatus.className = 'inline-block px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-800';
+        badgeStatus.textContent = 'Menunggu Verifikasi Pembayaran';
+      }
+
+      // Switch view to state 2
+      document.getElementById('forgot-id-form').classList.add('hidden');
+      document.getElementById('forgot-id-success').classList.remove('hidden');
+      if (window.lucide) lucide.createIcons();
+    } else {
+      errorBox.innerHTML = `<div class="flex items-start gap-2"><i data-lucide="alert-circle" class="w-4 h-4 text-red-600 shrink-0 mt-0.5"></i><span>${data.message || 'Verifikasi gagal.'}</span></div>`;
+      errorBox.classList.remove('hidden');
+      if (window.lucide) lucide.createIcons();
+    }
+  } catch (err) {
+    errorBox.innerHTML = '<div class="flex items-center gap-2"><i data-lucide="wifi-off" class="w-4 h-4 text-red-600 shrink-0"></i><span>Terjadi kendala koneksi ke server. Mohon coba beberapa saat lagi.</span></div>';
+    errorBox.classList.remove('hidden');
+    if (window.lucide) lucide.createIcons();
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i data-lucide="search" class="w-4 h-4"></i> <span>Verifikasi Identitas & Cari ID</span>';
+    if (window.lucide) lucide.createIcons();
+  }
+}
+
+function useFoundRegCode() {
+  if (!recoveredParticipant) return;
+
+  const regInput = document.getElementById('lookup-reg-code');
+  const nameInput = document.getElementById('lookup-name');
+
+  if (regInput && nameInput) {
+    regInput.value = recoveredParticipant.reg_code;
+    nameInput.value = recoveredParticipant.participant_name;
+    closeForgotIdModal();
+
+    // Trigger otomatis submit form verifikasi utama
+    const lookupForm = document.getElementById('lookup-form');
+    if (lookupForm) {
+      lookupForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+    }
+  }
+}
+
+window.openForgotIdModal = openForgotIdModal;
+window.closeForgotIdModal = closeForgotIdModal;
+window.submitForgotIdVerification = submitForgotIdVerification;
+window.useFoundRegCode = useFoundRegCode;

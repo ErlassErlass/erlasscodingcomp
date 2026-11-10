@@ -497,6 +497,144 @@ if ($action === 'check_status') {
     ]);
 }
 
+// 3b. Verifikasi & Pemulihan ID Peserta (Privat & Multi-Faktor)
+if ($action === 'recover_participant_id') {
+    $clientIp = $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+    if (strpos($clientIp, ',') !== false) {
+        $parts = explode(',', $clientIp);
+        $clientIp = trim($parts[0]);
+    }
+
+    $rateLimitKey = 'rl:recover_id:' . hash('sha256', $clientIp);
+    $maxAttempts = 5;
+    $windowSeconds = 900; // 15 menit
+
+    $redis = null;
+    $attempts = 0;
+    try {
+        $redis = new Redis();
+        if (@$redis->connect('127.0.0.1', 6379, 0.5)) {
+            $attempts = (int)$redis->get($rateLimitKey);
+            if ($attempts >= $maxAttempts) {
+                $ttl = $redis->ttl($rateLimitKey);
+                $minutes = max(1, ceil($ttl / 60));
+                send_json([
+                    'status' => 'error',
+                    'code' => 'RATE_LIMITED',
+                    'message' => "Terlalu banyak percobaan verifikasi identitas yang gagal dari perangkat Anda. Demi menjaga privasi data peserta, silakan tunggu {$minutes} menit lagi atau hubungi panitia melalui WhatsApp."
+                ], 429);
+            }
+        } else {
+            $redis = null;
+        }
+    } catch (Exception $e) {
+        $redis = null;
+    }
+
+    $nama = trim($_POST['participant_name'] ?? $_GET['participant_name'] ?? '');
+    $tglLahir = trim($_POST['birth_date'] ?? $_GET['birth_date'] ?? '');
+    $phone = trim($_POST['phone'] ?? $_GET['phone'] ?? '');
+
+    if (empty($nama) || empty($tglLahir) || empty($phone)) {
+        send_json([
+            'status' => 'error',
+            'message' => 'Mohon lengkapi seluruh field verifikasi: Nama Lengkap, Tanggal Lahir, dan Nomor WhatsApp.'
+        ], 422);
+    }
+
+    // Normalisasi input
+    $cleanNameInput = preg_replace('/[^a-z0-9]/', '', strtolower($nama));
+    
+    // Normalisasi tanggal lahir (dukung YYYY-MM-DD)
+    $tglParsed = date_create($tglLahir);
+    if (!$tglParsed) {
+        send_json([
+            'status' => 'error',
+            'message' => 'Format tanggal lahir tidak valid. Gunakan format YYYY-MM-DD.'
+        ], 422);
+    }
+    $birthDateDb = date_format($tglParsed, 'Y-m-d');
+
+    // Normalisasi nomor telepon
+    $cleanPhoneDigits = preg_replace('/[^0-9]/', '', $phone);
+    if (strpos($cleanPhoneDigits, '62') === 0) {
+        $cleanPhoneDigits = '0' . substr($cleanPhoneDigits, 2);
+    }
+
+    // Cari kandidat peserta berdasarkan tanggal lahir
+    $stmt = $pdo->prepare("SELECT id, reg_code, participant_name, school_name, branch, grade_category, phone, birth_date, payment_status, is_partner 
+                           FROM registrations 
+                           WHERE birth_date = ? 
+                           ORDER BY id DESC");
+    $stmt->execute([$birthDateDb]);
+    $candidates = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $matched = null;
+    foreach ($candidates as $cand) {
+        $dbPhoneDigits = preg_replace('/[^0-9]/', '', $cand['phone']);
+        if (strpos($dbPhoneDigits, '62') === 0) {
+            $dbPhoneDigits = '0' . substr($dbPhoneDigits, 2);
+        }
+
+        // Pencocokan nomor telepon (persis atau 8 digit terakhir cocok)
+        $phoneMatch = ($dbPhoneDigits === $cleanPhoneDigits) || 
+                      (strlen($cleanPhoneDigits) >= 8 && strlen($dbPhoneDigits) >= 8 && substr($dbPhoneDigits, -8) === substr($cleanPhoneDigits, -8));
+
+        // Pencocokan nama (case-insensitive, abaikan spasi & tanda baca)
+        $cleanDbName = preg_replace('/[^a-z0-9]/', '', strtolower($cand['participant_name']));
+        $nameMatch = (strpos($cleanDbName, $cleanNameInput) !== false || strpos($cleanNameInput, $cleanDbName) !== false);
+
+        if ($phoneMatch && $nameMatch) {
+            $matched = $cand;
+            break;
+        }
+    }
+
+    if (!$matched) {
+        // Catat kegagalan ke rate limiter
+        if ($redis) {
+            $redis->incr($rateLimitKey);
+            if ($attempts === 0) {
+                $redis->expire($rateLimitKey, $windowSeconds);
+            }
+        }
+
+        send_json([
+            'status' => 'error',
+            'message' => 'Data identitas tidak cocok dengan pendaftaran mana pun. Pastikan Nama Lengkap, Tanggal Lahir, dan Nomor WhatsApp sesuai persis dengan saat Anda mendaftar.'
+        ], 404);
+    }
+
+    // Jika berhasil, reset rate limiter IP
+    if ($redis) {
+        $redis->del($rateLimitKey);
+    }
+
+    // Buat nomor telepon tersamar (masked) untuk keamanan
+    $rawPhone = $matched['phone'];
+    $phoneLen = strlen($rawPhone);
+    if ($phoneLen >= 8) {
+        $maskedPhone = substr($rawPhone, 0, 4) . '****' . substr($rawPhone, -4);
+    } else {
+        $maskedPhone = substr($rawPhone, 0, 2) . '****';
+    }
+
+    send_json([
+        'status' => 'ok',
+        'message' => 'Identitas peserta berhasil diverifikasi.',
+        'data' => [
+            'reg_code' => $matched['reg_code'],
+            'participant_name' => $matched['participant_name'],
+            'school_name' => $matched['school_name'],
+            'branch' => $matched['branch'],
+            'grade_category' => $matched['grade_category'] ?: 'Kelas 4-6',
+            'payment_status' => $matched['payment_status'],
+            'is_partner' => (bool)$matched['is_partner'],
+            'masked_phone' => $maskedPhone
+        ]
+    ]);
+}
+
 // 4. Lookup Peserta untuk Form Pengumpulan Proyek
 if ($action === 'lookup_project_participant') {
     $reg_code = strtoupper(trim($_POST['reg_code'] ?? $_GET['reg_code'] ?? ''));

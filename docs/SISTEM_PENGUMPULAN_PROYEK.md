@@ -12,6 +12,11 @@ Dokumen ini menjelaskan alur pengumpulan karya proyek, spesifikasi berkas, kebij
    - Peserta memasukkan **Kode Registrasi** yang diperoleh saat pendaftaran (format: `E-1026-XXXX`).
    - Sistem memvalidasi status verifikasi peserta di database (`status = 'verified'`).
    - Jika terdaftar dan telah diverifikasi, data nama peserta, cabang lomba, dan kategori jenjang akan ditampilkan secara otomatis.
+   - **Bantuan Lupa ID Peserta (Verifikasi Privat)**:
+     - Jika peserta lupa nomor registrasinya, tersedia tombol **"Lupa ID Peserta?"**.
+     - Peserta wajib memverifikasi 3 data privat: **Nama Lengkap Siswa**, **Tanggal Lahir**, dan **Nomor WhatsApp yang Terdaftar**.
+     - Sistem mencocokkan ketiga parameter dan dilindungi sistem pembatas frekuensi (*Rate Limiting* Redis max 5x per 15 menit).
+     - Jika terverifikasi, ID Peserta ditampilkan bersama statusnya dan dapat langsung diisikan otomatis ke formulir (*auto-fill*).
 3. **Pengisian Formulir Proyek**:
    - **Judul Karya Proyek**: Nama karya yang diciptakan peserta.
    - **Deskripsi & Cara Main**: Ringkasan cerita, tujuan aplikasi/game, serta panduan tombol kontrol.

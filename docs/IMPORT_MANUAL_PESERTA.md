@@ -88,3 +88,4 @@ php /var/www/erlass-competition/scripts/import_peserta.php /path/ke/file_peserta
 4. **Sinkronisasi Langsung ke Portal Penjurian**:
    - Jika kolom `Judul Proyek` atau `Link Video Demo` diisi pada Excel, data tersebut otomatis diinjeksi ke tabel `project_submissions`.
    - Peserta akan **langsung muncul di antrean karya Dewan Juri** pada `penjurian.html` dan siap dinilai secara objektif (*Blind Review*).
+
