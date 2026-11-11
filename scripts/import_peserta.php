@@ -299,27 +299,30 @@ foreach ($rows as $idx => $r) {
 
         // 2. Jika ada informasi karya/video, simpan ke project_submissions agar langsung bisa dinilai
         if (!empty($judulProyek) || !empty($videoUrl) || !empty($fileKarya)) {
+            $maxSubId = (int)$pdo->query("SELECT MAX(id) FROM project_submissions")->fetchColumn();
+            $assignedGroup = ($maxSubId % 4) + 1; // 1, 2, 3, 4 round-robin
+
             $sqlSub = "INSERT INTO project_submissions (
-                registration_id, reg_code, participant_name, school_name, branch, grade_category,
+                registration_id, reg_code, participant_name, school_name, branch, grade_category, judge_group,
                 project_title, project_description, project_file_name, project_file_path, video_url,
                 statement_originality, agree_disqualification, agree_video_active, confirm_completeness, agree_documentation,
                 status, submitted_at, created_at
             ) VALUES (
-                ?, ?, ?, ?, ?, ?,
+                ?, ?, ?, ?, ?, ?, ?,
                 ?, ?, ?, ?, ?,
                 1, 1, 1, 1, 1,
                 'submitted', NOW(), NOW()
             )";
             $stmtSub = $pdo->prepare($sqlSub);
             $stmtSub->execute([
-                $newRegId, $regCode, $nama, $sekolah, $cabang, $gradeCategory,
+                $newRegId, $regCode, $nama, $sekolah, $cabang, $gradeCategory, $assignedGroup,
                 !empty($judulProyek) ? $judulProyek : 'Karya Peserta ' . $nama,
                 !empty($descProyek) ? $descProyek : 'Deskripsi proyek peserta',
                 !empty($fileKarya) ? $fileKarya : null,
                 !empty($fileKarya) ? 'uploads/projects/' . $fileKarya : null,
                 !empty($videoUrl) ? $videoUrl : 'https://youtube.com'
             ]);
-            echo "   * Proyek berhasil ditambahkan ke antrean Portal Penjurian.\n";
+            echo "   * Proyek berhasil ditambahkan ke antrean Portal Penjurian (Kelompok Juri {$assignedGroup}).\n";
         }
     }
 

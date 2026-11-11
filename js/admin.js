@@ -1187,13 +1187,14 @@ async function loadJudgingDashboard() {
 
   const branch = document.getElementById('jdg-filter-branch')?.value || '';
   const gradeCat = document.getElementById('jdg-filter-grade')?.value || '';
+  const judgeGroup = document.getElementById('jdg-filter-group')?.value || '';
   const search = (document.getElementById('jdg-filter-search')?.value || '').trim();
 
-  tbody.innerHTML = '<tr><td colspan="14" class="p-8 text-center text-slate-400"><i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2 text-amber-500"></i>Memuat rekapitulasi penilaian dewan juri...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="15" class="p-8 text-center text-slate-400"><i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2 text-amber-500"></i>Memuat rekapitulasi penilaian dewan juri...</td></tr>';
   if (window.lucide) lucide.createIcons();
 
   try {
-    const url = `api/admin.php?action=get_judging_leaderboard&token=${encodeURIComponent(authToken)}&branch=${encodeURIComponent(branch)}&grade_category=${encodeURIComponent(gradeCat)}&search=${encodeURIComponent(search)}`;
+    const url = `api/admin.php?action=get_judging_leaderboard&token=${encodeURIComponent(authToken)}&branch=${encodeURIComponent(branch)}&grade_category=${encodeURIComponent(gradeCat)}&judge_group=${encodeURIComponent(judgeGroup)}&search=${encodeURIComponent(search)}`;
     const res = await fetch(url);
     const data = await res.json();
 
@@ -1219,7 +1220,7 @@ async function loadJudgingDashboard() {
       if (infoEl) infoEl.textContent = `Menampilkan ${judgingLeaderboardData.length} karya berperingkat`;
 
       if (judgingLeaderboardData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="14" class="p-8 text-center text-slate-400">Belum ada karya yang selesai dinilai dewan juri pada filter ini.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="15" class="p-8 text-center text-slate-400">Belum ada karya yang selesai dinilai dewan juri pada filter ini.</td></tr>';
         return;
       }
 
@@ -1239,6 +1240,15 @@ async function loadJudgingDashboard() {
         else if (fs >= 60) predicate = '<span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-orange-100 text-orange-800">Cukup (C)</span>';
         else predicate = '<span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-red-100 text-red-800">Pembinaan (D)</span>';
 
+        let judgeStatusBadge = '';
+        if (r.judge_count >= 2) {
+          judgeStatusBadge = '<span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-200 shadow-2xs">2/2 Selesai</span>';
+        } else if (r.judge_count === 1) {
+          judgeStatusBadge = '<span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-800 border border-amber-200 shadow-2xs">1/2 Juri</span>';
+        } else {
+          judgeStatusBadge = '<span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-slate-100 text-slate-500 border border-slate-200 shadow-2xs">0/2 Juri</span>';
+        }
+
         html += `
           <tr class="hover:bg-slate-50 transition">
             <td class="py-3 px-3 text-center">${rankBadge}</td>
@@ -1252,13 +1262,16 @@ async function loadJudgingDashboard() {
               <span class="font-bold text-slate-800">${escapeHtml(r.branch)}</span>
               <span class="text-[10px] text-slate-400 block">${escapeHtml(r.grade_category)}</span>
             </td>
+            <td class="py-3 px-2 text-center">
+              <span class="px-2 py-0.5 rounded-md font-bold text-[10px] bg-indigo-50 text-indigo-700 border border-indigo-100">Grup ${r.judge_group || 1}</span>
+            </td>
             <td class="py-3 px-3 font-bold text-slate-900 max-w-[180px] truncate" title="${escapeHtml(r.project_title)}">${escapeHtml(r.project_title)}</td>
-            <td class="py-3 px-2 text-center text-slate-600 font-bold">${r.judge_count} juri</td>
+            <td class="py-3 px-2 text-center">${judgeStatusBadge}</td>
+            <td class="py-3 px-2 text-right text-slate-600 font-semibold">${parseFloat(r.avg_presentation || 0).toFixed(1)}</td>
             <td class="py-3 px-2 text-right text-slate-600 font-semibold">${parseFloat(r.avg_logic || 0).toFixed(1)}</td>
             <td class="py-3 px-2 text-right text-slate-600 font-semibold">${parseFloat(r.avg_creativity || 0).toFixed(1)}</td>
-            <td class="py-3 px-2 text-right text-slate-600 font-semibold">${parseFloat(r.avg_theme || 0).toFixed(1)}</td>
             <td class="py-3 px-2 text-right text-slate-600 font-semibold">${parseFloat(r.avg_design || 0).toFixed(1)}</td>
-            <td class="py-3 px-2 text-right text-slate-600 font-semibold">${parseFloat(r.avg_presentation || 0).toFixed(1)}</td>
+            <td class="py-3 px-2 text-right text-slate-600 font-semibold">${parseFloat(r.avg_theme || 0).toFixed(1)}</td>
             <td class="py-3 px-3 text-right">
               <span class="display-font font-black text-orange-600 text-sm block leading-none">${parseFloat(r.final_score || 0).toFixed(2)}</span>
               <div class="mt-1">${predicate}</div>
@@ -1282,7 +1295,7 @@ async function loadJudgingDashboard() {
     }
   } catch (err) {
     console.error('Error loading judging dashboard:', err);
-    tbody.innerHTML = '<tr><td colspan="14" class="p-8 text-center text-red-500">Gagal memuat rekap nilai penjurian. Periksa koneksi internet.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="15" class="p-8 text-center text-red-500">Gagal memuat rekap nilai penjurian. Periksa koneksi internet.</td></tr>';
   }
 }
 
@@ -1292,7 +1305,7 @@ function openScoreDetailsModal(submissionId) {
 
   const modal = document.getElementById('score-details-modal');
   document.getElementById('sdm-reg-code').textContent = item.reg_code;
-  document.getElementById('sdm-meta-info').textContent = `${item.participant_name} • ${item.school_name} • ${item.branch} (${item.grade_category})`;
+  document.getElementById('sdm-meta-info').textContent = `${item.participant_name} • ${item.school_name} • ${item.branch} (${item.grade_category}) • Kelompok Juri ${item.judge_group || 1}`;
   document.getElementById('sdm-project-title').textContent = item.project_title;
   document.getElementById('sdm-final-score').textContent = item.final_score.toFixed(2);
 
@@ -1315,33 +1328,47 @@ function openScoreDetailsModal(submissionId) {
               <span class="text-[10px] text-slate-400 font-medium">(${js.scored_at || '-'})</span>
             </div>
             <div class="text-right">
-              <span class="text-xs font-black text-orange-600">${js.total_score.toFixed(2)}</span>
+              <span class="text-xs font-black text-orange-600">${parseFloat(js.total_score || 0).toFixed(2)}</span>
               <span class="text-[10px] text-slate-400 font-bold">/ 100</span>
             </div>
           </div>
 
           <div class="grid grid-cols-5 gap-2 text-center text-[10px]">
             <div class="bg-slate-50 p-2 rounded-xl border border-slate-100">
-              <div class="text-slate-400 font-bold uppercase text-[9px]">Logika (30%)</div>
-              <div class="font-black text-slate-800 text-xs mt-0.5">${js.score_logic.toFixed(1)}</div>
+              <div class="text-slate-400 font-bold uppercase text-[9px]">Presentasi (40%)</div>
+              <div class="font-black text-slate-800 text-xs mt-0.5">${parseFloat(js.score_presentation || 0).toFixed(1)}</div>
             </div>
             <div class="bg-slate-50 p-2 rounded-xl border border-slate-100">
-              <div class="text-slate-400 font-bold uppercase text-[9px]">Kreatif (25%)</div>
-              <div class="font-black text-slate-800 text-xs mt-0.5">${js.score_creativity.toFixed(1)}</div>
+              <div class="text-slate-400 font-bold uppercase text-[9px]">Logika (20%)</div>
+              <div class="font-black text-slate-800 text-xs mt-0.5">${parseFloat(js.score_logic || 0).toFixed(1)}</div>
             </div>
             <div class="bg-slate-50 p-2 rounded-xl border border-slate-100">
-              <div class="text-slate-400 font-bold uppercase text-[9px]">Tema (20%)</div>
-              <div class="font-black text-slate-800 text-xs mt-0.5">${js.score_theme.toFixed(1)}</div>
+              <div class="text-slate-400 font-bold uppercase text-[9px]">Kreatif (15%)</div>
+              <div class="font-black text-slate-800 text-xs mt-0.5">${parseFloat(js.score_creativity || 0).toFixed(1)}</div>
             </div>
             <div class="bg-slate-50 p-2 rounded-xl border border-slate-100">
-              <div class="text-slate-400 font-bold uppercase text-[9px]">Desain (15%)</div>
-              <div class="font-black text-slate-800 text-xs mt-0.5">${js.score_design.toFixed(1)}</div>
+              <div class="text-slate-400 font-bold uppercase text-[9px]">Fungsi (15%)</div>
+              <div class="font-black text-slate-800 text-xs mt-0.5">${parseFloat(js.score_design || 0).toFixed(1)}</div>
             </div>
             <div class="bg-slate-50 p-2 rounded-xl border border-slate-100">
-              <div class="text-slate-400 font-bold uppercase text-[9px]">Pres. (10%)</div>
-              <div class="font-black text-slate-800 text-xs mt-0.5">${js.score_presentation.toFixed(1)}</div>
+              <div class="text-slate-400 font-bold uppercase text-[9px]">Tema (10%)</div>
+              <div class="font-black text-slate-800 text-xs mt-0.5">${parseFloat(js.score_theme || 0).toFixed(1)}</div>
             </div>
           </div>
+
+          ${parseFloat(js.bonus_score || 0) > 0 ? `
+            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-[10px] font-bold">
+              <i data-lucide="award" class="w-3.5 h-3.5 text-amber-600"></i>
+              <span>Bonus Sensor Eksternal: +${parseFloat(js.bonus_score).toFixed(0)} poin</span>
+            </div>
+          ` : ''}
+
+          ${parseInt(js.technical_passed) === 0 ? `
+            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-50 border border-red-200 text-red-800 text-[10px] font-bold">
+              <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-red-600"></i>
+              <span>Catatan: Syarat Wajib Sensor Eksternal Belum Terpenuhi</span>
+            </div>
+          ` : ''}
 
           <div class="pt-1">
             <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Catatan & Saran Juri:</span>
@@ -1367,7 +1394,8 @@ function closeScoreDetailsModal() {
 function exportJudgingAdminCSV() {
   const branch = document.getElementById('jdg-filter-branch')?.value || '';
   const gradeCat = document.getElementById('jdg-filter-grade')?.value || '';
-  window.location.href = `api/admin.php?action=export_judging_csv&branch=${encodeURIComponent(branch)}&grade_category=${encodeURIComponent(gradeCat)}&token=${encodeURIComponent(authToken)}`;
+  const judgeGroup = document.getElementById('jdg-filter-group')?.value || '';
+  window.location.href = `api/admin.php?action=export_judging_csv&branch=${encodeURIComponent(branch)}&grade_category=${encodeURIComponent(gradeCat)}&judge_group=${encodeURIComponent(judgeGroup)}&token=${encodeURIComponent(authToken)}`;
 }
 
 // Global Window Bindings untuk memastikan fungsi inline onclick HTML selalu dapat diakses

@@ -72,7 +72,7 @@ function verify_admin_token($token) {
     }
 
     try {
-        $stmt = $pdo->prepare("SELECT u.id, u.username, u.full_name, u.role, s.expires_at 
+        $stmt = $pdo->prepare("SELECT u.id, u.username, u.full_name, u.role, u.judge_group, s.expires_at 
                                FROM admin_sessions s
                                JOIN admin_users u ON s.user_id = u.id
                                WHERE s.token = ? AND s.expires_at > NOW() AND u.is_active = 1

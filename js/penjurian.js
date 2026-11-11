@@ -16,6 +16,8 @@ let currentSubmission = null;
 
 // Filter State
 let currentStatusFilter = ''; // '', 'unscored', 'scored'
+let currentBonusScore = 0;
+let currentTechnicalPassed = 1;
 
 // Helper XSS Escaping
 function escapeHtml(str) {
@@ -55,6 +57,19 @@ async function checkJudgeAuth() {
         const judgeNameEl = document.getElementById('judge-display-name');
         if (judgeNameEl && currentUser) {
           judgeNameEl.textContent = currentUser.full_name || currentUser.username || 'Dewan Juri';
+        }
+
+        const judgeGroupEl = document.getElementById('judge-group-badge');
+        if (judgeGroupEl && data.current_judge) {
+          if (data.current_judge.judge_group) {
+            let grpText = `Kelompok Juri ${data.current_judge.judge_group}`;
+            if (data.current_judge.partner_name) {
+              grpText += ` • Mitra: ${data.current_judge.partner_name}`;
+            }
+            judgeGroupEl.textContent = grpText;
+          } else {
+            judgeGroupEl.textContent = 'Admin / Panitia';
+          }
         }
 
         allSubmissions = data.submissions || [];
@@ -848,18 +863,57 @@ function switchContentTab(tabKey) {
 // 9. Scoring Studio (Right Column) & Two-Way Sync
 function populateScoringStudio(sub) {
   const myScore = sub.my_score;
-  const logicVal = myScore ? myScore.score_logic : 0;
-  const creativityVal = myScore ? myScore.score_creativity : 0;
-  const themeVal = myScore ? myScore.score_theme : 0;
-  const designVal = myScore ? myScore.score_design : 0;
-  const presVal = myScore ? myScore.score_presentation : 0;
+  const presVal = myScore ? (parseFloat(myScore.score_presentation) || 0) : 0;
+  const logicVal = myScore ? (parseFloat(myScore.score_logic) || 0) : 0;
+  const creativityVal = myScore ? (parseFloat(myScore.score_creativity) || 0) : 0;
+  const designVal = myScore ? (parseFloat(myScore.score_design) || 0) : 0;
+  const themeVal = myScore ? (parseFloat(myScore.score_theme) || 0) : 0;
+  const bonusVal = myScore ? (parseFloat(myScore.bonus_score) || 0) : 0;
+  const techPassedVal = myScore ? (parseInt(myScore.technical_passed) !== 0 ? 1 : 0) : 1;
   const notesVal = myScore ? (myScore.judge_notes || '') : '';
 
+  setScoreValues('presentation', presVal);
   setScoreValues('logic', logicVal);
   setScoreValues('creativity', creativityVal);
-  setScoreValues('theme', themeVal);
   setScoreValues('design', designVal);
-  setScoreValues('presentation', presVal);
+  setScoreValues('theme', themeVal);
+
+  currentBonusScore = bonusVal;
+  currentTechnicalPassed = techPassedVal;
+
+  // Handle Micro:bit Extras Panel (Bonus SD / Checklist SMP)
+  const mbCard = document.getElementById('microbit-extras-card');
+  const mbSdPanel = document.getElementById('microbit-sd-panel');
+  const mbSmpPanel = document.getElementById('microbit-smp-panel');
+  const mbBadge = document.getElementById('microbit-extras-badge');
+  const isMicrobit = (sub.branch || '').toLowerCase().includes('micro:bit');
+
+  if (isMicrobit && mbCard) {
+    mbCard.classList.remove('hidden');
+    const isSMP = (sub.grade_category || '').toUpperCase().includes('SMP');
+
+    if (isSMP) {
+      if (mbSdPanel) mbSdPanel.classList.add('hidden');
+      if (mbSmpPanel) mbSmpPanel.classList.remove('hidden');
+      if (mbBadge) mbBadge.textContent = 'Kategori SMP (Wajib)';
+      const smpCheck = document.getElementById('microbit-smp-check');
+      if (smpCheck) smpCheck.checked = (currentTechnicalPassed === 1);
+    } else {
+      if (mbSdPanel) mbSdPanel.classList.remove('hidden');
+      if (mbSmpPanel) mbSmpPanel.classList.add('hidden');
+      if (mbBadge) mbBadge.textContent = 'Kategori SD (Bonus)';
+      const radios = document.querySelectorAll('input[name="microbit-bonus-radio"]');
+      radios.forEach(r => {
+        r.checked = (parseFloat(r.value) === currentBonusScore);
+      });
+      const dispBonus = document.getElementById('display-bonus-score');
+      if (dispBonus) dispBonus.textContent = currentBonusScore;
+    }
+  } else if (mbCard) {
+    mbCard.classList.add('hidden');
+    currentBonusScore = 0;
+    currentTechnicalPassed = 1;
+  }
 
   document.getElementById('judge-notes-input').value = notesVal;
 
@@ -904,28 +958,41 @@ function adjustScoreStep(key, delta) {
   }
 }
 
+function setBonusScore(val) {
+  currentBonusScore = parseFloat(val) || 0;
+  const dispBonus = document.getElementById('display-bonus-score');
+  if (dispBonus) dispBonus.textContent = currentBonusScore;
+  recalculateTotalScore();
+}
+
+function setTechnicalPassed(val) {
+  currentTechnicalPassed = val ? 1 : 0;
+}
+
 function recalculateTotalScore() {
+  const presentation = parseFloat(document.getElementById('score-presentation-input').value) || 0;
   const logic = parseFloat(document.getElementById('score-logic-input').value) || 0;
   const creativity = parseFloat(document.getElementById('score-creativity-input').value) || 0;
-  const theme = parseFloat(document.getElementById('score-theme-input').value) || 0;
   const design = parseFloat(document.getElementById('score-design-input').value) || 0;
-  const presentation = parseFloat(document.getElementById('score-presentation-input').value) || 0;
+  const theme = parseFloat(document.getElementById('score-theme-input').value) || 0;
 
-  // Perhitungan bobot resmi (100%):
-  // 30% Logika + 25% Kreativitas + 20% Tema + 15% Estetika + 10% Presentasi
-  const cLogic = logic * 0.30;
-  const cCreativity = creativity * 0.25;
-  const cTheme = theme * 0.20;
+  // Formula Resmi 2026:
+  // 40% Presentasi + 20% Logika + 15% Kreativitas + 15% Fungsi & Keberhasilan + 10% Tema + Bonus Sensor
+  const cPresentation = presentation * 0.40;
+  const cLogic = logic * 0.20;
+  const cCreativity = creativity * 0.15;
   const cDesign = design * 0.15;
-  const cPresentation = presentation * 0.10;
+  const cTheme = theme * 0.10;
+  const bonus = currentBonusScore;
 
+  document.getElementById('contrib-presentation').textContent = cPresentation.toFixed(2);
   document.getElementById('contrib-logic').textContent = cLogic.toFixed(2);
   document.getElementById('contrib-creativity').textContent = cCreativity.toFixed(2);
-  document.getElementById('contrib-theme').textContent = cTheme.toFixed(2);
   document.getElementById('contrib-design').textContent = cDesign.toFixed(2);
-  document.getElementById('contrib-presentation').textContent = cPresentation.toFixed(2);
+  document.getElementById('contrib-theme').textContent = cTheme.toFixed(2);
 
-  const total = cLogic + cCreativity + cTheme + cDesign + cPresentation;
+  const rawTotal = cPresentation + cLogic + cCreativity + cDesign + cTheme + bonus;
+  const total = Math.min(100.0, Math.round(rawTotal * 100) / 100);
   document.getElementById('display-total-score').textContent = total.toFixed(2);
 
   // Grade Predicate (Light Theme Badges)
@@ -955,7 +1022,7 @@ function recalculateTotalScore() {
 }
 
 function updatePresetButtonHighlights() {
-  const criteria = ['logic', 'creativity', 'theme', 'design', 'presentation'];
+  const criteria = ['presentation', 'logic', 'creativity', 'design', 'theme'];
   criteria.forEach(crit => {
     const input = document.getElementById(`score-${crit}-input`);
     const val = input ? parseFloat(input.value) : null;
@@ -977,15 +1044,15 @@ function updatePresetButtonHighlights() {
 async function submitScore(advanceToNext) {
   if (!currentSubmission) return;
 
+  const presentation = parseFloat(document.getElementById('score-presentation-input').value) || 0;
   const logic = parseFloat(document.getElementById('score-logic-input').value) || 0;
   const creativity = parseFloat(document.getElementById('score-creativity-input').value) || 0;
-  const theme = parseFloat(document.getElementById('score-theme-input').value) || 0;
   const design = parseFloat(document.getElementById('score-design-input').value) || 0;
-  const presentation = parseFloat(document.getElementById('score-presentation-input').value) || 0;
+  const theme = parseFloat(document.getElementById('score-theme-input').value) || 0;
   const notes = document.getElementById('judge-notes-input').value.trim();
 
   // Validasi nilai minimal
-  const total = (logic * 0.3) + (creativity * 0.25) + (theme * 0.2) + (design * 0.15) + (presentation * 0.1);
+  const total = (presentation * 0.40) + (logic * 0.20) + (creativity * 0.15) + (design * 0.15) + (theme * 0.10) + currentBonusScore;
   if (total <= 0) {
     if (!confirm('Total nilai yang diberikan adalah 0.00. Apakah Anda yakin ingin menyimpan nilai ini?')) {
       return;
@@ -1019,11 +1086,13 @@ async function submitScore(advanceToNext) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         submission_id: currentSubmission.id,
+        score_presentation: presentation,
         score_logic: logic,
         score_creativity: creativity,
-        score_theme: theme,
         score_design: design,
-        score_presentation: presentation,
+        score_theme: theme,
+        bonus_score: currentBonusScore,
+        technical_passed: currentTechnicalPassed,
         judge_notes: notes
       })
     });
@@ -1037,11 +1106,13 @@ async function submitScore(advanceToNext) {
       currentSubmission.is_scored = true;
       currentSubmission.my_score = {
         score_id: data.score_id,
+        score_presentation: presentation,
         score_logic: logic,
         score_creativity: creativity,
-        score_theme: theme,
         score_design: design,
-        score_presentation: presentation,
+        score_theme: theme,
+        bonus_score: currentBonusScore,
+        technical_passed: currentTechnicalPassed,
         total_score: data.total_score,
         judge_notes: notes,
         scored_at: new Date().toISOString().replace('T', ' ').substring(0, 19)
@@ -1115,18 +1186,20 @@ async function loadLeaderboard() {
         else if (idx === 2) rankBadge = '<span class="w-6 h-6 rounded-full bg-amber-600 text-white font-black inline-flex items-center justify-center text-[10px] shadow-xs">3</span>';
         else rankBadge = `<span class="text-xs font-bold text-slate-500">${idx + 1}</span>`;
 
+        let judgeStatus = r.judge_count >= 2 ? '<span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-100 text-emerald-800">2/2 Juri</span>' : `<span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-amber-100 text-amber-800">${r.judge_count}/2 Juri</span>`;
+
         html += `
           <tr class="hover:bg-slate-50 transition">
             <td class="py-2.5 px-3 text-center">${rankBadge}</td>
             <td class="py-2.5 px-3 font-extrabold text-slate-900">${escapeHtml(r.blind_code)}</td>
             <td class="py-2.5 px-3 text-slate-600">${escapeHtml(r.branch)} <span class="text-[10px] text-slate-400 font-bold">(${escapeHtml(r.grade_category)})</span></td>
             <td class="py-2.5 px-3 font-bold text-orange-600">${escapeHtml(r.project_title)}</td>
-            <td class="py-2.5 px-2 text-center text-slate-600">${r.judge_count} juri</td>
+            <td class="py-2.5 px-2 text-center">${judgeStatus}</td>
+            <td class="py-2.5 px-2 text-right text-slate-600 font-semibold">${parseFloat(r.avg_presentation || 0).toFixed(1)}</td>
             <td class="py-2.5 px-2 text-right text-slate-600 font-semibold">${parseFloat(r.avg_logic || 0).toFixed(1)}</td>
             <td class="py-2.5 px-2 text-right text-slate-600 font-semibold">${parseFloat(r.avg_creativity || 0).toFixed(1)}</td>
-            <td class="py-2.5 px-2 text-right text-slate-600 font-semibold">${parseFloat(r.avg_theme || 0).toFixed(1)}</td>
             <td class="py-2.5 px-2 text-right text-slate-600 font-semibold">${parseFloat(r.avg_design || 0).toFixed(1)}</td>
-            <td class="py-2.5 px-2 text-right text-slate-600 font-semibold">${parseFloat(r.avg_presentation || 0).toFixed(1)}</td>
+            <td class="py-2.5 px-2 text-right text-slate-600 font-semibold">${parseFloat(r.avg_theme || 0).toFixed(1)}</td>
             <td class="py-2.5 px-3 text-right font-black text-orange-600 text-sm">${parseFloat(r.final_score || 0).toFixed(2)}</td>
           </tr>
         `;
@@ -1219,6 +1292,8 @@ window.toggleSpriteBreakdown = toggleSpriteBreakdown;
 window.syncScoreInput = syncScoreInput;
 window.setScorePreset = setScorePreset;
 window.adjustScoreStep = adjustScoreStep;
+window.setBonusScore = setBonusScore;
+window.setTechnicalPassed = setTechnicalPassed;
 window.updatePresetButtonHighlights = updatePresetButtonHighlights;
 window.submitScore = submitScore;
 window.openLeaderboardModal = openLeaderboardModal;

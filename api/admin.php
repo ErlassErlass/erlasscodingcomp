@@ -118,7 +118,8 @@ if ($action === 'login') {
             'id' => $user['id'],
             'username' => $user['username'],
             'full_name' => $user['full_name'],
-            'role' => $user['role']
+            'role' => $user['role'],
+            'judge_group' => $user['judge_group'] !== null ? (int)$user['judge_group'] : null
         ],
         'message' => 'Login berhasil!'
     ]);
@@ -953,6 +954,24 @@ if ($action === 'get_judging_submissions') {
     $status   = trim($_GET['status'] ?? ''); // 'all', 'scored', 'unscored'
     $search   = trim($_GET['search'] ?? '');
     $judgeId  = (int)$currentAdmin['id'];
+    $judgeRole = $currentAdmin['role'] ?? '';
+    $judgeGroup = $currentAdmin['judge_group'] !== null ? (int)$currentAdmin['judge_group'] : null;
+
+    // Filter kelompok juri: Juri diwajibkan sesuai kelompoknya (Opsi A 4-kelompok 2-juri), admin/panitia fleksibel
+    $filterGroup = null;
+    if ($judgeRole === 'juri') {
+        $filterGroup = $judgeGroup;
+    } elseif (isset($_GET['judge_group']) && $_GET['judge_group'] !== '') {
+        $filterGroup = (int)$_GET['judge_group'];
+    }
+
+    // Identifikasi partner dewan juri dalam kelompok yang sama
+    $partnerJudge = null;
+    if ($judgeGroup !== null) {
+        $stmtPartner = $pdo->prepare("SELECT id, full_name, username FROM admin_users WHERE role = 'juri' AND judge_group = ? AND id != ? LIMIT 1");
+        $stmtPartner->execute([$judgeGroup, $judgeId]);
+        $partnerJudge = $stmtPartner->fetch();
+    }
 
     $sql = "
         SELECT 
@@ -960,6 +979,7 @@ if ($action === 'get_judging_submissions') {
             p.reg_code,
             p.branch,
             p.grade_category,
+            p.judge_group,
             p.project_title,
             p.project_description,
             p.project_file_path,
@@ -971,11 +991,13 @@ if ($action === 'get_judging_submissions') {
             p.submitted_at,
             p.status,
             s.id AS score_id,
+            s.score_presentation,
             s.score_logic,
             s.score_creativity,
-            s.score_theme,
             s.score_design,
-            s.score_presentation,
+            s.score_theme,
+            s.bonus_score,
+            s.technical_passed,
             s.total_score,
             s.judge_notes,
             s.updated_at AS scored_at,
@@ -987,6 +1009,10 @@ if ($action === 'get_judging_submissions') {
     ";
     $params = [$judgeId];
 
+    if ($filterGroup !== null) {
+        $sql .= " AND p.judge_group = ?";
+        $params[] = $filterGroup;
+    }
     if ($branch !== '') {
         $sql .= " AND (p.branch = ? OR p.branch LIKE ?)";
         $params[] = $branch;
@@ -1076,6 +1102,7 @@ if ($action === 'get_judging_submissions') {
             'blind_code' => 'Peserta #' . $r['reg_code'],
             'branch' => $r['branch'],
             'grade_category' => $r['grade_category'],
+            'judge_group' => (int)$r['judge_group'],
             'project_title' => $displayTitle,
             'project_description' => $r['project_description'],
             'project_file_url' => $fullFileUrl,
@@ -1091,11 +1118,13 @@ if ($action === 'get_judging_submissions') {
             'is_scored' => !empty($r['score_id']),
             'my_score' => !empty($r['score_id']) ? [
                 'score_id' => (int)$r['score_id'],
+                'score_presentation' => (float)$r['score_presentation'],
                 'score_logic' => (float)$r['score_logic'],
                 'score_creativity' => (float)$r['score_creativity'],
-                'score_theme' => (float)$r['score_theme'],
                 'score_design' => (float)$r['score_design'],
-                'score_presentation' => (float)$r['score_presentation'],
+                'score_theme' => (float)$r['score_theme'],
+                'bonus_score' => (float)$r['bonus_score'],
+                'technical_passed' => (int)$r['technical_passed'],
                 'total_score' => (float)$r['total_score'],
                 'judge_notes' => $r['judge_notes'],
                 'scored_at' => $r['scored_at']
@@ -1105,13 +1134,28 @@ if ($action === 'get_judging_submissions') {
         ];
     }
 
-    // Stats for judge
-    $stmtTotal = $pdo->query("SELECT COUNT(*) AS total FROM project_submissions");
-    $totalCount = (int)($stmtTotal->fetch()['total'] ?? 0);
+    // Stats for judge (dibatasi sesuai kelompok jika juri)
+    if ($judgeRole === 'juri' && $judgeGroup !== null) {
+        $stmtTotal = $pdo->prepare("SELECT COUNT(*) AS total FROM project_submissions WHERE judge_group = ?");
+        $stmtTotal->execute([$judgeGroup]);
+        $totalCount = (int)($stmtTotal->fetch()['total'] ?? 0);
 
-    $stmtMyScored = $pdo->prepare("SELECT COUNT(*) AS total FROM project_scores WHERE judge_id = ?");
-    $stmtMyScored->execute([$judgeId]);
-    $myScoredCount = (int)($stmtMyScored->fetch()['total'] ?? 0);
+        $stmtMyScored = $pdo->prepare("
+            SELECT COUNT(*) AS total 
+            FROM project_scores s
+            JOIN project_submissions p ON s.submission_id = p.id
+            WHERE s.judge_id = ? AND p.judge_group = ?
+        ");
+        $stmtMyScored->execute([$judgeId, $judgeGroup]);
+        $myScoredCount = (int)($stmtMyScored->fetch()['total'] ?? 0);
+    } else {
+        $stmtTotal = $pdo->query("SELECT COUNT(*) AS total FROM project_submissions");
+        $totalCount = (int)($stmtTotal->fetch()['total'] ?? 0);
+
+        $stmtMyScored = $pdo->prepare("SELECT COUNT(*) AS total FROM project_scores WHERE judge_id = ?");
+        $stmtMyScored->execute([$judgeId]);
+        $myScoredCount = (int)($stmtMyScored->fetch()['total'] ?? 0);
+    }
 
     send_json([
         'status' => 'ok',
@@ -1124,44 +1168,48 @@ if ($action === 'get_judging_submissions') {
         'current_judge' => [
             'id' => $currentAdmin['id'],
             'name' => $currentAdmin['full_name'],
-            'role' => $currentAdmin['role']
+            'role' => $currentAdmin['role'],
+            'judge_group' => $judgeGroup,
+            'partner_name' => $partnerJudge ? $partnerJudge['full_name'] : null
         ]
     ]);
 }
 
-// 13. Simpan Nilai Juri (Rubrik 5 Kriteria Terbobot)
+// 13. Simpan Nilai Juri (Rubrik 5 Kriteria Terbobot Resmi 2026)
 if ($action === 'save_project_score') {
     $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
     
     $submission_id      = (int)($input['submission_id'] ?? 0);
-    $score_logic        = max(0, min(100, (float)($input['score_logic'] ?? 0)));
-    $score_creativity   = max(0, min(100, (float)($input['score_creativity'] ?? 0)));
-    $score_theme        = max(0, min(100, (float)($input['score_theme'] ?? 0)));
-    $score_design       = max(0, min(100, (float)($input['score_design'] ?? 0)));
-    $score_presentation = max(0, min(100, (float)($input['score_presentation'] ?? 0)));
+    $score_presentation = max(0, min(100, (float)($input['score_presentation'] ?? 0))); // 40%
+    $score_logic        = max(0, min(100, (float)($input['score_logic'] ?? 0)));        // 20%
+    $score_creativity   = max(0, min(100, (float)($input['score_creativity'] ?? 0)));   // 15%
+    $score_design       = max(0, min(100, (float)($input['score_design'] ?? 0)));       // 15% (Fungsi & Keberhasilan)
+    $score_theme        = max(0, min(100, (float)($input['score_theme'] ?? 0)));        // 10%
+    $bonus_score        = max(0, min(10, (float)($input['bonus_score'] ?? 0)));         // 0, 3, 5 (Micro:bit SD bonus)
+    $technical_passed   = isset($input['technical_passed']) ? ((int)$input['technical_passed'] ? 1 : 0) : 1;
     $judge_notes        = trim($input['judge_notes'] ?? '');
 
     if ($submission_id <= 0) {
         send_json(['status' => 'error', 'message' => 'ID Proyek tidak valid.'], 422);
     }
 
-    $stmtSub = $pdo->prepare("SELECT id, reg_code FROM project_submissions WHERE id = ? LIMIT 1");
+    $stmtSub = $pdo->prepare("SELECT id, reg_code, branch, grade_category, judge_group FROM project_submissions WHERE id = ? LIMIT 1");
     $stmtSub->execute([$submission_id]);
     $sub = $stmtSub->fetch();
     if (!$sub) {
         send_json(['status' => 'error', 'message' => 'Data karya proyek tidak ditemukan.'], 404);
     }
 
-    // Hitung total skor terbobot 100%:
-    // 30% Logika + 25% Kreativitas + 20% Tema & Fungsi + 15% Estetika + 10% Presentasi
-    $total_score = round(
-        ($score_logic * 0.30) +
-        ($score_creativity * 0.25) +
-        ($score_theme * 0.20) +
-        ($score_design * 0.15) +
-        ($score_presentation * 0.10),
-        2
-    );
+    // Formula Resmi 2026:
+    // (Presentasi * 0.40) + (Logika * 0.20) + (Kreativitas * 0.15) + (Fungsi * 0.15) + (Tema * 0.10) + bonus_score
+    // Batas maksimal total nilai adalah 100
+    $weighted = ($score_presentation * 0.40) +
+                ($score_logic * 0.20) +
+                ($score_creativity * 0.15) +
+                ($score_design * 0.15) +
+                ($score_theme * 0.10) +
+                $bonus_score;
+    $total_score = min(100.0, round($weighted, 2));
 
     $judgeId = (int)$currentAdmin['id'];
     $judgeName = $currentAdmin['full_name'] ?: ('Juri #' . $judgeId);
@@ -1169,19 +1217,23 @@ if ($action === 'save_project_score') {
     $stmtSave = $pdo->prepare("
         INSERT INTO project_scores (
             submission_id, judge_id, judge_name,
-            score_logic, score_creativity, score_theme, score_design, score_presentation,
+            score_presentation, score_logic, score_creativity, score_design, score_theme,
+            bonus_score, technical_passed,
             total_score, judge_notes, updated_at
         ) VALUES (
             ?, ?, ?,
             ?, ?, ?, ?, ?,
+            ?, ?,
             ?, ?, NOW()
         )
         ON DUPLICATE KEY UPDATE
+            score_presentation = VALUES(score_presentation),
             score_logic = VALUES(score_logic),
             score_creativity = VALUES(score_creativity),
-            score_theme = VALUES(score_theme),
             score_design = VALUES(score_design),
-            score_presentation = VALUES(score_presentation),
+            score_theme = VALUES(score_theme),
+            bonus_score = VALUES(bonus_score),
+            technical_passed = VALUES(technical_passed),
             total_score = VALUES(total_score),
             judge_notes = VALUES(judge_notes),
             updated_at = NOW()
@@ -1189,7 +1241,8 @@ if ($action === 'save_project_score') {
 
     $stmtSave->execute([
         $submission_id, $judgeId, $judgeName,
-        $score_logic, $score_creativity, $score_theme, $score_design, $score_presentation,
+        $score_presentation, $score_logic, $score_creativity, $score_design, $score_theme,
+        $bonus_score, $technical_passed,
         $total_score, $judge_notes
     ]);
 
@@ -1204,11 +1257,12 @@ if ($action === 'save_project_score') {
     ]);
 }
 
-// 14. Rekapitulasi Nilai & Leaderboard
+// 14. Rekapitulasi Nilai & Leaderboard (Maks 2 Juri per Proyek)
 if ($action === 'get_judging_leaderboard') {
-    $branch   = trim($_GET['branch'] ?? '');
-    $gradeCat = trim($_GET['grade_category'] ?? '');
-    $search   = trim($_GET['search'] ?? '');
+    $branch      = trim($_GET['branch'] ?? '');
+    $gradeCat    = trim($_GET['grade_category'] ?? '');
+    $search      = trim($_GET['search'] ?? '');
+    $groupFilter = isset($_GET['judge_group']) && $_GET['judge_group'] !== '' ? (int)$_GET['judge_group'] : null;
     $isPrivileged = in_array($currentAdmin['role'] ?? '', ['superadmin', 'panitia'], true);
 
     $sql = "
@@ -1219,13 +1273,15 @@ if ($action === 'get_judging_leaderboard') {
             p.school_name,
             p.branch,
             p.grade_category,
+            p.judge_group,
             p.project_title,
             COUNT(s.id) AS judge_count,
+            ROUND(AVG(s.score_presentation), 2) AS avg_presentation,
             ROUND(AVG(s.score_logic), 2) AS avg_logic,
             ROUND(AVG(s.score_creativity), 2) AS avg_creativity,
-            ROUND(AVG(s.score_theme), 2) AS avg_theme,
             ROUND(AVG(s.score_design), 2) AS avg_design,
-            ROUND(AVG(s.score_presentation), 2) AS avg_presentation,
+            ROUND(AVG(s.score_theme), 2) AS avg_theme,
+            ROUND(AVG(s.bonus_score), 2) AS avg_bonus,
             ROUND(AVG(s.total_score), 2) AS final_score
         FROM project_submissions p
         LEFT JOIN project_scores s ON s.submission_id = p.id
@@ -1233,6 +1289,10 @@ if ($action === 'get_judging_leaderboard') {
     ";
     $params = [];
 
+    if ($groupFilter !== null) {
+        $sql .= " AND p.judge_group = ?";
+        $params[] = $groupFilter;
+    }
     if ($branch !== '') {
         $sql .= " AND (p.branch = ? OR p.branch LIKE ?)";
         $params[] = $branch;
@@ -1266,7 +1326,8 @@ if ($action === 'get_judging_leaderboard') {
         $stmtScores = $pdo->prepare("
             SELECT 
                 submission_id, judge_id, judge_name,
-                score_logic, score_creativity, score_theme, score_design, score_presentation,
+                score_presentation, score_logic, score_creativity, score_design, score_theme,
+                bonus_score, technical_passed,
                 total_score, judge_notes, updated_at
             FROM project_scores 
             WHERE submission_id IN ($inPlaceholders)
@@ -1277,11 +1338,13 @@ if ($action === 'get_judging_leaderboard') {
             $scoresBySub[$sc['submission_id']][] = [
                 'judge_id' => (int)$sc['judge_id'],
                 'judge_name' => $sc['judge_name'],
+                'score_presentation' => (float)$sc['score_presentation'],
                 'score_logic' => (float)$sc['score_logic'],
                 'score_creativity' => (float)$sc['score_creativity'],
-                'score_theme' => (float)$sc['score_theme'],
                 'score_design' => (float)$sc['score_design'],
-                'score_presentation' => (float)$sc['score_presentation'],
+                'score_theme' => (float)$sc['score_theme'],
+                'bonus_score' => (float)$sc['bonus_score'],
+                'technical_passed' => (int)$sc['technical_passed'],
                 'total_score' => (float)$sc['total_score'],
                 'judge_notes' => $sc['judge_notes'],
                 'scored_at' => $sc['updated_at']
@@ -1306,13 +1369,15 @@ if ($action === 'get_judging_leaderboard') {
             'blind_code' => 'Peserta #' . $r['reg_code'],
             'branch' => $r['branch'],
             'grade_category' => $r['grade_category'],
+            'judge_group' => (int)$r['judge_group'],
             'project_title' => $pTitle,
             'judge_count' => (int)$r['judge_count'],
+            'avg_presentation' => (float)$r['avg_presentation'],
             'avg_logic' => (float)$r['avg_logic'],
             'avg_creativity' => (float)$r['avg_creativity'],
-            'avg_theme' => (float)$r['avg_theme'],
             'avg_design' => (float)$r['avg_design'],
-            'avg_presentation' => (float)$r['avg_presentation'],
+            'avg_theme' => (float)$r['avg_theme'],
+            'avg_bonus' => (float)$r['avg_bonus'],
             'final_score' => (float)$r['final_score'],
             'judge_scores' => $scoresBySub[$r['id']] ?? []
         ];
@@ -1351,8 +1416,9 @@ if ($action === 'get_judging_leaderboard') {
 
 // 15. Export Berita Acara Rekapitulasi Nilai Juri (CSV)
 if ($action === 'export_judging_csv') {
-    $branch   = trim($_GET['branch'] ?? '');
-    $gradeCat = trim($_GET['grade_category'] ?? '');
+    $branch      = trim($_GET['branch'] ?? '');
+    $gradeCat    = trim($_GET['grade_category'] ?? '');
+    $groupFilter = isset($_GET['judge_group']) && $_GET['judge_group'] !== '' ? (int)$_GET['judge_group'] : null;
     $isPrivileged = in_array($currentAdmin['role'] ?? '', ['superadmin', 'panitia'], true);
 
     $sql = "
@@ -1362,19 +1428,25 @@ if ($action === 'export_judging_csv') {
             p.school_name,
             p.branch,
             p.grade_category,
+            p.judge_group,
             p.project_title,
             COUNT(s.id) AS judge_count,
+            ROUND(AVG(s.score_presentation), 2) AS avg_presentation,
             ROUND(AVG(s.score_logic), 2) AS avg_logic,
             ROUND(AVG(s.score_creativity), 2) AS avg_creativity,
-            ROUND(AVG(s.score_theme), 2) AS avg_theme,
             ROUND(AVG(s.score_design), 2) AS avg_design,
-            ROUND(AVG(s.score_presentation), 2) AS avg_presentation,
+            ROUND(AVG(s.score_theme), 2) AS avg_theme,
+            ROUND(AVG(s.bonus_score), 2) AS avg_bonus,
             ROUND(AVG(s.total_score), 2) AS final_score
         FROM project_submissions p
         LEFT JOIN project_scores s ON s.submission_id = p.id
         WHERE 1 = 1
     ";
     $params = [];
+    if ($groupFilter !== null) {
+        $sql .= " AND p.judge_group = ?";
+        $params[] = $groupFilter;
+    }
     if ($branch !== '') {
         $sql .= " AND (p.branch = ? OR p.branch LIKE ?)";
         $params[] = $branch;
@@ -1403,9 +1475,9 @@ if ($action === 'export_judging_csv') {
         $headers[] = 'Asal Sekolah';
     }
     $headers = array_merge($headers, [
-        'Cabang', 'Kategori', 'Judul Karya', 'Jml Penilai',
-        'Logika (30%)', 'Kreativitas (25%)', 'Tema & Fungsi (20%)',
-        'Estetika (15%)', 'Presentasi (10%)', 'NILAI AKHIR'
+        'Cabang', 'Kategori', 'Kelompok Juri', 'Judul Karya', 'Jml Penilai (Maks 2)',
+        'Presentasi (40%)', 'Logika (20%)', 'Kreativitas (15%)',
+        'Fungsi (15%)', 'Tema (10%)', 'Bonus Sensor', 'NILAI AKHIR'
     ]);
     fputcsv($output, $headers);
 
@@ -1425,13 +1497,15 @@ if ($action === 'export_judging_csv') {
         }
         $line[] = $r['branch'];
         $line[] = $r['grade_category'];
+        $line[] = 'Kelompok ' . $r['judge_group'];
         $line[] = $pTitle;
-        $line[] = $r['judge_count'];
+        $line[] = $r['judge_count'] . '/2';
+        $line[] = $r['avg_presentation'];
         $line[] = $r['avg_logic'];
         $line[] = $r['avg_creativity'];
-        $line[] = $r['avg_theme'];
         $line[] = $r['avg_design'];
-        $line[] = $r['avg_presentation'];
+        $line[] = $r['avg_theme'];
+        $line[] = $r['avg_bonus'];
         $line[] = $r['final_score'];
         fputcsv($output, $line);
     }

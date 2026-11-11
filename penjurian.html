@@ -195,7 +195,7 @@
             </span>
             <div class="text-left leading-tight hidden xs:block">
               <div id="judge-display-name" class="font-bold text-slate-800 text-[11px]">Dewan Juri</div>
-              <div class="text-[9px] text-slate-400 font-medium">Juri Penilai Resmi</div>
+              <div id="judge-group-badge" class="text-[9px] text-orange-600 font-extrabold uppercase tracking-wider">Kelompok Juri</div>
             </div>
           </div>
 
@@ -811,21 +811,67 @@
               </div>
             </div>
 
-            <!-- RUBRIC 1: LOGIKA PEMROGRAMAN & ALGORITMA (30%) -->
+            <!-- RUBRIC 1: PRESENTASI DAN PEMAHAMAN PROYEK (40%) -->
             <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
               <div class="flex flex-wrap items-center justify-between gap-1">
                 <div class="flex items-center gap-1.5">
                   <span class="w-5 h-5 rounded-md bg-slate-900 text-white flex items-center justify-center text-[10px] font-black font-tabular">1</span>
-                  <span class="text-xs font-bold text-slate-800">Logika & Algoritma</span>
-                  <span class="px-2 py-0.5 rounded-md bg-slate-200/70 text-slate-700 text-[10px] font-bold tracking-wide">Bobot 30%</span>
+                  <span class="text-xs font-bold text-slate-800">Presentasi & Pemahaman Proyek</span>
+                  <span class="px-2 py-0.5 rounded-md bg-slate-200/70 text-slate-700 text-[10px] font-bold tracking-wide">Bobot 40%</span>
                 </div>
                 <div class="text-[11px] font-bold text-slate-500">
-                  Poin: <span id="contrib-logic" class="text-orange-600 font-black font-tabular text-xs">0.00</span> <span class="text-[10px] font-tabular text-slate-400">/ 30.00 pts</span>
+                  Poin: <span id="contrib-presentation" class="text-orange-600 font-black font-tabular text-xs">0.00</span> <span class="text-[10px] font-tabular text-slate-400">/ 40.00 pts</span>
                 </div>
               </div>
               
               <p class="text-[10px] text-slate-500 leading-snug">
-                Kompleksitas algoritma, struktur perulangan (loop), percabangan logika (if/else), variabel, sensor, dan efisiensi susunan balok.
+                Kemampuan menjelaskan konsep & alur proyek, kejelasan artikulasi bahasa, penguasaan materi presentasi, dan kerapian struktur penyampaian.
+              </p>
+
+              <div class="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-200/60">
+                <div class="flex items-center gap-1">
+                  <span class="text-[10px] font-bold text-slate-400 mr-0.5">Preset:</span>
+                  <button type="button" onclick="setScorePreset('presentation', 70)" data-criterion="presentation" data-val="70" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">70</button>
+                  <button type="button" onclick="setScorePreset('presentation', 80)" data-criterion="presentation" data-val="80" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">80</button>
+                  <button type="button" onclick="setScorePreset('presentation', 85)" data-criterion="presentation" data-val="85" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">85</button>
+                  <button type="button" onclick="setScorePreset('presentation', 90)" data-criterion="presentation" data-val="90" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">90</button>
+                  <button type="button" onclick="setScorePreset('presentation', 95)" data-criterion="presentation" data-val="95" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">95</button>
+                  <button type="button" onclick="setScorePreset('presentation', 100)" data-criterion="presentation" data-val="100" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">100</button>
+                </div>
+
+                <div class="flex items-center gap-1.5 ml-auto">
+                  <button type="button" onclick="adjustScoreStep('presentation', -1)" class="btn-tactile w-7 h-7 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black text-xs flex items-center justify-center transition shadow-xs" title="Kurangi 1">-</button>
+                  <input 
+                    type="number" 
+                    id="score-presentation-input" 
+                    min="0" 
+                    max="100" 
+                    step="0.5" 
+                    value="0" 
+                    oninput="syncScoreInput('presentation', this.value)"
+                    class="font-tabular font-bold w-16 px-2 py-1 rounded-lg text-xs text-center bg-white border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500 shadow-xs"
+                  >
+                  <button type="button" onclick="adjustScoreStep('presentation', 1)" class="btn-tactile w-7 h-7 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black text-xs flex items-center justify-center transition shadow-xs" title="Tambah 1">+</button>
+                  <span class="text-xs font-bold font-tabular text-slate-400">/ 100</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- RUBRIC 2: LOGIKA DAN CARA KERJA PROGRAM (20%) -->
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
+              <div class="flex flex-wrap items-center justify-between gap-1">
+                <div class="flex items-center gap-1.5">
+                  <span class="w-5 h-5 rounded-md bg-slate-900 text-white flex items-center justify-center text-[10px] font-black font-tabular">2</span>
+                  <span class="text-xs font-bold text-slate-800">Logika & Cara Kerja Program</span>
+                  <span class="px-2 py-0.5 rounded-md bg-slate-200/70 text-slate-700 text-[10px] font-bold tracking-wide">Bobot 20%</span>
+                </div>
+                <div class="text-[11px] font-bold text-slate-500">
+                  Poin: <span id="contrib-logic" class="text-orange-600 font-black font-tabular text-xs">0.00</span> <span class="text-[10px] font-tabular text-slate-400">/ 20.00 pts</span>
+                </div>
+              </div>
+              
+              <p class="text-[10px] text-slate-500 leading-snug">
+                Logika pemrograman (looping, condition, variable, event), efisiensi blok kode / script, dan eksekusi program tanpa bug fatal.
               </p>
 
               <div class="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-200/60">
@@ -857,21 +903,21 @@
               </div>
             </div>
 
-            <!-- RUBRIC 2: KREATIVITAS & ORISINALITAS (25%) -->
+            <!-- RUBRIC 3: KREATIVITAS DAN PENGEMBANGAN IDE (15%) -->
             <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
               <div class="flex flex-wrap items-center justify-between gap-1">
                 <div class="flex items-center gap-1.5">
-                  <span class="w-5 h-5 rounded-md bg-slate-900 text-white flex items-center justify-center text-[10px] font-black font-tabular">2</span>
-                  <span class="text-xs font-bold text-slate-800">Kreativitas & Orisinalitas</span>
-                  <span class="px-2 py-0.5 rounded-md bg-slate-200/70 text-slate-700 text-[10px] font-bold tracking-wide">Bobot 25%</span>
+                  <span class="w-5 h-5 rounded-md bg-slate-900 text-white flex items-center justify-center text-[10px] font-black font-tabular">3</span>
+                  <span class="text-xs font-bold text-slate-800">Kreativitas & Ide</span>
+                  <span class="px-2 py-0.5 rounded-md bg-slate-200/70 text-slate-700 text-[10px] font-bold tracking-wide">Bobot 15%</span>
                 </div>
                 <div class="text-[11px] font-bold text-slate-500">
-                  Poin: <span id="contrib-creativity" class="text-orange-600 font-black font-tabular text-xs">0.00</span> <span class="text-[10px] font-tabular text-slate-400">/ 25.00 pts</span>
+                  Poin: <span id="contrib-creativity" class="text-orange-600 font-black font-tabular text-xs">0.00</span> <span class="text-[10px] font-tabular text-slate-400">/ 15.00 pts</span>
                 </div>
               </div>
               
               <p class="text-[10px] text-slate-500 leading-snug">
-                Keunikan konsep ide, inovasi mekanik gameplay / interaktivitas, originalitas alur, serta pemecahan masalah kreatif.
+                Keunikan ide / orisinalitas proyek, inovasi penyelesaian masalah (problem solving), serta nilai tambah dan daya tarik karya.
               </p>
 
               <div class="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-200/60">
@@ -903,58 +949,12 @@
               </div>
             </div>
 
-            <!-- RUBRIC 3: KESESUAIAN TEMA & FUNGSIONALITAS (20%) -->
-            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
-              <div class="flex flex-wrap items-center justify-between gap-1">
-                <div class="flex items-center gap-1.5">
-                  <span class="w-5 h-5 rounded-md bg-slate-900 text-white flex items-center justify-center text-[10px] font-black font-tabular">3</span>
-                  <span class="text-xs font-bold text-slate-800">Tema & Fungsionalitas</span>
-                  <span class="px-2 py-0.5 rounded-md bg-slate-200/70 text-slate-700 text-[10px] font-bold tracking-wide">Bobot 20%</span>
-                </div>
-                <div class="text-[11px] font-bold text-slate-500">
-                  Poin: <span id="contrib-theme" class="text-orange-600 font-black font-tabular text-xs">0.00</span> <span class="text-[10px] font-tabular text-slate-400">/ 20.00 pts</span>
-                </div>
-              </div>
-              
-              <p class="text-[10px] text-slate-500 leading-snug">
-                Relevansi dengan tema kompetisi, pesan yang disampaikan, stabilitas program (bebas bug/glitch fatal saat dijalankan).
-              </p>
-
-              <div class="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-200/60">
-                <div class="flex items-center gap-1">
-                  <span class="text-[10px] font-bold text-slate-400 mr-0.5">Preset:</span>
-                  <button type="button" onclick="setScorePreset('theme', 70)" data-criterion="theme" data-val="70" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">70</button>
-                  <button type="button" onclick="setScorePreset('theme', 80)" data-criterion="theme" data-val="80" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">80</button>
-                  <button type="button" onclick="setScorePreset('theme', 85)" data-criterion="theme" data-val="85" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">85</button>
-                  <button type="button" onclick="setScorePreset('theme', 90)" data-criterion="theme" data-val="90" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">90</button>
-                  <button type="button" onclick="setScorePreset('theme', 95)" data-criterion="theme" data-val="95" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">95</button>
-                  <button type="button" onclick="setScorePreset('theme', 100)" data-criterion="theme" data-val="100" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">100</button>
-                </div>
-
-                <div class="flex items-center gap-1.5 ml-auto">
-                  <button type="button" onclick="adjustScoreStep('theme', -1)" class="btn-tactile w-7 h-7 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black text-xs flex items-center justify-center transition shadow-xs" title="Kurangi 1">-</button>
-                  <input 
-                    type="number" 
-                    id="score-theme-input" 
-                    min="0" 
-                    max="100" 
-                    step="0.5" 
-                    value="0" 
-                    oninput="syncScoreInput('theme', this.value)"
-                    class="font-tabular font-bold w-16 px-2 py-1 rounded-lg text-xs text-center bg-white border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500 shadow-xs"
-                  >
-                  <button type="button" onclick="adjustScoreStep('theme', 1)" class="btn-tactile w-7 h-7 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black text-xs flex items-center justify-center transition shadow-xs" title="Tambah 1">+</button>
-                  <span class="text-xs font-bold font-tabular text-slate-400">/ 100</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- RUBRIC 4: ESTETIKA, DESAIN UI & GERAK (15%) -->
+            <!-- RUBRIC 4: FUNGSI DAN KEBERHASILAN PROYEK (15%) -->
             <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
               <div class="flex flex-wrap items-center justify-between gap-1">
                 <div class="flex items-center gap-1.5">
                   <span class="w-5 h-5 rounded-md bg-slate-900 text-white flex items-center justify-center text-[10px] font-black font-tabular">4</span>
-                  <span class="text-xs font-bold text-slate-800">Estetika, Desain UI & Gerak</span>
+                  <span class="text-xs font-bold text-slate-800">Fungsi & Keberhasilan Proyek</span>
                   <span class="px-2 py-0.5 rounded-md bg-slate-200/70 text-slate-700 text-[10px] font-bold tracking-wide">Bobot 15%</span>
                 </div>
                 <div class="text-[11px] font-bold text-slate-500">
@@ -963,7 +963,7 @@
               </div>
               
               <p class="text-[10px] text-slate-500 leading-snug">
-                Kerapian visual grafis, tata letak antarmuka (UI), animasi kehalusan gerak sprite, sinkronisasi audio dan efek suara.
+                Kesesuaian hasil karya dengan tujuan proyek, kemampuan beroperasi/berinteraksi dengan lancar, dan kebermanfaatan aplikasi/alat.
               </p>
 
               <div class="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-200/60">
@@ -995,49 +995,96 @@
               </div>
             </div>
 
-            <!-- RUBRIC 5: PRESENTASI & PEMAHAMAN PESERTA (10%) -->
+            <!-- RUBRIC 5: KESESUAIAN DENGAN TEMA (10%) -->
             <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
               <div class="flex flex-wrap items-center justify-between gap-1">
                 <div class="flex items-center gap-1.5">
                   <span class="w-5 h-5 rounded-md bg-slate-900 text-white flex items-center justify-center text-[10px] font-black font-tabular">5</span>
-                  <span class="text-xs font-bold text-slate-800">Presentasi & Pemahaman</span>
+                  <span class="text-xs font-bold text-slate-800">Kesesuaian dengan Tema</span>
                   <span class="px-2 py-0.5 rounded-md bg-slate-200/70 text-slate-700 text-[10px] font-bold tracking-wide">Bobot 10%</span>
                 </div>
                 <div class="text-[11px] font-bold text-slate-500">
-                  Poin: <span id="contrib-presentation" class="text-orange-600 font-black font-tabular text-xs">0.00</span> <span class="text-[10px] font-tabular text-slate-400">/ 10.00 pts</span>
+                  Poin: <span id="contrib-theme" class="text-orange-600 font-black font-tabular text-xs">0.00</span> <span class="text-[10px] font-tabular text-slate-400">/ 10.00 pts</span>
                 </div>
               </div>
               
               <p class="text-[10px] text-slate-500 leading-snug">
-                Penguasaan konsep saat menerangkan di video, kejelasan artikulasi, sistematika presentasi, dan kepercayaan diri.
+                Relevansi proyek dengan tema resmi kompetisi, keselarasan konsep cerita/alat dengan implementasi program yang dibuat.
               </p>
 
               <div class="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-200/60">
                 <div class="flex items-center gap-1">
                   <span class="text-[10px] font-bold text-slate-400 mr-0.5">Preset:</span>
-                  <button type="button" onclick="setScorePreset('presentation', 70)" data-criterion="presentation" data-val="70" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">70</button>
-                  <button type="button" onclick="setScorePreset('presentation', 80)" data-criterion="presentation" data-val="80" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">80</button>
-                  <button type="button" onclick="setScorePreset('presentation', 85)" data-criterion="presentation" data-val="85" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">85</button>
-                  <button type="button" onclick="setScorePreset('presentation', 90)" data-criterion="presentation" data-val="90" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">90</button>
-                  <button type="button" onclick="setScorePreset('presentation', 95)" data-criterion="presentation" data-val="95" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">95</button>
-                  <button type="button" onclick="setScorePreset('presentation', 100)" data-criterion="presentation" data-val="100" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">100</button>
+                  <button type="button" onclick="setScorePreset('theme', 70)" data-criterion="theme" data-val="70" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">70</button>
+                  <button type="button" onclick="setScorePreset('theme', 80)" data-criterion="theme" data-val="80" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">80</button>
+                  <button type="button" onclick="setScorePreset('theme', 85)" data-criterion="theme" data-val="85" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">85</button>
+                  <button type="button" onclick="setScorePreset('theme', 90)" data-criterion="theme" data-val="90" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">90</button>
+                  <button type="button" onclick="setScorePreset('theme', 95)" data-criterion="theme" data-val="95" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">95</button>
+                  <button type="button" onclick="setScorePreset('theme', 100)" data-criterion="theme" data-val="100" class="btn-preset btn-tactile font-tabular px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 transition">100</button>
                 </div>
 
                 <div class="flex items-center gap-1.5 ml-auto">
-                  <button type="button" onclick="adjustScoreStep('presentation', -1)" class="btn-tactile w-7 h-7 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black text-xs flex items-center justify-center transition shadow-xs" title="Kurangi 1">-</button>
+                  <button type="button" onclick="adjustScoreStep('theme', -1)" class="btn-tactile w-7 h-7 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black text-xs flex items-center justify-center transition shadow-xs" title="Kurangi 1">-</button>
                   <input 
                     type="number" 
-                    id="score-presentation-input" 
+                    id="score-theme-input" 
                     min="0" 
                     max="100" 
                     step="0.5" 
                     value="0" 
-                    oninput="syncScoreInput('presentation', this.value)"
+                    oninput="syncScoreInput('theme', this.value)"
                     class="font-tabular font-bold w-16 px-2 py-1 rounded-lg text-xs text-center bg-white border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500 shadow-xs"
                   >
-                  <button type="button" onclick="adjustScoreStep('presentation', 1)" class="btn-tactile w-7 h-7 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black text-xs flex items-center justify-center transition shadow-xs" title="Tambah 1">+</button>
+                  <button type="button" onclick="adjustScoreStep('theme', 1)" class="btn-tactile w-7 h-7 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-black text-xs flex items-center justify-center transition shadow-xs" title="Tambah 1">+</button>
                   <span class="text-xs font-bold font-tabular text-slate-400">/ 100</span>
                 </div>
+              </div>
+            </div>
+
+            <!-- PANEL KHUSUS MICRO:BIT (BONUS SENSOR SD / CHECKLIST WAJIB SMP) -->
+            <div id="microbit-extras-card" class="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200/80 space-y-2.5 hidden">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                  <span class="w-5 h-5 rounded-md bg-amber-600 text-white flex items-center justify-center text-[10px] font-black">
+                    <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
+                  </span>
+                  <span class="text-xs font-bold text-amber-950">Ketentuan Khusus Micro:bit</span>
+                </div>
+                <span id="microbit-extras-badge" class="px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 text-[10px] font-bold">Kategori SD</span>
+              </div>
+
+              <!-- SD: Bonus Sensor Eksternal -->
+              <div id="microbit-sd-panel" class="space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-bold text-amber-900">Bonus Poin Sensor Eksternal:</span>
+                  <span class="text-[11px] font-black text-amber-800 font-tabular">+<span id="display-bonus-score">0</span> pts</span>
+                </div>
+                <div class="grid grid-cols-3 gap-1.5">
+                  <label class="flex items-center gap-1.5 p-2 rounded-lg bg-white border border-amber-200 cursor-pointer hover:bg-amber-100/50 transition">
+                    <input type="radio" name="microbit-bonus-radio" value="0" onchange="setBonusScore(0)" class="text-orange-600 focus:ring-orange-500" checked>
+                    <span class="text-[10px] font-bold text-slate-700">0 (+0 pts)</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 p-2 rounded-lg bg-white border border-amber-200 cursor-pointer hover:bg-amber-100/50 transition">
+                    <input type="radio" name="microbit-bonus-radio" value="3" onchange="setBonusScore(3)" class="text-orange-600 focus:ring-orange-500">
+                    <span class="text-[10px] font-bold text-slate-700">1 (+3 pts)</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 p-2 rounded-lg bg-white border border-amber-200 cursor-pointer hover:bg-amber-100/50 transition">
+                    <input type="radio" name="microbit-bonus-radio" value="5" onchange="setBonusScore(5)" class="text-orange-600 focus:ring-orange-500">
+                    <span class="text-[10px] font-bold text-slate-700">&ge;2 (+5 pts)</span>
+                  </label>
+                </div>
+                <p class="text-[9px] text-amber-700 italic">Maksimal total nilai akhir dibatasi 100.00 poin.</p>
+              </div>
+
+              <!-- SMP: Checklist Wajib Sensor Eksternal -->
+              <div id="microbit-smp-panel" class="space-y-1.5 hidden">
+                <p class="text-[10px] text-amber-900 leading-snug">
+                  Ketentuan Wajib SMP: Proyek minimal menggunakan 1 sensor eksternal.
+                </p>
+                <label class="flex items-center gap-2 p-2 rounded-lg bg-white border border-amber-200 cursor-pointer hover:bg-amber-100/50 transition">
+                  <input type="checkbox" id="microbit-smp-check" onchange="setTechnicalPassed(this.checked)" class="w-4 h-4 text-orange-600 rounded border-slate-300 focus:ring-orange-500" checked>
+                  <span class="text-xs font-bold text-slate-800">Sensor Eksternal Terverifikasi Digunakan</span>
+                </label>
               </div>
             </div>
 
@@ -1160,12 +1207,12 @@
               <th class="py-2.5 px-3">Kode Samaran</th>
               <th class="py-2.5 px-3">Cabang & Kategori</th>
               <th class="py-2.5 px-3">Judul Karya</th>
-              <th class="py-2.5 px-2 text-center">Penilai</th>
-              <th class="py-2.5 px-2 text-right">Logika</th>
-              <th class="py-2.5 px-2 text-right">Kreatif</th>
-              <th class="py-2.5 px-2 text-right">Tema</th>
-              <th class="py-2.5 px-2 text-right">Estetika</th>
-              <th class="py-2.5 px-2 text-right">Pres.</th>
+              <th class="py-2.5 px-2 text-center">Status Juri</th>
+              <th class="py-2.5 px-2 text-right">Pres. (40%)</th>
+              <th class="py-2.5 px-2 text-right">Logika (20%)</th>
+              <th class="py-2.5 px-2 text-right">Kreatif (15%)</th>
+              <th class="py-2.5 px-2 text-right">Fungsi (15%)</th>
+              <th class="py-2.5 px-2 text-right">Tema (10%)</th>
               <th class="py-2.5 px-3 text-right font-black text-orange-600">NILAI AKHIR</th>
             </tr>
           </thead>

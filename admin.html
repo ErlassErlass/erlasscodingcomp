@@ -579,6 +579,14 @@
                 <option value="SMP 7-9">SMP / Kelas 7-9</option>
               </select>
 
+              <select id="jdg-filter-group" onchange="loadJudgingDashboard()" class="text-xs bg-white border border-slate-200 rounded-xl px-3 py-2 outline-none font-semibold text-slate-700">
+                <option value="">Semua Kelompok Juri</option>
+                <option value="1">Kelompok 1 (Juri 1 &amp; 2)</option>
+                <option value="2">Kelompok 2 (Juri 3 &amp; 4)</option>
+                <option value="3">Kelompok 3 (Juri 5 &amp; 6)</option>
+                <option value="4">Kelompok 4 (Juri 7 &amp; 8)</option>
+              </select>
+
               <button type="button" onclick="loadJudgingDashboard()" class="p-2 rounded-xl text-slate-600 hover:text-orange-600 bg-white border border-slate-200 transition" title="Segarkan Leaderboard">
                 <i data-lucide="refresh-cw" class="w-4 h-4"></i>
               </button>
@@ -590,24 +598,25 @@
               <thead class="bg-slate-100/80 text-[11px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
                 <tr>
                   <th class="py-3 px-3 text-center">Rank</th>
-                  <th class="py-3 px-3">Kode & Tanggal</th>
+                  <th class="py-3 px-3">Kode &amp; Tanggal</th>
                   <th class="py-3 px-3">Nama Peserta</th>
                   <th class="py-3 px-3">Asal Sekolah</th>
-                  <th class="py-3 px-3">Cabang & Jenjang</th>
+                  <th class="py-3 px-3">Cabang &amp; Jenjang</th>
+                  <th class="py-3 px-2 text-center">Grup</th>
                   <th class="py-3 px-3">Judul Karya</th>
-                  <th class="py-3 px-2 text-center">Jml Juri</th>
-                  <th class="py-3 px-2 text-right">Logika (30%)</th>
-                  <th class="py-3 px-2 text-right">Kreatif (25%)</th>
-                  <th class="py-3 px-2 text-right">Tema (20%)</th>
-                  <th class="py-3 px-2 text-right">Desain (15%)</th>
-                  <th class="py-3 px-2 text-right">Pres. (10%)</th>
+                  <th class="py-3 px-2 text-center">Status Juri</th>
+                  <th class="py-3 px-2 text-right">Pres. (40%)</th>
+                  <th class="py-3 px-2 text-right">Logika (20%)</th>
+                  <th class="py-3 px-2 text-right">Kreatif (15%)</th>
+                  <th class="py-3 px-2 text-right">Fungsi (15%)</th>
+                  <th class="py-3 px-2 text-right">Tema (10%)</th>
                   <th class="py-3 px-3 text-right font-black text-orange-600">NILAI AKHIR</th>
                   <th class="py-3 px-3 text-center no-print">Rincian Juri</th>
                 </tr>
               </thead>
               <tbody id="judging-table-body" class="divide-y divide-slate-100 font-medium">
                 <tr>
-                  <td colspan="14" class="py-8 text-center text-slate-400">Memuat rekapitulasi penilaian dewan juri...</td>
+                  <td colspan="15" class="py-8 text-center text-slate-400">Memuat rekapitulasi penilaian dewan juri...</td>
                 </tr>
               </tbody>
             </table>

@@ -860,11 +860,14 @@ if ($action === 'submit_project') {
             'submitted_at' => date('Y-m-d H:i:s')
         ]);
     } else {
-        // Mode Submit Pertama Kali
+        // Mode Submit Pertama Kali (Tentukan Kelompok Juri 1..4 secara seimbang - Opsi A Round-Robin)
+        $maxSubId = (int)$pdo->query("SELECT MAX(id) FROM project_submissions")->fetchColumn();
+        $judge_group = ($maxSubId % 4) + 1; // 1, 2, 3, 4, 1, 2, 3, 4...
+
         $stmtIns = $pdo->prepare("
             INSERT INTO project_submissions (
                 registration_id, reg_code, participant_name, school_name, branch,
-                grade_category, project_title, project_description,
+                grade_category, judge_group, project_title, project_description,
                 project_file_path, project_file_name, project_file_size,
                 video_url, backup_video_url,
                 statement_originality, agree_disqualification, agree_video_active,
@@ -872,7 +875,7 @@ if ($action === 'submit_project') {
                 status, allow_revision, version, submitted_at, created_at
             ) VALUES (
                 ?, ?, ?, ?, ?,
-                ?, ?, ?,
+                ?, ?, ?, ?,
                 ?, ?, ?,
                 ?, ?,
                 ?, ?, ?,
@@ -882,7 +885,7 @@ if ($action === 'submit_project') {
         ");
         $stmtIns->execute([
             $participant['id'], $reg_code, $participant['participant_name'], $participant['school_name'], $branch,
-            $grade_category, $project_title, $project_description,
+            $grade_category, $judge_group, $project_title, $project_description,
             $project_file_path, $project_file_name, $project_file_size,
             $video_url, $backup_video_url,
             $statement_originality, $agree_disqualification, $agree_video_active,
