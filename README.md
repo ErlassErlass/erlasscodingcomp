@@ -4,122 +4,120 @@ Sistem terpadu pendaftaran peserta, pengumpulan karya proyek, manajemen panitia,
 
 ---
 
-## 🌟 Fitur Utama Sistem
+## Fitur Utama Sistem
 
 ### 1. Portal Pendaftaran Peserta (`index.html`)
-- **Pencarian Sekolah Nasional Standar**: Terintegrasi langsung dengan basis data 38 provinsi Kemdikbud (NPSN, Jenjang, Status Negeri/Swasta, Kabupaten/Kota, dan Provinsi terisi otomatis tanpa input teks manual bebas).
-- **Auto-Cutoff Pendaftaran**: Pendaftaran tertutup secara otomatis tepat pada **5 November 2026 pukul 23:59:59 WIB** berdasarkan konfigurasi tanggal dinamis dari database.
+- **Pencarian Sekolah Nasional Standar**: Terintegrasi langsung dengan basis data 38 provinsi Kemdikbud (NPSN, Jenjang, Wilayah Kota/Kabupaten, Provinsi, dan status Kemitraan terisi otomatis).
+- **Auto-Cutoff Pendaftaran**: Pendaftaran publik tertutup otomatis pada **5 November 2026 pukul 23:59:59 WIB** berdasarkan konfigurasi database (`competitions.registration_end`).
 - **Dukungan Multi-Cabang & Jenjang**:
-  - Scratch Coding (Kelas 1–3 SD, Kelas 4–6 SD)
-  - Micro:bit (Kelas 4–6 SD, SMP 7–9)
-  - Erboblox Robotics (TK/Playgroup, SD, SMP)
-- **Generasi Kode Registrasi Unik**: Format otomatis `E-1026-XXXX`.
+  - Scratch Coding (Kelas 1-3 SD, Kelas 4-6 SD)
+  - Micro:bit (Kelas 4-6 SD, SMP 7-9)
+  - Erboblox Robotics (Kelas 4-6 SD, SMP 7-9)
+- **Generasi Kode Registrasi Unik**: Format otomatis `E-1026-XXXX` / `E-1126-XXXX`.
 
 ### 2. Portal Pengumpulan Proyek (`kumpul-proyek.html`)
-- **Verifikasi Kode Registrasi**: Validasi kepesertaan sebelum formulir terbuka.
-- **Upload Berkas Proyek**: Validasi ekstensi `.sb3` (Scratch) dan `.hex` (Micro:bit) dengan batas ukuran aman (max 50MB).
-- **Integrasi Video Presentasi**: Input link video YouTube (termasuk format shorts & youtu.be) atau Google Drive preview, dilengkapi input tautan cadangan.
-- **Sistem Izin Revisi Mandiri**: Penguncian otomatis setelah karya terkumpul. Revisi karya hanya dapat dilakukan jika panitia memberikan izin revisi (*allow revision*) melalui dashboard admin.
+- **Verifikasi Kode Registrasi**: Validasi kepesertaan (`payment_status = 'verified'` atau `is_partner = 1`) sebelum formulir terbuka.
+- **Bantuan Lupa ID Peserta (Verifikasi Privat)**: Pemulihan kode registrasi mandiri dengan verifikasi 3 data privat (Nama Lengkap, Tanggal Lahir, dan Nomor WhatsApp terdaftar), dilengkapi pembatas frekuensi (*Rate Limiting* Redis maksimal 5 percobaan per 15 menit).
+- **Upload Berkas Proyek**: Validasi ekstensi `.sb3` (Scratch Coding) dan `.hex` (Micro:bit) dengan batas ukuran aman maksimal **50 MB** (khusus Erboblox Robotics tidak mewajibkan upload berkas kode).
+- **Integrasi Video Presentasi**: Input tautan video YouTube (reguler, Shorts, `youtu.be`) atau Google Drive preview, dilengkapi input tautan cadangan dan 5 poin pernyataan konfirmasi peserta.
+- **Sistem Izin Revisi Mandiri**: Penguncian otomatis setelah karya terkumpul (`allow_revision = 0`, batas pengumpulan baru hingga **21 November 2026**). Revisi karya hanya dapat dilakukan jika panitia memberikan izin revisi melalui dashboard admin.
+- **Distribusi Otomatis Antrean Penjurian**: Setiap karya baru otomatis dialokasikan secara merata ke kelompok penilai 1 sampai 4 (*round-robin*).
 
 ### 3. Dashboard Panitia & Manajemen (`admin.html`)
 - **Triple Tab Management**:
   - Tab 1: **Data Pendaftar** (Metrik peserta, filter cabang/status, verifikasi bukti transfer, bulk delete peserta).
   - Tab 2: **Pengumpulan Proyek** (Daftar karya terkumpul, inspeksi berkas, izin revisi, catatan arahan revisi panitia, ekspor CSV proyek).
-  - Tab 3: **Penilaian & Rekap Nilai Juri** (Dashboard eksekutif skor dewan juri: nama asli peserta & sekolah terbuka, rata-rata 5 rubrik penilaian, total skor akhir, filter cabang/jenjang, modal popup rincian nilai individual per juri, dan ekspor Berita Acara resmi ke CSV).
+  - Tab 3: **Penilaian & Rekap Nilai Juri** (Dashboard eksekutif skor dewan juri: nama asli peserta & sekolah terbuka, filter **Kelompok Juri 1-4**, status penyelesaian `0/2` / `1/2` / `2/2`, rata-rata 5 rubrik resmi 2026 + bonus sensor, total skor akhir, modal popup rincian nilai individual per juri, dan ekspor Berita Acara resmi ke CSV).
 - **Unduh Template Peserta Manual**: Tombol *Template Peserta* di header untuk mendapatkan template spreadsheet `.xlsx` & `.csv`.
 - **Multi-Event Switching**: Mendukung pengelolaan multi-tahun kompetisi (2026, 2027, dst.) dalam satu database.
-- **Manajemen Akun Panitia & Juri**: Dukungan akun superadmin, panitia, serta 8 Dewan Juri resmi (`juri1` - `juri8`).
+- **Manajemen Akun Panitia & Juri**: Dukungan akun `superadmin`, `panitia`, serta 8 Dewan Juri resmi (`juri1` - `juri8`) yang terbagi ke dalam 4 kelompok kerja (`judge_group` 1-4).
 
 ### 4. Studio Penjurian Resmi - Blind Review (`penjurian.html`)
+- **Pembagian 4 Kelompok Penilaian (Opsi A - 2 Juri per Proyek)**:
+  - Total karya yang masuk dibagi secara merata ke 4 kelompok kerja (*round-robin* modulo) sehingga setiap juri memproses 25% total beban karya:
+    - **Kelompok 1**: `juri1` (Dewan Juri 1) & `juri2` (Dewan Juri 2)
+    - **Kelompok 2**: `juri3` (Dewan Juri 3) & `juri4` (Dewan Juri 4)
+    - **Kelompok 3**: `juri5` (Dewan Juri 5) & `juri6` (Dewan Juri 6)
+    - **Kelompok 4**: `juri7` (Dewan Juri 7) & `juri8` (Dewan Juri 8)
+  - Setiap karya dinilai oleh 2 juri dalam kelompok yang sama; nilai akhir proyek adalah rata-rata kedua juri: `(Nilai_Juri_A + Nilai_Juri_B) / 2`.
 - **100% Light Theme & Design Taste Standards**:
-  - Tipografi eksekutif: Kombinasi **Plus Jakarta Sans** (`font-extrabold`, `tracking-tight`) untuk hirarki judul dan **JetBrains Mono** (`.font-tabular`) untuk angka stabil tanpa pergeseran layout.
-  - Skema warna monokromatik kontras tinggi dengan aksen oranye Erlass (`#ea580c`).
-  - Mikro-interaksi taktil (`.btn-tactile`) dengan efek pantulan pegas pada tombol aksi.
-  - Sorotan tombol preset nilai aktif secara otomatis (`70`, `80`, `85`, `90`, `95`, `100`).
-  - Ergonomi layar laptop (`max-h-[calc(100dvh-5.5rem)]`) memastikan tombol simpan selalu terlihat di resolusi 1366x768.
+  - Tipografi eksekutif: **Plus Jakarta Sans** untuk hirarki judul dan **JetBrains Mono** (`.font-tabular`) untuk angka stabil.
+  - Skema warna monokromatik kontras tinggi dengan aksen oranye Erlass (`#ea580c`), tombol taktil (`.btn-tactile`), sorotan preset aktif, dan ergonomi *sticky scroll* untuk layar laptop.
 - **Kerahasiaan Mutlak (Strict Blind Review)**:
-  - Dewan Juri **tidak dapat melihat** nama murid, nama sekolah, nomor telepon, email, maupun daerah asal peserta.
-  - Kode peserta disamarkan sebagai `Peserta #E-1026-XXXX`.
-  - Judul proyek otomatis dibersihkan dari embel-embel nama peserta (misal: `"Menjaga Lingkungan By Azel"` -> `"Menjaga Lingkungan"`).
+  - Dewan Juri **tidak dapat melihat** nama murid, nama sekolah, nomor telepon, maupun daerah asal peserta.
+  - Kode peserta disamarkan sebagai `Peserta #E-XXXX-XXXX`, berkas disamarkan menjadi `Proyek_E-XXXX-XXXX.[ext]`, dan judul proyek dibersihkan otomatis dari embel-embel nama pembuat.
 - **Pratinjau Balok Kode Interaktif**:
-  - **Scratch (`.sb3`)**: Integrasi engine TurboWarp (`embed.html`) dengan dukungan CORS server.
-  - **Tombol Editor Balok Kode ↗**: Membuka kanvas balok Scratch 3.0 visual lengkap di tab baru secara leluasa.
-  - **Inspeksi Balok Otomatis (ZipArchive)**: Analisis metrik algoritma instan (Total Objek, Total Balok Kode, Kostum, Audio, dan rincian jumlah balok per sprite).
-  - **Micro:bit (`.hex`)**: Integrasi tersemat Microsoft MakeCode Controller Mode (Simulator perangkat keras LED 5x5/tombol virtual + Kanvas balok kode otomatis dari berkas `.hex`).
-  - **Erboblox Robotics**: Integrasi tersemat Ichibot Block Studio (kanvas pemrograman visual robotik Blockly + video demonstrasi fisik).
-  - **Video Player 16:9**: Player video presentasi tersemat langsung untuk YouTube dan Google Drive.
-- **Rubrik Penilaian 5 Kriteria Terbobot (Total 100%)**:
-  1. Logika Pemrograman & Algoritma (**30%**)
-  2. Kreativitas & Orisinalitas (**25%**)
-  3. Kesesuaian Tema & Fungsionalitas (**20%**)
-  4. Estetika, Desain UI & Gerak (**15%**)
-  5. Presentasi & Pemahaman Peserta di Video (**10%**)
-  - *Tanpa Slider*: Menggunakan input angka presisi (0-100), tombol penyesuai bertahap (`-` dan `+`), serta tombol jalan pintas nilai preset (`70`, `80`, `85`, `90`, `95`, `100`).
-  - Kalkulator akumulasi real-time dan predikat mutu kualitatif (*Istimewa A+*, *Sangat Baik A*, *Baik B*, dll).
-  - Tombol *"Simpan & Lanjut ke Peserta Berikutnya"* untuk efisiensi penilaian.
-- **Rekapitulasi & Peringkat (Leaderboard)**:
-  - Urutan peringkat berdasarkan rata-rata skor akhir juri.
-  - Ekspor Berita Acara Rekap Nilai Juri ke format CSV.
+  - **Scratch (`.sb3`)**: Engine TurboWarp Embed + tombol Editor Balok Kode + analisis otomatis `ZipArchive` (target, total balok, kostum, suara, rincian per sprite).
+  - **Micro:bit (`.hex`)**: Integrasi Microsoft MakeCode Controller Mode (simulator LED 5x5/tombol virtual + kanvas balok kode otomatis dari `.hex`).
+  - **Erboblox Robotics**: Integrasi Ichibot Block Studio + pemutar video demonstrasi fisik.
+  - **Video Player 16:9**: Player video presentasi tersemat untuk YouTube dan Google Drive.
+- **Rubrik Penilaian Resmi 2026 (5 Kriteria Terbobot - Total 100%)**:
+  1. Presentasi dan Pemahaman Proyek (**40%**)
+  2. Logika dan Cara Kerja Program (**20%**)
+  3. Kreativitas dan Pengembangan Ide (**15%**)
+  4. Fungsi dan Keberhasilan Proyek (**15%**)
+  5. Kesesuaian dengan Tema (**10%**)
+  - **Ketentuan Khusus Platform Micro:bit**:
+    - Jenjang SD (`Kelas 1-3` & `Kelas 4-6`): Pilihan **Bonus Nilai Sensor Eksternal** (`+0`, `+3` untuk 1 sensor, `+5` untuk >=2 sensor), total nilai akhir dibatasi maksimal `100.00`.
+    - Jenjang SMP (`SMP 7-9`): *Checklist* verifikasi wajib minimal 1 sensor eksternal (`technical_passed`).
+  - *Tanpa Slider*: Input angka presisi (0-100), tombol penyesuai bertahap (`-` / `+`), tombol preset (`70`, `80`, `85`, `90`, `95`, `100`), kalkulator real-time, predikat mutu (*Istimewa A+*, *Sangat Baik A*, *Baik B*, *Cukup C*, *Perlu Pembinaan D*), serta tombol *"Simpan & Lanjut ke Peserta Berikutnya"*.
 
 ### 5. Sistem Import Manual Peserta Susulan (Excel & CSV)
-- **Template Excel & CSV Siap Pakai**:
-  - Lembar `DATA PESERTA`: Validasi dropdown pada kolom Jenis Kelamin, Kategori Jenjang, Cabang Lomba, dan Status Kemitraan.
-  - Lembar `PETUNJUK PENGISIAN`: Panduan rinci format data setiap kolom.
-- **Script CLI Importer (`scripts/import_peserta.php`)**:
-  - Mode simulasi tanpa simpan: `php scripts/import_peserta.php file.xlsx --dry-run`
-  - Mode simpan database: `php scripts/import_peserta.php file.xlsx`
-  - Generasi otomatis nomor registrasi sequence unik berurutan (`E-1126-XXXX`).
-  - Deteksi otomatis kemitraan sekolah dari database `partner_schools` dan `national_schools`.
-  - Integrasi otomatis ke antrean penjurian: jika judul proyek/video diisi, otomatis terdaftar di `project_submissions`.
+- **Template Excel & CSV Siap Pakai**: Lembar `DATA PESERTA` (dengan validasi dropdown) & `PETUNJUK PENGISIAN`.
+- **Script CLI Importer (`scripts/import_peserta.php`)**: Mendukung mode `--dry-run` (simulasi) dan eksekusi simpan database, penomoran `reg_code` berurutan, deteksi otomatis kemitraan dari `partner_schools`/`national_schools`, serta injeksi otomatis ke `project_submissions` dengan alokasi `judge_group` 1-4 bila data proyek diisi.
 - **Dokumentasi Lengkap:** [docs/IMPORT_MANUAL_PESERTA.md](docs/IMPORT_MANUAL_PESERTA.md).
 
 ---
 
-## 🏗️ Struktur Basis Data
+## Struktur Basis Data
 
 Database: `erlass_competition` (MySQL / MariaDB)
 
 | Tabel | Deskripsi |
 | :--- | :--- |
 | `competitions` | Konfigurasi event kompetisi, tanggal cutoff pendaftaran (`registration_end`), biaya pendaftaran, dan status aktif. |
-| `registrations` | Data pendaftaran peserta (Nama, Sekolah, NPSN, Wilayah, Cabang, Status Verifikasi, Bukti Transfer). |
-| `admin_users` | Akun pengguna panitia dan juri dengan role `superadmin`, `panitia`, atau `juri` (Password di-hash dengan BCrypt). |
+| `competition_branches` | Daftar cabang lomba per kompetisi (`Scratch Coding`, `Micro:bit`, `Erboblox Robotics`). |
+| `national_schools` | Dataset sekolah nasional Kemdikbud se-Indonesia (NPSN, nama, jenjang, kota/kabupaten, provinsi, flag mitra). |
+| `partner_schools` | Daftar sekolah mitra pelanggan Erlass Academy (`school_code`/NPSN, wilayah, status aktif). |
+| `registrations` | Data pendaftaran peserta (nama, sekolah, NPSN, wilayah, cabang, kelas, kategori jenjang, status verifikasi, bukti transfer). |
+| `admin_users` | Akun pengguna panitia dan juri dengan role `superadmin`, `panitia`, atau `juri`, serta kolom `judge_group` (1-4 untuk juri, `NULL` untuk admin/panitia). Password di-hash dengan BCrypt. |
 | `admin_sessions` | Sesi autentikasi aman berbasis token kriptografi 64 karakter. |
-| `project_submissions` | Berkas karya peserta, judul proyek, sinopsis, link video presentasi, status pengumpulan, dan izin revisi. |
-| `project_scores` | Nilai dewan juri per kriteria (Logika 30%, Kreatif 25%, Tema 20%, Estetika 15%, Presentasi 10%), total skor terbobot, catatan juri, dan `UNIQUE KEY (submission_id, judge_id)`. |
+| `project_submissions` | Berkas karya peserta, `judge_group` (1-4), judul proyek, sinopsis, link video presentasi, status pengumpulan, versi, dan izin revisi. |
+| `project_scores` | Nilai dewan juri per kriteria (Presentasi 40%, Logika 20%, Kreativitas 15%, Fungsi 15%, Tema 10%), `bonus_score` sensor SD, `technical_passed` verifikasi SMP, `total_score`, catatan juri, dan `UNIQUE KEY (submission_id, judge_id)`. |
 
 ---
 
-## 👥 Hak Akses (Role-Based Access Control)
+## Hak Akses (Role-Based Access Control)
 
 | Role | Akses Halaman | Hak Istimewa |
 | :--- | :--- | :--- |
-| `superadmin` | `admin.html`, `penjurian.html` | Akses penuh seluruh data, manajemen akun panitia/juri, ekspor data identitas asli, hapus data. |
-| `panitia` | `admin.html` | Verifikasi pendaftaran peserta, monitoring pengumpulan karya, pemberian izin revisi karya. |
-| `juri` | `penjurian.html` (Khusus) | **Blind Review Only**. Akses ke `admin.html` diblokir otomatis. Hanya dapat menilai karya tanpa identitas peserta dan melihat rekapitulasi nilai. |
+| `superadmin` | `admin.html`, `penjurian.html` | Akses penuh seluruh data, manajemen akun panitia/juri, pengelolaan event, ekspor data identitas asli, hapus data. |
+| `panitia` | `admin.html`, `penjurian.html` | Verifikasi pendaftaran peserta, monitoring pengumpulan karya, pemberian izin revisi karya, monitoring rekapitulasi nilai penuh. |
+| `juri` | `penjurian.html` (Khusus) | **Blind Review Only & Terisolasi per Kelompok**. Akses ke `admin.html` diblokir otomatis. Hanya dapat melihat & menilai karya sesuai `judge_group` masing-masing tanpa identitas pribadi peserta. |
 
 ---
 
-## 📁 Struktur Direktori
+## Struktur Direktori
 
 ```text
 /var/www/erlass-competition/
-├── index.html                 # Halaman utama pendaftaran peserta
-├── kumpul-proyek.html         # Portal pengumpulan karya proyek peserta
-├── admin.html                 # Dashboard panitia & administrasi kompetisi
-├── penjurian.html             # Studio penjurian dewan juri (Blind Review)
-├── herobanner.jpeg            # Aset visual hero utama
-├── template_import_peserta.xlsx # Berkas template spreadsheet peserta
-├── template_import_peserta.csv  # Berkas template CSV peserta
-├── Data Sekolah Se Indonesia/ # Dataset CSV sekolah per provinsi
+├── index.html                                           # Halaman utama pendaftaran peserta
+├── kumpul-proyek.html                                   # Portal pengumpulan karya proyek peserta & pemulihan ID
+├── admin.html                                           # Dashboard panitia & administrasi kompetisi
+├── penjurian.html                                       # Studio penjurian dewan juri (Blind Review)
+├── herobanner.jpeg                                      # Aset visual hero utama
+├── template_import_peserta.xlsx                         # Berkas template spreadsheet peserta
+├── template_import_peserta.csv                          # Berkas template CSV peserta
+├── Data Sekolah Se Indonesia/                           # Dataset CSV sekolah per provinsi
 ├── api/
-│   ├── db.php                 # Koneksi database & fungsi helper sesi
-│   ├── public.php             # API publik (pendaftaran, pencarian sekolah, submit proyek)
-│   └── admin.php              # API admin & penjurian (auth, scoring, leaderboard, export)
+│   ├── db.php                                           # Koneksi database & fungsi helper sesi/token
+│   ├── public.php                                       # API publik (kompetisi, cari sekolah, daftar, lupa ID, submit proyek)
+│   └── admin.php                                        # API admin & penjurian (auth, scoring 40/20/15/15/10, leaderboard, export)
 ├── css/
-│   └── style.css              # Styling tambahan aplikasi
+│   └── style.css                                        # Styling tambahan aplikasi
 ├── docs/
 │   ├── Juknis_Lomba_Erlass_Competition_2026.pdf
+│   ├── Pedoman_Resmi_Rubrik_Penilaian_Erlass_Competition_2026.pdf
 │   ├── PANDUAN_PENJURIAN_DAN_BLIND_REVIEW.md
 │   ├── SISTEM_PENGUMPULAN_PROYEK.md
 │   ├── IMPORT_MANUAL_PESERTA.md
@@ -128,25 +126,23 @@ Database: `erlass_competition` (MySQL / MariaDB)
 │   ├── template_import_peserta.xlsx
 │   └── template_import_peserta.csv
 ├── js/
-│   ├── app.js                 # Logika pendaftaran & pencarian sekolah publik
-│   ├── kumpul-proyek.js       # Logika formulir pengumpulan proyek
-│   ├── admin.js               # Logika dashboard admin panitia
-│   └── penjurian.js           # Logika studio penjurian juri & scoring
+│   ├── app.js                                           # Logika pendaftaran & pencarian sekolah publik
+│   ├── kumpul-proyek.js                                 # Logika formulir pengumpulan proyek & pemulihan ID
+│   ├── admin.js                                         # Logika dashboard admin panitia
+│   └── penjurian.js                                     # Logika studio penjurian juri & kalkulasi rubrik 2026
 ├── scripts/
-│   └── import_peserta.php     # CLI Importer data peserta manual (Excel/CSV)
+│   └── import_peserta.php                               # CLI Importer data peserta manual (Excel/CSV)
 └── uploads/
-    ├── proofs/                # Berkas bukti transfer pembayaran
-    └── projects/              # Berkas proyek karya peserta (.sb3, .hex)
+    ├── proofs/                                          # Berkas bukti transfer pembayaran
+    └── projects/                                          # Berkas proyek karya peserta (.sb3, .hex)
 ```
 
 ---
 
-## 🚀 Panduan Akses Cepat
+## Panduan Akses Cepat
 
 - **Portal Pendaftaran:** [https://erlasscompetition.erlass.academy/](https://erlasscompetition.erlass.academy/)
 - **Pengumpulan Proyek:** [https://erlasscompetition.erlass.academy/kumpul-proyek.html](https://erlasscompetition.erlass.academy/kumpul-proyek.html)
 - **Dashboard Panitia:** [https://erlasscompetition.erlass.academy/admin.html](https://erlasscompetition.erlass.academy/admin.html)
 - **Studio Penjurian Juri:** [https://erlasscompetition.erlass.academy/penjurian.html](https://erlasscompetition.erlass.academy/penjurian.html)
 - **Template Excel Peserta:** [https://erlasscompetition.erlass.academy/template_import_peserta.xlsx](https://erlasscompetition.erlass.academy/template_import_peserta.xlsx)
-- **Template CSV Peserta:** [https://erlasscompetition.erlass.academy/template_import_peserta.csv](https://erlasscompetition.erlass.academy/template_import_peserta.csv)
-

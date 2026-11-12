@@ -4,50 +4,52 @@ Seluruh komunikasi data klien dan server menggunakan antarmuka JSON berbasis HTT
 
 ---
 
-## 🌐 1. Endpoint Publik (`api/public.php`)
+## 1. Endpoint Publik (`api/public.php`)
 
 Endpoint ini dapat diakses oleh publik tanpa memerlukan token autentikasi.
 
-### `GET ?action=get_config`
-Mengambil konfigurasi aktif kompetisi (nama event, batas tanggal pendaftaran, biaya, dan status pembukaan pendaftaran).
+### `GET ?action=get_competition`
+Mengambil konfigurasi aktif kompetisi, daftar cabang lomba (`branches`), status penutupan pendaftaran otomatis (`is_registration_closed`), dan daftar sekolah rekanan terstruktur (`schools_hierarchy`).
+- **Parameter Opsional**: `slug`, `id`.
 - **Respons Sukses (200)**:
   ```json
   {
     "status": "ok",
     "competition": {
       "id": 1,
-      "event_code": "ERLASS2026",
-      "event_name": "Erlass Competition 2026",
+      "slug": "erlass-competition-2026",
+      "title": "Erlass Competition 2026",
       "registration_end": "2026-11-05",
-      "is_active": 1,
-      "is_registration_open": true
-    }
+      "is_registration_closed": true
+    },
+    "branches": [],
+    "is_registration_closed": true,
+    "schools_hierarchy": {}
   }
   ```
 
-### `GET ?action=search_school&q={query}&province={prov}&city={city}&limit=20`
-Mencari data sekolah nasional dari basis data 38 provinsi Kemdikbud.
+### `GET ?action=search_schools&q={query}`
+Mencari data sekolah nasional (`national_schools`) maupun sekolah mitra (`partner_schools`) berdasarkan NPSN (angka) atau nama sekolah (minimal 2 karakter).
 - **Respons Sukses (200)**:
   ```json
   {
     "status": "ok",
-    "count": 5,
     "schools": [
       {
-        "npsn": "20101234",
-        "name": "SD NEGERI 01 JAKARTA",
-        "level": "SD",
-        "status": "Negeri",
-        "city": "KOTA JAKARTA PUSAT",
-        "province": "DKI JAKARTA"
+        "npsn": "20105028",
+        "school_name": "SDS FAJAR INDAH",
+        "jenjang": "SD",
+        "city": "KOTA ADM. JAKARTA UTARA",
+        "province": "DKI JAKARTA",
+        "is_partner": 1
       }
     ]
   }
   ```
 
-### `POST ?action=register` (Multipart Form Data)
-Mengirimkan data formulir pendaftaran peserta baru beserta bukti transfer pembayaran.
-- **Fields**: `full_name`, `email`, `phone`, `school_name`, `npsn`, `school_level`, `school_status`, `school_city`, `school_province`, `branch`, `grade_category`, `payment_proof` (File).
+### `POST ?action=register` (`multipart/form-data`)
+Mengirimkan data formulir pendaftaran peserta baru beserta bukti transfer pembayaran (otomatis terblokir dengan HTTP 403 setelah tanggal cutoff `registration_end`).
+- **Fields**: `competition_id`, `nama_lengkap`, `jenis_kelamin`, `tanggal_lahir`, `usia`, `kelas`, `grade_category`, `nomor_telepon`, `alamat`, `status_siswa`, `status_kemitraan`, `cabang_kompetisi`, `wilayah`, `nama_sekolah`, `npsn`, `payment_proof` (File).
 - **Respons Sukses (200)**:
   ```json
   {
@@ -57,75 +59,122 @@ Mengirimkan data formulir pendaftaran peserta baru beserta bukti transfer pembay
   }
   ```
 
-### `GET ?action=check_registration_code&code={reg_code}`
-Memvalidasi kode registrasi peserta sebelum pengumpulan karya proyek.
+### `GET ?action=check_status&query={reg_code}`
+Mengecek status verifikasi pendaftaran peserta berdasarkan kode registrasi resmi (`E-XXXX-XXXX`).
+
+### `POST ?action=recover_participant_id`
+Pemulihan ID Peserta secara privat (*Lupa ID Peserta*) dengan memverifikasi 3 identitas rahasia peserta. Dilindungi **Rate Limiting Redis** (maksimal 5 percobaan gagal per IP dalam 15 menit; mengembalikan HTTP 429 `RATE_LIMITED` bila melebihi batas).
+- **Fields**: `participant_name`, `birth_date` (`YYYY-MM-DD`), `phone`.
 - **Respons Sukses (200)**:
   ```json
   {
     "status": "ok",
-    "registration": {
+    "message": "Identitas peserta berhasil diverifikasi.",
+    "data": {
       "reg_code": "E-1026-0605",
       "participant_name": "Azel Marcello",
+      "school_name": "SD BINTANG KEJORA",
       "branch": "Scratch Coding",
       "grade_category": "Kelas 4-6",
-      "status": "verified"
+      "payment_status": "verified",
+      "is_partner": true,
+      "masked_phone": "0812****1234"
     }
   }
   ```
 
-### `POST ?action=submit_project` (Multipart Form Data)
-Mengirimkan berkas karya proyek, sinopsis, dan tautan video presentasi.
-- **Fields**: `reg_code`, `project_title`, `project_description`, `video_url`, `backup_video_url`, `project_file` (File `.sb3` atau `.hex`).
+### `GET ?action=lookup_project_participant&reg_code={reg_code}`
+Memvalidasi kode registrasi peserta (harus `payment_status = 'verified'` atau `is_partner = 1`) dan mengecek apakah karya proyek sudah pernah dikirimkan sebelumnya sebelum membuka formulir `kumpul-proyek.html`.
+- **Respons Sukses (200)**:
+  ```json
+  {
+    "status": "ok",
+    "participant": {
+      "id": 944,
+      "reg_code": "E-1126-0134",
+      "participant_name": "Antoni",
+      "school_name": "SDS FAJAR INDAH",
+      "branch": "Scratch Coding",
+      "grade": "Kelas 5",
+      "grade_category": "Kelas 4-6"
+    },
+    "has_submitted": false,
+    "submission": null,
+    "allow_revision": 0
+  }
+  ```
+
+### `POST ?action=submit_project` (`multipart/form-data`)
+Mengirimkan (atau merevisi jika `allow_revision = 1`) karya proyek peserta. Pengumpulan baru dibatasi hingga **21 November 2026 pukul 23:59:59 WIB** dan otomatis menugaskan `judge_group` (1-4) secara *round-robin* untuk penjurian.
+- **Fields**: `reg_code`, `participant_name`, `grade_category`, `project_title`, `project_description`, `video_url`, `backup_video_url` (opsional), `statement_originality`, `agree_disqualification`, `agree_video_active`, `confirm_completeness`, `agree_documentation`, `project_file` (Wajib `.sb3` untuk Scratch Coding / `.hex` untuk Micro:bit, maksimal 50 MB; tidak wajib untuk Erboblox Robotics).
 
 ---
 
-## 🔒 2. Endpoint Administratif & Penjurian (`api/admin.php`)
+## 2. Endpoint Administratif & Penjurian (`api/admin.php`)
 
-Endpoint administratif memerlukan token sesi (`?token=...` atau header `Authorization: Bearer <token>`).
+Endpoint administratif memerlukan token sesi (`?token=...` atau header `Authorization: Bearer <token>`). Akun dengan role `juri` dibatasi hanya ke endpoint penjurian dan manajemen sandi mandiri.
 
-### A. Autentikasi
-- **`POST ?action=login`**: Masuk menggunakan username dan password (`superadmin`, `panitia`, atau `juri`). Mengembalikan session token 64 karakter.
-- **`GET/POST ?action=logout`**: Menghapus token sesi aktif.
+### A. Autentikasi & Manajemen Akun
+- **`POST ?action=login`**: Masuk menggunakan `username` dan `password` (`superadmin`, `panitia`, atau `juri`). Mengembalikan token sesi 64 karakter serta objek `user` (`id`, `username`, `full_name`, `role`, `judge_group`). Dilindungi proteksi *lockout* 15 menit setelah 5x gagal login.
+- **`GET/POST ?action=logout`**: Menghapus token sesi aktif dari tabel `admin_sessions`.
 - **`POST ?action=change_password`**: Mengubah kata sandi mandiri pengguna yang sedang login.
+- **`GET ?action=get_users`**, **`POST ?action=create_user`**, **`POST ?action=toggle_user_status`**, **`POST ?action=delete_user`**, **`POST ?action=reset_user_password`** *(Khusus `superadmin`)*.
 
 ### B. Modul Panitia (`role: superadmin, panitia`)
-- **`GET ?action=get_registrations`**: Mengambil daftar seluruh pendaftar, pencarian, dan filter.
-- **`POST ?action=verify_registration`**: Menyetujui (`approved`) atau menolak (`rejected`) verifikasi pendaftaran peserta.
-- **`POST ?action=delete_registration`**: Menghapus satu pendaftar beserta berkas buktinya.
-- **`POST ?action=bulk_delete_registrations`**: Menghapus beberapa pendaftar sekaligus (*batch delete*).
-- **`GET ?action=export_csv`**: Mengunduh data seluruh peserta dalam format CSV/Excel.
+- **`GET ?action=get_reports`**: Statistik ringkas pendaftar per cabang dan wilayah.
+- **`GET ?action=get_registrations`**: Mengambil daftar seluruh pendaftar beserta filter & pencarian.
+- **`POST ?action=update_status`**: Memperbarui status verifikasi peserta (`id`, `status` [`pending` | `verified` | `rejected`], `admin_notes`).
+- **`POST ?action=delete_registration`**: Menghapus satu data pendaftar beserta berkas bukti pembayarannya.
+- **`POST ?action=bulk_delete_registrations`**: Menghapus beberapa pendaftar sekaligus (`ids`: array integer).
+- **`GET ?action=export_csv`**: Mengunduh data seluruh peserta dalam format CSV.
+- **`GET ?action=get_competitions`** & **`POST ?action=save_competition`**: Pengaturan event kompetisi multi-tahun.
 - **`GET ?action=get_project_submissions`**: Mengambil daftar seluruh karya proyek yang terkumpul.
-- **`POST ?action=toggle_project_revision`**: Membuka atau menutup izin revisi karya beserta catatan instruksi revisi.
+- **`POST ?action=toggle_project_revision`**: Membuka atau menutup izin revisi karya (`id`, `allow_revision`, `admin_notes`).
+- **`GET ?action=export_project_submissions`**: Ekspor daftar karya terkumpul dalam format CSV.
 - **`POST ?action=delete_project_submission`**: Menghapus data karya proyek peserta beserta berkas fisiknya.
 
-### C. Modul Dewan Juri (`role: juri, superadmin`)
+### C. Modul Dewan Juri (`role: juri, panitia, superadmin`)
 - **`GET ?action=get_judging_submissions`**:
-  Mengambil antrian karya proyek yang **telah disanitasi secara ketat** (*Blind Review*).
-  - Nama siswa, nama sekolah, nomor telepon, dan email tidak disertakan.
-  - Kode peserta diformat: `Peserta #E-XXXX-XXXX`.
-  - Berkas `.sb3` otomatis dianalisis struktur baloknya menggunakan `ZipArchive` (total blok, kostum, audio, dan rincian per sprite).
+  Mengambil antrian karya proyek dalam mode **Blind Review** (tanpa nama peserta, sekolah, HP, maupun wilayah).
+  - **Isolasi Kelompok Juri (Opsi A)**: Jika role adalah `juri`, sistem otomatis memfilter hanya proyek dengan `p.judge_group` yang sesuai dengan kelompok juri yang login (Kelompok 1-4), dan menyertakan info `partner_name` pada `current_judge`. Untuk `superadmin`/`panitia`, tersedia parameter opsional `?judge_group=1..4`.
+  - Parameter filter opsional: `branch`, `grade_category`, `status` (`all`, `scored`, `unscored`), `search`.
+  - Berkas `.sb3` otomatis dianalisis struktur bloknya menggunakan `ZipArchive` (`scratch_summary`: `total_targets`, `total_blocks`, `sprites`).
+
 - **`POST ?action=save_project_score`**:
-  Menyimpan atau memperbarui penilaian karya peserta.
+  Menyimpan atau memperbarui penilaian karya peserta (maksimal 2 juri per proyek sesuai kelompok).
   - **Payload JSON**:
     ```json
     {
-      "submission_id": 2,
-      "score_logic": 90,
-      "score_creativity": 85,
-      "score_theme": 95,
-      "score_design": 88,
-      "score_presentation": 92,
-      "judge_notes": "Catatan evaluasi konstruktif juri..."
+      "submission_id": 5,
+      "score_presentation": 90,
+      "score_logic": 85,
+      "score_creativity": 80,
+      "score_design": 85,
+      "score_theme": 90,
+      "bonus_score": 0,
+      "technical_passed": 1,
+      "judge_notes": "Presentasi jelas dan struktur program rapi."
     }
     ```
-  - **Perhitungan Terbobot Resmi (100%)**:
-    `Total = (Logika * 0.3) + (Kreatif * 0.25) + (Tema * 0.2) + (Estetika * 0.15) + (Presentasi * 0.1)`
-- **`GET ?action=get_judging_leaderboard&branch=&grade_category=&search=`**:
-  Mengambil rekapitulasi nilai peringkat peserta berdasarkan rata-rata skor dewan juri (`AVG(total_score)`).
-  - **Jika diakses Dewan Juri (Role `juri`)**: Data nama peserta dan asal sekolah disamarkan secara ketat (*Blind Review*).
-  - **Jika diakses Panitia / Superadmin (`isPrivileged = true`)**: Mengembalikan data lengkap (`participant_name`, `school_name`) serta array `judge_scores` yang memuat rincian nilai tiap dewan juri individual (skor 5 rubrik, total skor, catatan juri, dan waktu penilaian).
-- **`GET ?action=export_judging_csv&branch=&grade_category=`**:
-  Mengunduh Berita Acara Rekapitulasi Nilai Dewan Juri dalam format CSV. Identitas peserta otomatis terbuka bagi panitia/superadmin dan disamarkan bagi dewan juri.
-- **`GET ?action=stream_project_file&id={sub_id}`**:
-  Menyajikan aliran biner berkas proyek dengan header CORS (`Access-Control-Allow-Origin: *`) dan nama berkas bersih yang disamarkan (`Proyek_E-XXXX-XXXX.sb3`).
+  - **Perhitungan Terbobot Resmi 2026 (Total 100%)**:
+    - Presentasi & Pemahaman Proyek (`score_presentation`): **40%**
+    - Logika & Cara Kerja Program (`score_logic`): **20%**
+    - Kreativitas & Pengembangan Ide (`score_creativity`): **15%**
+    - Fungsi & Keberhasilan Proyek (`score_design`): **15%**
+    - Kesesuaian dengan Tema (`score_theme`): **10%**
+    - Bonus Sensor Eksternal (`bonus_score`): **+0**, **+3**, atau **+5** poin *(khusus Micro:bit SD)*.
+    - Verifikasi Wajib Sensor Eksternal (`technical_passed`): `1` / `0` *(khusus Micro:bit SMP)*.
+    - **Formula**:
+      `Total = MIN(100.0, ROUND((Presentasi * 0.40) + (Logika * 0.20) + (Kreativitas * 0.15) + (Fungsi * 0.15) + (Tema * 0.10) + bonus_score, 2))`
 
+- **`GET ?action=get_judging_leaderboard&branch=&grade_category=&judge_group=&search=`**:
+  Mengambil rekapitulasi nilai peringkat peserta berdasarkan rata-rata skor dewan juri (`AVG(total_score)`).
+  - Mengembalikan `judge_group`, `judge_count` (0-2), rata-rata masing-masing kriteria (`avg_presentation`, `avg_logic`, `avg_creativity`, `avg_design`, `avg_theme`, `avg_bonus`), dan `final_score`.
+  - **Jika diakses Dewan Juri (`juri`)**: Identitas `participant_name` dan `school_name` tetap disamarkan (*Dirahasiakan (Blind Review)*).
+  - **Jika diakses Panitia / Superadmin**: Identitas peserta ditampilkan utuh beserta rincian per juri di array `judge_scores` (termasuk `bonus_score` dan `technical_passed`).
+
+- **`GET ?action=export_judging_csv&branch=&grade_category=&judge_group=`**:
+  Mengunduh Berita Acara Rekapitulasi Nilai Dewan Juri dalam format CSV (kolom Kelompok Juri, Status Jml Penilai `X/2`, Presentasi 40%, Logika 20%, Kreativitas 15%, Fungsi 15%, Tema 10%, Bonus Sensor, dan Nilai Akhir).
+
+- **`GET ?action=stream_project_file&id={sub_id}&token={token}`**:
+  Menyajikan aliran biner berkas proyek (`.sb3` / `.hex`) dengan header CORS (`Access-Control-Allow-Origin: *`) dan nama berkas bersih yang disamarkan (`Proyek_E-XXXX-XXXX.[ext]`).

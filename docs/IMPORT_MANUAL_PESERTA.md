@@ -36,7 +36,7 @@ Mulai baris ke-5 adalah baris pengisian data peserta:
 | **A** | `No` | Opsional | Nomor urut | `1` |
 | **B** | `Nama Lengkap Peserta *` | **Wajib** | Nama lengkap siswa | `Ganendra Alkhalifi` |
 | **C** | `Jenis Kelamin *` | **Wajib** | Dropdown: `Laki-laki` atau `Perempuan` | `Laki-laki` |
-| **D** | `Tanggal Lahir *` | **Wajib** | Format: `YYYY-MM-DD` | `2014-07-15` |
+| **D** | `Tanggal Lahir *` | **Wajib** | Format standar `YYYY-MM-DD` (tanpa nama kota atau bulan berbahasa Indonesia) | `2014-07-15` |
 | **E** | `Usia` | Opsional | Angka tahun usia peserta (dihitung otomatis jika kosong) | `12` |
 | **F** | `No WhatsApp / HP *` | **Wajib** | Nomor aktif diawali `08...` | `081298765432` |
 | **G** | `Alamat Domisili` | Opsional | Alamat rumah tempat tinggal siswa | `Jl. Raya Condet No. 12` |
@@ -86,6 +86,6 @@ php /var/www/erlass-competition/scripts/import_peserta.php /path/ke/file_peserta
    - Sistem mencocokkan NPSN dan Nama Sekolah dengan tabel `partner_schools` dan `national_schools`.
    - Sekolah mitra otomatis dikenakan tarif Rp 0,-.
 4. **Sinkronisasi Langsung ke Portal Penjurian**:
-   - Jika kolom `Judul Proyek` atau `Link Video Demo` diisi pada Excel, data tersebut otomatis diinjeksi ke tabel `project_submissions`.
-   - Peserta akan **langsung muncul di antrean karya Dewan Juri** pada `penjurian.html` dan siap dinilai secara objektif (*Blind Review*).
+   - Jika kolom `Judul Proyek`, `Link Video Demo`, atau `Nama Berkas Karya` diisi pada Excel, data tersebut otomatis diinjeksi ke tabel `project_submissions`.
+   - Sistem otomatis menetapkan `judge_group` (Kelompok 1 sampai 4 secara *round-robin*), sehingga peserta langsung muncul di antrean karya 2 Dewan Juri terkait pada `penjurian.html` (*Blind Review*).
 
