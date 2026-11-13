@@ -703,12 +703,16 @@ document.getElementById('change-pass-form').addEventListener('submit', async e =
   }
 });
 
-// 8. Ekspor CSV Laporan per Event
-function exportCSV() {
-  const branch = document.getElementById('filter-branch').value;
-  const status = document.getElementById('filter-status').value;
-  const url = `api/admin.php?action=export_csv&competition_id=${currentCompetitionId}&token=${encodeURIComponent(authToken)}&branch=${encodeURIComponent(branch)}&status=${encodeURIComponent(status)}`;
+// 8. Ekspor Laporan per Event (Excel .xlsx & CSV)
+function exportExcel() {
+  const branch = document.getElementById('filter-branch') ? document.getElementById('filter-branch').value : '';
+  const status = document.getElementById('filter-status') ? document.getElementById('filter-status').value : '';
+  const url = `api/admin.php?action=export_excel&competition_id=${currentCompetitionId}&token=${encodeURIComponent(authToken)}&branch=${encodeURIComponent(branch)}&status=${encodeURIComponent(status)}`;
   window.open(url, '_blank');
+}
+
+function exportCSV() {
+  exportExcel();
 }
 
 // 9. Manajemen User Panitia (User Management)

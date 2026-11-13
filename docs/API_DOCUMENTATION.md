@@ -126,7 +126,7 @@ Endpoint administratif memerlukan token sesi (`?token=...` atau header `Authoriz
 - **`POST ?action=update_status`**: Memperbarui status verifikasi peserta (`id`, `status` [`pending` | `verified` | `rejected`], `admin_notes`).
 - **`POST ?action=delete_registration`**: Menghapus satu data pendaftar beserta berkas bukti pembayarannya.
 - **`POST ?action=bulk_delete_registrations`**: Menghapus beberapa pendaftar sekaligus (`ids`: array integer).
-- **`GET ?action=export_csv`**: Mengunduh data seluruh peserta dalam format CSV (UTF-8 BOM). Dilengkapi kolom `Link Bukti Pembayaran` berisi tautan HTTPS langsung steril (`https://erlasscompetition.erlass.academy/uploads/bukti_transfer/...`) untuk peserta umum, atau keterangan `Sekolah Mitra (Bebas Biaya)` untuk peserta mitra.
+- **`GET ?action=export_excel`** (atau **`GET ?action=export_csv`**): Mengunduh data seluruh peserta dalam format Microsoft Excel asli (`.xlsx`) dengan penataan tabel profesional (freeze panes baris header, auto-filter, auto-fit lebar kolom, dan tautan aktif / native hyperlink pada kolom `Link Bukti Pembayaran`). Mendukung parameter opsional `&format=csv` jika membutuhkan format teks mentah CSV (UTF-8 BOM).
 - **`GET ?action=get_competitions`** & **`POST ?action=save_competition`**: Pengaturan event kompetisi multi-tahun.
 - **`GET ?action=get_project_submissions`**: Mengambil daftar seluruh karya proyek yang terkumpul.
 - **`POST ?action=toggle_project_revision`**: Membuka atau menutup izin revisi karya (`id`, `allow_revision`, `admin_notes`).

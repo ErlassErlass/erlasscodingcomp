@@ -544,11 +544,14 @@ if ($action === 'bulk_delete_registrations') {
     ]);
 }
 
-// 5. Ekspor Laporan ke CSV (Langsung dibuka rapi di Excel)
-if ($action === 'export_csv') {
+// 5. Ekspor Laporan Peserta (Format Excel .xlsx & CSV)
+if ($action === 'export_excel' || $action === 'export_csv') {
     $comp_id = (int)($_GET['competition_id'] ?? 1);
     $branch  = trim($_GET['branch'] ?? '');
     $status  = trim($_GET['status'] ?? '');
+    // Default format: excel (.xlsx) kecuali parameter ?format=csv diminta secara eksplisit
+    $requestedFormat = strtolower(trim($_GET['format'] ?? ''));
+    $format = ($action === 'export_csv' && $requestedFormat === 'csv') ? 'csv' : 'excel';
 
     $sql = "SELECT * FROM registrations WHERE competition_id = ?";
     $params = [$comp_id];
@@ -567,7 +570,93 @@ if ($action === 'export_csv') {
     $stmt->execute($params);
     $rows = $stmt->fetchAll();
 
-    $filename = "Laporan_Peserta_Erlass_Competition_" . date('Ymd_His') . ".csv";
+    // Base URL steril untuk tautan langsung bukti bayar
+    $customHost = $_SERVER['HTTP_HOST'] ?? '';
+    if (!empty($customHost) && !in_array($customHost, ['localhost', '127.0.0.1']) && strpos($customHost, 'erlass') !== false) {
+        $baseUrl = 'https://' . $customHost;
+    } else {
+        $baseUrl = 'https://erlasscompetition.erlass.academy';
+    }
+
+    $timestamp = date('Ymd_His');
+
+    // 5A. Format Excel (.xlsx) dengan Tautan Hyperlink Aktif & Penataan Gaya Rapi
+    if ($format === 'excel') {
+        $exportRows = [];
+        $no = 1;
+        foreach ($rows as $r) {
+            $proofLink = '-';
+            if (!empty($r['payment_proof'])) {
+                $cleanProof = basename(trim($r['payment_proof']));
+                $proofLink = $baseUrl . '/uploads/bukti_transfer/' . rawurlencode($cleanProof);
+            } elseif (!empty($r['is_partner']) || (isset($r['payment_amount']) && (float)$r['payment_amount'] <= 0)) {
+                $proofLink = 'Sekolah Mitra (Bebas Biaya)';
+            } else {
+                $proofLink = 'Belum Unggah Bukti';
+            }
+
+            $exportRows[] = [
+                'no' => $no++,
+                'reg_code' => $r['reg_code'],
+                'participant_name' => $r['participant_name'],
+                'gender' => $r['gender'],
+                'birth_date' => $r['birth_date'],
+                'age' => $r['age'],
+                'grade' => $r['grade'],
+                'phone' => $r['phone'],
+                'address' => $r['address'],
+                'student_status' => $r['student_status'],
+                'partnership_status' => $r['partnership_status'],
+                'category' => $r['is_partner'] ? 'Pelanggan Erlass' : 'Umum',
+                'branch' => $r['branch'],
+                'region' => $r['region'],
+                'school_name' => $r['school_name'],
+                'npsn' => $r['npsn'] ?: '-',
+                'payment_amount' => $r['payment_amount'],
+                'payment_status' => $r['payment_status'],
+                'payment_proof' => $r['payment_proof'] ?: '-',
+                'proof_link' => $proofLink,
+                'admin_notes' => $r['admin_notes'] ?: '-',
+                'created_at' => $r['created_at']
+            ];
+        }
+
+        $tmpIn = tempnam(sys_get_temp_dir(), 'erlass_exp_in_');
+        $tmpOut = tempnam(sys_get_temp_dir(), 'erlass_exp_out_') . '.xlsx';
+        file_put_contents($tmpIn, json_encode([
+            'sheet_title' => 'Peserta Lomba',
+            'rows' => $exportRows
+        ], JSON_UNESCAPED_UNICODE));
+
+        $pyScript = __DIR__ . '/../scripts/export_excel.py';
+        $cmd = 'python3 ' . escapeshellarg($pyScript) . ' ' . escapeshellarg($tmpIn) . ' ' . escapeshellarg($tmpOut) . ' 2>&1';
+        $pyOutput = [];
+        $pyReturn = 0;
+        exec($cmd, $pyOutput, $pyReturn);
+
+        @unlink($tmpIn);
+
+        if ($pyReturn === 0 && file_exists($tmpOut) && filesize($tmpOut) > 0) {
+            $filename = "Laporan_Peserta_Erlass_Competition_" . $timestamp . ".xlsx";
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment; filename="' . $filename . '"');
+            header('Content-Length: ' . filesize($tmpOut));
+            header('Cache-Control: max-age=0, no-cache, no-store, must-revalidate');
+            header('Pragma: no-cache');
+            header('Expires: 0');
+            readfile($tmpOut);
+            @unlink($tmpOut);
+            exit;
+        }
+
+        // Jika script Python menghasilkan kendala, fallback ke CSV di bawah
+        if (file_exists($tmpOut)) {
+            @unlink($tmpOut);
+        }
+    }
+
+    // 5B. Format CSV (Fallback atau Permintaan Eksplisit ?format=csv)
+    $filename = "Laporan_Peserta_Erlass_Competition_" . $timestamp . ".csv";
 
     header('Content-Type: text/csv; charset=utf-8');
     header('Content-Disposition: attachment; filename="' . $filename . '"');
@@ -578,14 +667,6 @@ if ($action === 'export_csv') {
 
     // UTF-8 BOM untuk Excel agar aksen & teks Indonesia terbaca dengan sempurna
     fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
-
-    // Base URL steril untuk tautan langsung bukti bayar
-    $customHost = $_SERVER['HTTP_HOST'] ?? '';
-    if (!empty($customHost) && !in_array($customHost, ['localhost', '127.0.0.1']) && strpos($customHost, 'erlass') !== false) {
-        $baseUrl = 'https://' . $customHost;
-    } else {
-        $baseUrl = 'https://erlasscompetition.erlass.academy';
-    }
 
     // Header Kolom
     fputcsv($output, [
