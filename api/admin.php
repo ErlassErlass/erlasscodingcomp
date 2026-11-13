@@ -579,6 +579,14 @@ if ($action === 'export_csv') {
     // UTF-8 BOM untuk Excel agar aksen & teks Indonesia terbaca dengan sempurna
     fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
 
+    // Base URL steril untuk tautan langsung bukti bayar
+    $customHost = $_SERVER['HTTP_HOST'] ?? '';
+    if (!empty($customHost) && !in_array($customHost, ['localhost', '127.0.0.1']) && strpos($customHost, 'erlass') !== false) {
+        $baseUrl = 'https://' . $customHost;
+    } else {
+        $baseUrl = 'https://erlasscompetition.erlass.academy';
+    }
+
     // Header Kolom
     fputcsv($output, [
         'No',
@@ -600,12 +608,23 @@ if ($action === 'export_csv') {
         'Biaya Pendaftaran',
         'Status Pembayaran',
         'Nama Berkas Bukti Transfer',
+        'Link Bukti Pembayaran',
         'Catatan Panitia',
         'Waktu Pendaftaran'
     ]);
 
     $no = 1;
     foreach ($rows as $r) {
+        $proofLink = '-';
+        if (!empty($r['payment_proof'])) {
+            $cleanProof = basename(trim($r['payment_proof']));
+            $proofLink = $baseUrl . '/uploads/bukti_transfer/' . rawurlencode($cleanProof);
+        } elseif (!empty($r['is_partner']) || (isset($r['payment_amount']) && (float)$r['payment_amount'] <= 0)) {
+            $proofLink = 'Sekolah Mitra (Bebas Biaya)';
+        } else {
+            $proofLink = 'Belum Unggah Bukti';
+        }
+
         fputcsv($output, [
             $no++,
             $r['reg_code'],
@@ -626,6 +645,7 @@ if ($action === 'export_csv') {
             $r['payment_amount'],
             strtoupper($r['payment_status']),
             $r['payment_proof'] ?: '-',
+            $proofLink,
             $r['admin_notes'] ?: '-',
             $r['created_at']
         ]);
