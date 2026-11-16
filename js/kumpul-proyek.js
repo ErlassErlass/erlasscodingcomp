@@ -237,8 +237,17 @@ function renderSubmissionForm(participant, existingSubmission, isRevision) {
     if (existingSubmission.project_file_name) {
       const fileInfo = document.getElementById('selected-file-info');
       const fileName = document.getElementById('selected-file-name');
-      fileInfo.classList.remove('hidden');
-      fileName.textContent = `File Saat Ini: ${existingSubmission.project_file_name} (Unggah baru jika ingin mengganti)`;
+      const fileSize = document.getElementById('selected-file-size');
+      const fileBadge = document.getElementById('selected-file-badge');
+      if (fileInfo) fileInfo.classList.remove('hidden');
+      if (fileName) fileName.textContent = `File Tersimpan: ${existingSubmission.project_file_name}`;
+      if (fileSize && existingSubmission.project_file_size) {
+        fileSize.textContent = `${(existingSubmission.project_file_size / (1024 * 1024)).toFixed(2)} MB`;
+      }
+      if (fileBadge) {
+        fileBadge.textContent = 'Tersimpan di Server';
+        fileBadge.className = 'px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700';
+      }
     }
   } else {
     revisionBanner.classList.add('hidden');
@@ -249,16 +258,34 @@ function renderSubmissionForm(participant, existingSubmission, isRevision) {
   if (window.lucide) lucide.createIcons();
 }
 
-// 6. File Upload Handlers (Drag & Drop)
+// 6. File Upload Handlers (Drag & Drop & Rich Preview)
 function initUploadHandlers() {
   const dropzone = document.getElementById('project-dropzone');
   const fileInput = document.getElementById('project_file');
   const fileInfo = document.getElementById('selected-file-info');
   const fileName = document.getElementById('selected-file-name');
+  const fileSize = document.getElementById('selected-file-size');
+  const fileBadge = document.getElementById('selected-file-badge');
+  const fileIcon = document.getElementById('selected-file-icon');
+  const btnRemove = document.getElementById('btn-remove-selected-file');
+  const errorBox = document.getElementById('submit-error-box');
 
   if (!dropzone || !fileInput) return;
 
-  dropzone.addEventListener('click', () => fileInput.click());
+  dropzone.addEventListener('click', (e) => {
+    // Hindari membuka dialog jika yang diklik adalah tombol remove
+    if (e.target.closest('#btn-remove-selected-file')) return;
+    fileInput.click();
+  });
+
+  if (btnRemove) {
+    btnRemove.addEventListener('click', (e) => {
+      e.stopPropagation();
+      fileInput.value = '';
+      if (fileInfo) fileInfo.classList.add('hidden');
+      if (errorBox) errorBox.classList.add('hidden');
+    });
+  }
 
   dropzone.addEventListener('dragover', (e) => {
     e.preventDefault();
@@ -285,24 +312,93 @@ function initUploadHandlers() {
   });
 
   function handleSelectedFile(file) {
-    if (!file) return;
-    const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+    if (!file || !fileInfo) return;
+
+    const ext = file.name.split('.').pop().toLowerCase();
+    const sizeBytes = file.size;
+    const sizeMb = (sizeBytes / (1024 * 1024)).toFixed(2);
+    const maxMb = 100;
+
+    // Format tampilan ukuran (KB atau MB)
+    const formattedSize = sizeBytes < 1024 * 1024 
+      ? `${(sizeBytes / 1024).toFixed(1)} KB` 
+      : `${sizeMb} MB`;
+
+    if (fileName) fileName.textContent = file.name;
+    if (fileSize) fileSize.textContent = formattedSize;
+
+    // Deteksi kesesuaian cabang lomba
+    const branch = currentParticipant ? (currentParticipant.branch || '') : '';
+    const isScratch = branch.toLowerCase().includes('scratch');
+    const isMicrobit = branch.toLowerCase().includes('micro');
+
+    let isValidExt = true;
+    let extError = '';
+
+    if (isScratch && ext !== 'sb3') {
+      isValidExt = false;
+      extError = 'Format harus .sb3 untuk Scratch';
+    } else if (isMicrobit && ext !== 'hex') {
+      isValidExt = false;
+      extError = 'Format harus .hex untuk Micro:bit';
+    }
+
+    if (sizeBytes > maxMb * 1024 * 1024) {
+      // Melebihi 100 MB
+      fileInfo.className = 'mt-3 w-full max-w-md p-3.5 bg-red-50 border-2 border-red-300 rounded-2xl shadow-sm flex items-center justify-between gap-3 text-left';
+      if (fileIcon) fileIcon.className = 'w-10 h-10 rounded-xl bg-red-100 text-red-600 flex items-center justify-center shrink-0';
+      if (fileBadge) {
+        fileBadge.className = 'px-2 py-0.5 rounded-md text-[10px] font-bold bg-red-200 text-red-800';
+        fileBadge.textContent = `Melebihi Batas 100 MB (${sizeMb} MB)`;
+      }
+      if (errorBox) {
+        errorBox.innerHTML = `<div class="flex items-center gap-2"><i data-lucide="alert-triangle" class="w-4 h-4 text-red-600 shrink-0"></i><span>Ukuran berkas Anda (${sizeMb} MB) melebihi batas maksimal 100 MB. Mohon periksa kembali berkas proyek Anda.</span></div>`;
+        errorBox.classList.remove('hidden');
+      }
+    } else if (!isValidExt) {
+      // Ekstensi tidak sesuai
+      fileInfo.className = 'mt-3 w-full max-w-md p-3.5 bg-amber-50 border-2 border-amber-300 rounded-2xl shadow-sm flex items-center justify-between gap-3 text-left';
+      if (fileIcon) fileIcon.className = 'w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0';
+      if (fileBadge) {
+        fileBadge.className = 'px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-200 text-amber-900';
+        fileBadge.textContent = extError;
+      }
+    } else {
+      // Valid & Siap Unggah
+      fileInfo.className = 'mt-3 w-full max-w-md p-3.5 bg-white border-2 border-emerald-300 rounded-2xl shadow-sm flex items-center justify-between gap-3 text-left';
+      if (fileIcon) fileIcon.className = 'w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0';
+      if (fileBadge) {
+        fileBadge.className = 'px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800';
+        fileBadge.textContent = 'Siap Diunggah';
+      }
+      if (errorBox) errorBox.classList.add('hidden');
+    }
+
     fileInfo.classList.remove('hidden');
-    fileName.textContent = `${file.name} (${sizeMb} MB)`;
     if (window.lucide) lucide.createIcons();
   }
 }
 
-// 7. Submission Form Handling
+// 7. Submission Form Handling (Real-time Upload Progress Bar via XHR)
 function initSubmissionForm() {
   const form = document.getElementById('submission-form');
   const errorBox = document.getElementById('submit-error-box');
   const submitBtn = document.getElementById('btn-submit-project');
 
-  form.addEventListener('submit', async (e) => {
+  // Komponen Progress Bar
+  const progressContainer = document.getElementById('upload-progress-container');
+  const progressBar = document.getElementById('upload-progress-bar');
+  const progressPercent = document.getElementById('upload-progress-percent');
+  const progressLabel = document.getElementById('upload-progress-label');
+  const progressDetail = document.getElementById('upload-progress-detail');
+  const progressStatus = document.getElementById('upload-progress-status');
+
+  form.addEventListener('submit', (e) => {
     e.preventDefault();
-    errorBox.classList.add('hidden');
-    errorBox.innerHTML = '';
+    if (errorBox) {
+      errorBox.classList.add('hidden');
+      errorBox.innerHTML = '';
+    }
 
     const title = document.getElementById('project_title').value.trim();
     const desc = document.getElementById('project_description').value.trim();
@@ -312,6 +408,15 @@ function initSubmissionForm() {
     if (!title || !desc || !videoUrl) {
       showSubmitError('Mohon lengkapi judul proyek, deskripsi singkat, dan link video presentasi.');
       return;
+    }
+
+    // Validasi ukuran client-side sebelum kirim
+    if (fileInput && fileInput.files && fileInput.files.length > 0) {
+      const selectedFile = fileInput.files[0];
+      if (selectedFile.size > 100 * 1024 * 1024) {
+        showSubmitError(`Ukuran berkas (${(selectedFile.size / (1024 * 1024)).toFixed(1)} MB) melebihi batas maksimal 100 MB.`);
+        return;
+      }
     }
 
     // Validasi format link video
@@ -326,48 +431,144 @@ function initSubmissionForm() {
       return;
     }
 
+    // Siapkan UI Upload & Progress Bar
     submitBtn.disabled = true;
-    submitBtn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Mengirim Proyek...';
+    submitBtn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> <span id="btn-submit-text">Sedang Mengunggah (0%)...</span>';
     if (window.lucide) lucide.createIcons();
+
+    const hasFile = fileInput && fileInput.files && fileInput.files.length > 0;
+    const fileSizeTotal = hasFile ? fileInput.files[0].size : 0;
+    const totalMbStr = (fileSizeTotal / (1024 * 1024)).toFixed(1);
+
+    if (progressContainer) {
+      progressContainer.classList.remove('hidden');
+      if (progressBar) progressBar.style.width = '0%';
+      if (progressPercent) progressPercent.textContent = '0%';
+      if (progressLabel) progressLabel.textContent = hasFile ? 'Mengunggah berkas proyek...' : 'Menyimpan data proyek...';
+      if (progressDetail) progressDetail.textContent = hasFile ? `0 MB / ${totalMbStr} MB` : 'Mengirim data...';
+      if (progressStatus) progressStatus.textContent = 'Menghubungkan ke server...';
+      progressContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
 
     const formData = new FormData(form);
 
-    try {
-      const res = await fetch('api/public.php?action=submit_project', {
-        method: 'POST',
-        body: formData
-      });
-      const data = await res.json();
+    // Kirim via XMLHttpRequest untuk mendapatkan event onprogress byte-by-byte
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', 'api/public.php?action=submit_project', true);
 
-      if (data.status === 'ok') {
-        alert(data.message || 'Proyek Anda berhasil dikumpulkan!');
-        // Refresh data dan tampilkan bukti
-        const regCode = document.getElementById('sub-reg-code').value;
-        const name = document.getElementById('sub-participant-name').value;
-        const refRes = await fetch(`api/public.php?action=lookup_project_participant&reg_code=${encodeURIComponent(regCode)}&participant_name=${encodeURIComponent(name)}`);
-        const refData = await refRes.json();
-        if (refData.status === 'ok') {
-          renderReceipt(refData.participant, refData.submission);
-        } else {
-          window.location.reload();
+    let lastLoaded = 0;
+    let lastTime = Date.now();
+
+    if (xhr.upload) {
+      xhr.upload.onprogress = (evt) => {
+        if (evt.lengthComputable) {
+          // Tahan di 99% sampai respon server selesai diterima
+          const pct = Math.min(Math.round((evt.loaded / evt.total) * 100), 99);
+          if (progressBar) progressBar.style.width = pct + '%';
+          if (progressPercent) progressPercent.textContent = pct + '%';
+
+          const loadedMb = (evt.loaded / (1024 * 1024)).toFixed(1);
+          const totalMb = (evt.total / (1024 * 1024)).toFixed(1);
+          if (progressDetail) progressDetail.textContent = `${loadedMb} MB / ${totalMb} MB`;
+
+          const now = Date.now();
+          const timeDiff = (now - lastTime) / 1000;
+          if (timeDiff >= 0.4) {
+            const bytesDiff = evt.loaded - lastLoaded;
+            const speedKbs = (bytesDiff / timeDiff / 1024).toFixed(0);
+            if (progressStatus) progressStatus.textContent = `${speedKbs} KB/s`;
+            lastLoaded = evt.loaded;
+            lastTime = now;
+          }
+
+          const btnText = document.getElementById('btn-submit-text');
+          if (btnText) btnText.textContent = `Sedang Mengunggah (${pct}%)...`;
+
+          if (evt.loaded >= evt.total) {
+            if (progressBar) progressBar.style.width = '100%';
+            if (progressPercent) progressPercent.textContent = '100%';
+            if (progressLabel) progressLabel.textContent = 'Berkas selesai diunggah (100%)';
+            if (progressStatus) progressStatus.textContent = 'Memverifikasi dan memproses di server...';
+            if (btnText) btnText.textContent = 'Memverifikasi di Server...';
+          }
         }
-      } else {
-        showSubmitError(data.message || 'Gagal mengirim proyek.');
+      };
+    }
+
+    xhr.onload = async () => {
+      try {
+        if (xhr.status === 413) {
+          showSubmitError('Ukuran berkas proyek terlalu besar (melebihi batas maksimal 100 MB). Silakan periksa atau kompres aset di dalam proyek Anda.');
+          if (progressContainer) progressContainer.classList.add('hidden');
+          return;
+        }
+
+        let data;
+        try {
+          data = JSON.parse(xhr.responseText);
+        } catch (parseErr) {
+          showSubmitError(`Respon server tidak valid (Kode HTTP ${xhr.status}). Mohon hubungi panitia jika kendala berlanjut.`);
+          if (progressContainer) progressContainer.classList.add('hidden');
+          return;
+        }
+
+        if (xhr.status >= 200 && xhr.status < 300 && data.status === 'ok') {
+          if (progressBar) progressBar.style.width = '100%';
+          if (progressPercent) progressPercent.textContent = '100%';
+          if (progressStatus) progressStatus.textContent = 'Pengumpulan sukses!';
+          
+          alert(data.message || 'Proyek Anda berhasil dikumpulkan!');
+
+          // Refresh data dan tampilkan bukti tanda terima resmi
+          const regCode = document.getElementById('sub-reg-code').value;
+          const name = document.getElementById('sub-participant-name').value;
+          const refRes = await fetch(`api/public.php?action=lookup_project_participant&reg_code=${encodeURIComponent(regCode)}&participant_name=${encodeURIComponent(name)}`);
+          const refData = await refRes.json();
+          if (refData.status === 'ok') {
+            renderReceipt(refData.participant, refData.submission);
+          } else {
+            window.location.reload();
+          }
+        } else {
+          showSubmitError(data.message || `Gagal mengirim proyek (Status: ${xhr.status}).`);
+          if (progressContainer) progressContainer.classList.add('hidden');
+        }
+      } catch (err) {
+        showSubmitError('Terjadi kendala saat memproses respons pengumpulan proyek.');
+        if (progressContainer) progressContainer.classList.add('hidden');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i data-lucide="send" class="w-4 h-4"></i> <span id="btn-submit-text">Kirim Proyek Sekarang</span>';
+        if (window.lucide) lucide.createIcons();
       }
-    } catch (err) {
-      showSubmitError('Terjadi kendala jaringan saat mengirim berkas. Mohon coba kembali.');
-    } finally {
+    };
+
+    xhr.onerror = () => {
+      showSubmitError('Terjadi kendala jaringan saat mengirim berkas. Mohon periksa koneksi internet Anda dan coba kembali.');
+      if (progressContainer) progressContainer.classList.add('hidden');
       submitBtn.disabled = false;
       submitBtn.innerHTML = '<i data-lucide="send" class="w-4 h-4"></i> <span id="btn-submit-text">Kirim Proyek Sekarang</span>';
       if (window.lucide) lucide.createIcons();
-    }
+    };
+
+    xhr.ontimeout = () => {
+      showSubmitError('Waktu pengunggahan habis (timeout). Koneksi internet terlalu lambat untuk mengirim berkas ini.');
+      if (progressContainer) progressContainer.classList.add('hidden');
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<i data-lucide="send" class="w-4 h-4"></i> <span id="btn-submit-text">Kirim Proyek Sekarang</span>';
+      if (window.lucide) lucide.createIcons();
+    };
+
+    xhr.send(formData);
   });
 
   function showSubmitError(msg) {
-    errorBox.innerHTML = `<div class="flex items-center gap-2"><i data-lucide="alert-triangle" class="w-4 h-4 text-red-600 shrink-0"></i><span>${msg}</span></div>`;
-    errorBox.classList.remove('hidden');
-    errorBox.scrollIntoView({ behavior: 'smooth' });
-    if (window.lucide) lucide.createIcons();
+    if (errorBox) {
+      errorBox.innerHTML = `<div class="flex items-center gap-2"><i data-lucide="alert-triangle" class="w-4 h-4 text-red-600 shrink-0"></i><span>${msg}</span></div>`;
+      errorBox.classList.remove('hidden');
+      errorBox.scrollIntoView({ behavior: 'smooth' });
+      if (window.lucide) lucide.createIcons();
+    }
   }
 }
 

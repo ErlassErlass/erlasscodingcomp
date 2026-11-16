@@ -796,9 +796,9 @@ if ($action === 'submit_project') {
                 send_json(['status' => 'error', 'message' => 'Untuk cabang Micro:bit, berkas wajib berekstensi .hex.'], 422);
             }
 
-            $maxBytes = 50 * 1024 * 1024; // 50MB
+            $maxBytes = 100 * 1024 * 1024; // 100MB
             if ($file['size'] > $maxBytes) {
-                send_json(['status' => 'error', 'message' => 'Ukuran berkas melebihi batas maksimal 50 MB.'], 422);
+                send_json(['status' => 'error', 'message' => 'Ukuran berkas melebihi batas maksimal 100 MB.'], 422);
             }
 
             // Standar penamaan proyek otomatis: [Kategori]_[IDPeserta]_[NamaPeserta].[ext]

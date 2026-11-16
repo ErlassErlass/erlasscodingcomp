@@ -24,7 +24,7 @@ Dokumen ini menjelaskan alur pengumpulan karya proyek, spesifikasi berkas, kebij
      - Kategori Scratch Coding: Berkas wajib berekstensi `.sb3`.
      - Kategori Micro:bit: Berkas wajib berekstensi `.hex`.
      - Kategori Erboblox Robotics: Tidak mewajibkan upload berkas kode (penilaian menggunakan video demonstrasi fisik).
-     - Batas ukuran berkas maksimal: **50 MB**.
+     - Batas ukuran berkas maksimal: **100 MB** (didukung indikator visual progress bar pengunggahan real-time byte-per-byte dan preview berkas interaktif).
    - **Tautan Video Presentasi**:
      - URL video YouTube (format reguler, `youtu.be`, atau `youtube.com/shorts`) atau tautan pratinjau Google Drive (harus disetel akses *"Siapa saja yang memiliki link"*).
      - Tautan cadangan video (opsional).

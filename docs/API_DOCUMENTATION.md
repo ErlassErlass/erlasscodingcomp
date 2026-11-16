@@ -106,7 +106,7 @@ Memvalidasi kode registrasi peserta (harus `payment_status = 'verified'` atau `i
 
 ### `POST ?action=submit_project` (`multipart/form-data`)
 Mengirimkan (atau merevisi jika `allow_revision = 1`) karya proyek peserta. Pengumpulan baru dibatasi hingga **21 November 2026 pukul 23:59:59 WIB** dan otomatis menugaskan `judge_group` (1-4) secara *round-robin* untuk penjurian.
-- **Fields**: `reg_code`, `participant_name`, `grade_category`, `project_title`, `project_description`, `video_url`, `backup_video_url` (opsional), `statement_originality`, `agree_disqualification`, `agree_video_active`, `confirm_completeness`, `agree_documentation`, `project_file` (Wajib `.sb3` untuk Scratch Coding / `.hex` untuk Micro:bit, maksimal 50 MB; tidak wajib untuk Erboblox Robotics).
+- **Fields**: `reg_code`, `participant_name`, `grade_category`, `project_title`, `project_description`, `video_url`, `backup_video_url` (opsional), `statement_originality`, `agree_disqualification`, `agree_video_active`, `confirm_completeness`, `agree_documentation`, `project_file` (Wajib `.sb3` untuk Scratch Coding / `.hex` untuk Micro:bit, maksimal 100 MB; tidak wajib untuk Erboblox Robotics). Dilengkapi indikator progress bar upload XHR real-time dan preview berkas.
 
 ---
 
