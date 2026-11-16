@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initLookup();
   initUploadHandlers();
   initSubmissionForm();
+  initFAQAccordion();
   checkUrlParams();
 });
 
@@ -697,6 +698,140 @@ function useFoundRegCode() {
       lookupForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
     }
   }
+}
+
+// 8. FAQ Accordion, Category Filter & Live Search
+function initFAQAccordion() {
+  const faqSection = document.getElementById('faq-section');
+  if (!faqSection) return;
+
+  const toggles = faqSection.querySelectorAll('.faq-toggle');
+  const items = faqSection.querySelectorAll('.faq-item');
+  const filterBtns = faqSection.querySelectorAll('.faq-filter-btn');
+  const searchInput = document.getElementById('faq-search-input');
+  const searchClear = document.getElementById('faq-search-clear');
+  const emptyState = document.getElementById('faq-empty-state');
+  const btnResetSearch = document.getElementById('btn-reset-faq-search');
+
+  let activeCategory = 'all';
+
+  // Toggle Accordion Item
+  toggles.forEach((toggle) => {
+    toggle.addEventListener('click', () => {
+      const item = toggle.closest('.faq-item');
+      const answer = item.querySelector('.faq-answer');
+      const chevron = item.querySelector('.faq-chevron');
+      const isOpen = !answer.classList.contains('hidden');
+
+      if (isOpen) {
+        answer.classList.add('hidden');
+        if (chevron) chevron.style.transform = 'rotate(0deg)';
+        item.classList.remove('border-orange-400', 'shadow-xs');
+      } else {
+        answer.classList.remove('hidden');
+        if (chevron) chevron.style.transform = 'rotate(180deg)';
+        item.classList.add('border-orange-400', 'shadow-xs');
+      }
+      if (window.lucide) lucide.createIcons();
+    });
+  });
+
+  // Filter Logic
+  function applyFilters() {
+    const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
+    let visibleCount = 0;
+
+    items.forEach((item) => {
+      const cat = item.getAttribute('data-category');
+      const matchCat = (activeCategory === 'all' || cat === activeCategory);
+
+      let matchQuery = true;
+      if (query) {
+        const text = item.innerText.toLowerCase();
+        matchQuery = text.includes(query);
+      }
+
+      if (matchCat && matchQuery) {
+        item.classList.remove('hidden');
+        visibleCount++;
+        // Otomatis buka jawaban jika sedang melakukan pencarian
+        if (query) {
+          const ans = item.querySelector('.faq-answer');
+          const chev = item.querySelector('.faq-chevron');
+          if (ans) ans.classList.remove('hidden');
+          if (chev) chev.style.transform = 'rotate(180deg)';
+        }
+      } else {
+        item.classList.add('hidden');
+      }
+    });
+
+    if (emptyState) {
+      if (visibleCount === 0) {
+        emptyState.classList.remove('hidden');
+      } else {
+        emptyState.classList.add('hidden');
+      }
+    }
+
+    if (searchClear) {
+      if (query) {
+        searchClear.classList.remove('hidden');
+      } else {
+        searchClear.classList.add('hidden');
+      }
+    }
+  }
+
+  // Category Filter Buttons
+  filterBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      activeCategory = btn.getAttribute('data-category') || 'all';
+
+      // Update button active styling
+      filterBtns.forEach((b) => {
+        b.className = 'faq-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800';
+      });
+      btn.className = 'faq-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer bg-orange-600 text-white shadow-sm';
+
+      applyFilters();
+    });
+  });
+
+  // Live Search Input
+  if (searchInput) {
+    searchInput.addEventListener('input', () => {
+      applyFilters();
+    });
+  }
+
+  if (searchClear) {
+    searchClear.addEventListener('click', () => {
+      if (searchInput) {
+        searchInput.value = '';
+        searchInput.focus();
+      }
+      applyFilters();
+    });
+  }
+
+  function resetSearch() {
+    if (searchInput) searchInput.value = '';
+    activeCategory = 'all';
+    filterBtns.forEach((b) => {
+      const isAll = (b.getAttribute('data-category') === 'all');
+      b.className = isAll
+        ? 'faq-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer bg-orange-600 text-white shadow-sm'
+        : 'faq-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800';
+    });
+    applyFilters();
+  }
+
+  if (btnResetSearch) {
+    btnResetSearch.addEventListener('click', resetSearch);
+  }
+
+  window.resetFaqSearch = resetSearch;
 }
 
 window.openForgotIdModal = openForgotIdModal;

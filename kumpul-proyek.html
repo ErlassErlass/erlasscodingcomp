@@ -40,6 +40,10 @@
           <i data-lucide="search" class="w-4 h-4 text-amber-600"></i>
           <span>Cek ID Peserta</span>
         </a>
+        <a href="#faq-section" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs sm:text-sm font-extrabold text-orange-700 bg-orange-50 hover:bg-orange-100 border border-orange-200 rounded-xl transition shadow-xs">
+          <i data-lucide="help-circle" class="w-4 h-4 text-orange-600"></i>
+          <span>FAQ Lomba</span>
+        </a>
         <a href="docs/Juknis_Lomba_Erlass_Competition_2026.pdf" target="_blank" class="hidden md:inline-flex items-center gap-1.5 px-3.5 py-2 text-xs sm:text-sm font-extrabold text-orange-700 bg-orange-100 hover:bg-orange-200 rounded-xl transition border border-orange-200">
           <i data-lucide="file-text" class="w-4 h-4"></i>
           <span>Juknis PDF</span>
@@ -720,6 +724,471 @@
         </div>
       </form>
     </div>
+
+    <!-- ============================================================== -->
+    <!-- SECTION FAQ & PANDUAN LOMBA LENGKAP RESMI                    -->
+    <!-- ============================================================== -->
+    <section id="faq-section" class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xl space-y-6">
+      <!-- Header FAQ -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-100">
+        <div class="space-y-1.5">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-100 text-orange-700 text-xs font-extrabold uppercase tracking-wider">
+            <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+            <span>Pusat Bantuan & Tanya Jawab</span>
+          </div>
+          <h3 class="display-font text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+            FAQ Erlass Coding & Robotics Competition 2026
+          </h3>
+          <p class="text-xs text-slate-500">
+            Panduan resmi bagi peserta, orang tua, dan guru pembimbing • Tema: <em>Teknologi untuk Kehidupan yang Lebih Cerdas, Kreatif, dan Berkelanjutan</em>
+          </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+          <a href="FAQ_Erlass_Coding_Robotics_Competition_2026_Lengkap.pdf" download class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition border border-slate-200 shadow-2xs" title="Unduh Berkas FAQ Format PDF Resmi">
+            <i data-lucide="file-down" class="w-4 h-4 text-orange-600"></i>
+            <span>Unduh FAQ PDF</span>
+          </a>
+          <a href="https://wa.me/6282311341381?text=Halo%20Panitia%20Erlass%20Competition,%20saya%20ingin%20bertanya%20seputar%20kompetisi." target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition shadow-sm">
+            <i data-lucide="message-circle" class="w-4 h-4"></i>
+            <span>WhatsApp Panitia</span>
+          </a>
+        </div>
+      </div>
+      <!-- Search & Filter Controls -->
+      <div class="space-y-3">
+        <div class="relative">
+          <input
+            type="text"
+            id="faq-search-input"
+            placeholder="Cari pertanyaan... (contoh: ukuran berkas 100 MB, video presentasi, revisi, Scratch, AI, juri)"
+            class="w-full px-4 py-3 pl-11 pr-10 text-xs sm:text-sm rounded-2xl border border-slate-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-100 outline-none transition bg-slate-50 focus:bg-white"
+          >
+          <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+            <i data-lucide="search" class="w-4 h-4"></i>
+          </div>
+          <button type="button" id="faq-search-clear" class="hidden absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+        <div class="flex flex-wrap items-center gap-1.5 pt-1" id="faq-category-filters">
+          <button type="button" class="faq-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer bg-orange-600 text-white shadow-sm" data-category="all">
+            <span>Semua Pertanyaan (28)</span>
+          </button>
+          <button type="button" class="faq-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800" data-category="A">
+            <span>A. Info Umum (5)</span>
+          </button>
+          <button type="button" class="faq-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800" data-category="B">
+            <span>B. Proyek & AI (5)</span>
+          </button>
+          <button type="button" class="faq-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800" data-category="C">
+            <span>C. Teknis & File (5)</span>
+          </button>
+          <button type="button" class="faq-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800" data-category="D">
+            <span>D. Video Presentasi (4)</span>
+          </button>
+          <button type="button" class="faq-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800" data-category="E">
+            <span>E. Pengumpulan & ID (4)</span>
+          </button>
+          <button type="button" class="faq-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800" data-category="F">
+            <span>F. Penilaian & Juara (5)</span>
+          </button>
+        </div>
+      </div>
+      <!-- Accordion FAQ Items List -->
+      <div class="space-y-2.5 pt-2" id="faq-accordion-list">
+        <div class="faq-item border border-slate-200 rounded-2xl overflow-hidden transition-all duration-200 hover:border-orange-300 bg-white" data-category="A">
+          <button type="button" class="faq-toggle w-full px-5 py-3.5 text-left flex items-center justify-between gap-3 font-bold text-slate-800 hover:text-orange-600 transition cursor-pointer">
+            <span class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-lg bg-orange-100 text-orange-700 text-xs font-black flex items-center justify-center shrink-0">1</span>
+              <span class="text-xs sm:text-sm">Apa itu Erlass Coding & Robotics Competition 2026?</span>
+            </span>
+            <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0"></i>
+          </button>
+          <div class="faq-answer hidden px-5 pb-5 pt-2 text-xs text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/50">
+            Erlass Coding & Robotics Competition 2026 merupakan kompetisi teknologi bagi siswa untuk mengembangkan kreativitas, kemampuan pemrograman, robotika, dan keterampilan memecahkan masalah melalui pembuatan proyek teknologi.
+          </div>
+        </div>
+        <div class="faq-item border border-slate-200 rounded-2xl overflow-hidden transition-all duration-200 hover:border-orange-300 bg-white" data-category="A">
+          <button type="button" class="faq-toggle w-full px-5 py-3.5 text-left flex items-center justify-between gap-3 font-bold text-slate-800 hover:text-orange-600 transition cursor-pointer">
+            <span class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-lg bg-orange-100 text-orange-700 text-xs font-black flex items-center justify-center shrink-0">2</span>
+              <span class="text-xs sm:text-sm">Apa saja kategori lomba dan jenjang pendidikan yang dapat mengikuti kompetisi?</span>
+            </span>
+            <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0"></i>
+          </button>
+          <div class="faq-answer hidden px-5 pb-5 pt-2 text-xs text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/50">
+            <p>Kompetisi terbuka untuk tiga cabang lomba dengan pembagian jenjang pendidikan masing-masing:</p><ul class='list-disc pl-5 mt-2 space-y-1 font-medium'><li><strong>Coding Scratch</strong>: SD kelas 1–3, SD kelas 4–6, dan SMP kelas 7–9.</li><li><strong>Micro:Bit</strong>: SD kelas 1–3, SD kelas 4–6, dan SMP kelas 7–9.</li><li><strong>Erboblox Robotics</strong>: SD kelas 1–3, SD kelas 4–6, dan SMP kelas 7–9.</li></ul><p class='mt-2'>Peserta mengikuti kategori sesuai jenjang pendidikan masing-masing pada tahun ajaran aktif.</p>
+          </div>
+        </div>
+        <div class="faq-item border border-slate-200 rounded-2xl overflow-hidden transition-all duration-200 hover:border-orange-300 bg-white" data-category="A">
+          <button type="button" class="faq-toggle w-full px-5 py-3.5 text-left flex items-center justify-between gap-3 font-bold text-slate-800 hover:text-orange-600 transition cursor-pointer">
+            <span class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-lg bg-orange-100 text-orange-700 text-xs font-black flex items-center justify-center shrink-0">3</span>
+              <span class="text-xs sm:text-sm">Apakah satu peserta boleh mengikuti lebih dari satu kategori lomba?</span>
+            </span>
+            <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0"></i>
+          </button>
+          <div class="faq-answer hidden px-5 pb-5 pt-2 text-xs text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/50">
+            Ketentuan kompetisi adalah satu peserta untuk satu lomba. Apabila peserta ingin mengikuti lebih dari satu lomba, peserta harus memiliki ID Peserta yang berbeda untuk setiap lomba. Namun, pendaftaran kompetisi saat ini sudah ditutup sehingga peserta tidak dapat menambahkan kategori lomba baru.
+          </div>
+        </div>
+        <div class="faq-item border border-slate-200 rounded-2xl overflow-hidden transition-all duration-200 hover:border-orange-300 bg-white" data-category="A">
+          <button type="button" class="faq-toggle w-full px-5 py-3.5 text-left flex items-center justify-between gap-3 font-bold text-slate-800 hover:text-orange-600 transition cursor-pointer">
+            <span class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-lg bg-orange-100 text-orange-700 text-xs font-black flex items-center justify-center shrink-0">4</span>
+              <span class="text-xs sm:text-sm">Apakah proyek harus sesuai dengan tema kompetisi?</span>
+            </span>
+            <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0"></i>
+          </button>
+          <div class="faq-answer hidden px-5 pb-5 pt-2 text-xs text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/50">
+            <p><strong>Ya.</strong> Seluruh proyek harus memiliki keterkaitan dengan tema: <em>“Teknologi untuk Kehidupan yang Lebih Cerdas, Kreatif, dan Berkelanjutan.”</em></p><p class='mt-2'>Peserta bebas menentukan ide, judul, dan bentuk proyek. Proyek dapat mengangkat salah satu atau beberapa unsur tema, seperti teknologi untuk membantu kehidupan sehari-hari, pendidikan, kesehatan, kreativitas, lingkungan, maupun pemecahan masalah lainnya. Peserta tidak harus mengangkat ketiga unsur tema sekaligus. Hal terpenting adalah peserta mampu menjelaskan hubungan proyek yang dibuat dengan tema kompetisi.</p>
+          </div>
+        </div>
+        <div class="faq-item border border-slate-200 rounded-2xl overflow-hidden transition-all duration-200 hover:border-orange-300 bg-white" data-category="A">
+          <button type="button" class="faq-toggle w-full px-5 py-3.5 text-left flex items-center justify-between gap-3 font-bold text-slate-800 hover:text-orange-600 transition cursor-pointer">
+            <span class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-lg bg-orange-100 text-orange-700 text-xs font-black flex items-center justify-center shrink-0">5</span>
+              <span class="text-xs sm:text-sm">Apakah proyek harus berbentuk game atau robot tertentu?</span>
+            </span>
+            <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0"></i>
+          </button>
+          <div class="faq-answer hidden px-5 pb-5 pt-2 text-xs text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/50">
+            Tidak. Peserta bebas menentukan bentuk proyek sesuai kategori lomba. Contohnya game edukasi, animasi interaktif, simulasi teknologi, cerita interaktif, robot otomatis, robot penghindar rintangan, robot pemilah sampah, atau sistem sederhana untuk membantu aktivitas sehari-hari. Kreativitas dan orisinalitas peserta menjadi bagian penting dalam penilaian kompetisi.
+          </div>
+        </div>
+        <div class="faq-item border border-slate-200 rounded-2xl overflow-hidden transition-all duration-200 hover:border-orange-300 bg-white" data-category="B">
+          <button type="button" class="faq-toggle w-full px-5 py-3.5 text-left flex items-center justify-between gap-3 font-bold text-slate-800 hover:text-orange-600 transition cursor-pointer">
+            <span class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-lg bg-orange-100 text-orange-700 text-xs font-black flex items-center justify-center shrink-0">6</span>
+              <span class="text-xs sm:text-sm">Apakah peserta harus membuat proyek sendiri atau boleh bekerja sama dengan teman?</span>
+            </span>
+            <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0"></i>
+          </button>
+          <div class="faq-answer hidden px-5 pb-5 pt-2 text-xs text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/50">
+            Kompetisi menggunakan format individual. Artinya, satu proyek merupakan karya satu peserta dan bukan hasil pengerjaan bersama dalam satu kelompok. Peserta harus memahami seluruh kode dan mampu menjelaskan alur cara kerja proyek yang dikumpulkan secara mandiri.
+          </div>
+        </div>
+        <div class="faq-item border border-slate-200 rounded-2xl overflow-hidden transition-all duration-200 hover:border-orange-300 bg-white" data-category="B">
+          <button type="button" class="faq-toggle w-full px-5 py-3.5 text-left flex items-center justify-between gap-3 font-bold text-slate-800 hover:text-orange-600 transition cursor-pointer">
+            <span class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-lg bg-orange-100 text-orange-700 text-xs font-black flex items-center justify-center shrink-0">7</span>
+              <span class="text-xs sm:text-sm">Apakah orang tua atau guru boleh membantu peserta membuat proyek?</span>
+            </span>
+            <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0"></i>
+          </button>
+          <div class="faq-answer hidden px-5 pb-5 pt-2 text-xs text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/50">
+            Boleh memberikan pendampingan secara wajar. Orang tua dan guru dapat membantu menjelaskan konsep dan materi, memberikan arahan dan masukan, mempersiapkan perangkat komputer/laptop, membantu keselamatan penggunaan alat, serta mendampingi proses perekaman video presentasi. Namun, ide, logika pemrograman, pengembangan inti, dan pemahaman terhadap proyek harus berasal dari peserta sendiri.
+          </div>
+        </div>
+        <div class="faq-item border border-slate-200 rounded-2xl overflow-hidden transition-all duration-200 hover:border-orange-300 bg-white" data-category="B">
+          <button type="button" class="faq-toggle w-full px-5 py-3.5 text-left flex items-center justify-between gap-3 font-bold text-slate-800 hover:text-orange-600 transition cursor-pointer">
+            <span class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-lg bg-orange-100 text-orange-700 text-xs font-black flex items-center justify-center shrink-0">8</span>
+              <span class="text-xs sm:text-sm">Apakah peserta boleh menggunakan Google, YouTube, buku, atau tutorial sebagai referensi?</span>
+            </span>
+            <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0"></i>
+          </button>
+          <div class="faq-answer hidden px-5 pb-5 pt-2 text-xs text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/50">
+            Boleh. Peserta dapat menggunakan berbagai sumber sebagai referensi dan sarana belajar. Peserta diperbolehkan mengikuti tutorial, mempelajari contoh proyek, kemudian mengembangkan ide dan fungsinya sendiri. Namun, peserta tidak diperbolehkan menyalin seluruh karya orang lain (plagiarisme penuh) dan mengakuinya sebagai karya pribadi.
+          </div>
+        </div>
+        <div class="faq-item border border-slate-200 rounded-2xl overflow-hidden transition-all duration-200 hover:border-orange-300 bg-white" data-category="B">
+          <button type="button" class="faq-toggle w-full px-5 py-3.5 text-left flex items-center justify-between gap-3 font-bold text-slate-800 hover:text-orange-600 transition cursor-pointer">
+            <span class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-lg bg-orange-100 text-orange-700 text-xs font-black flex items-center justify-center shrink-0">9</span>
+              <span class="text-xs sm:text-sm">Apakah peserta diperbolehkan menggunakan AI untuk membantu membuat proyek?</span>
+            </span>
+            <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0"></i>
+          </button>
+          <div class="faq-answer hidden px-5 pb-5 pt-2 text-xs text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/50">
+            Boleh. AI dapat digunakan sebagai alat bantu untuk mencari inspirasi dan ide proyek, memahami kode pemrograman, mendapatkan saran pengembangan proyek, membantu membuat aset atau desain ilustrasi, maupun menyelesaikan kendala teknis. Namun, peserta tetap harus memahami hasil yang dibuat dan mampu menjelaskan cara kerja proyeknya sendiri.
+          </div>
+        </div>
+        <div class="faq-item border border-slate-200 rounded-2xl overflow-hidden transition-all duration-200 hover:border-orange-300 bg-white" data-category="B">
+          <button type="button" class="faq-toggle w-full px-5 py-3.5 text-left flex items-center justify-between gap-3 font-bold text-slate-800 hover:text-orange-600 transition cursor-pointer">
+            <span class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-lg bg-orange-100 text-orange-700 text-xs font-black flex items-center justify-center shrink-0">10</span>
+              <span class="text-xs sm:text-sm">Apakah peserta boleh menggunakan gambar, musik, atau aset dari internet?</span>
+            </span>
+            <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0"></i>
+          </button>
+          <div class="faq-answer hidden px-5 pb-5 pt-2 text-xs text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/50">
+            Boleh, selama penggunaannya tidak melanggar hak cipta atau ketentuan lisensi. Apabila pemilik aset mewajibkan pencantuman sumber (atribusi), peserta harus mencantumkannya secara jujur pada deskripsi proyek atau di dalam karya.
+          </div>
+        </div>
+        <div class="faq-item border border-slate-200 rounded-2xl overflow-hidden transition-all duration-200 hover:border-orange-300 bg-white" data-category="C">
+          <button type="button" class="faq-toggle w-full px-5 py-3.5 text-left flex items-center justify-between gap-3 font-bold text-slate-800 hover:text-orange-600 transition cursor-pointer">
+            <span class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-lg bg-orange-100 text-orange-700 text-xs font-black flex items-center justify-center shrink-0">11</span>
+              <span class="text-xs sm:text-sm">Apakah peserta bebas menggunakan perangkat sendiri untuk membuat proyek?</span>
+            </span>
+            <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0"></i>
+          </button>
+          <div class="faq-answer hidden px-5 pb-5 pt-2 text-xs text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/50">
+            Peserta wajib menggunakan perangkat yang telah ditetapkan oleh panitia sesuai kategori lomba. Khusus kategori robotik, peserta harus menggunakan perangkat robotik yang telah ditentukan oleh penyelenggara (Erboblox/Jimu). Peserta tidak diperkenankan mengganti perangkat dengan jenis lain di luar ketentuan kompetisi.
+          </div>
+        </div>
+        <div class="faq-item border border-slate-200 rounded-2xl overflow-hidden transition-all duration-200 hover:border-orange-300 bg-white" data-category="C">
+          <button type="button" class="faq-toggle w-full px-5 py-3.5 text-left flex items-center justify-between gap-3 font-bold text-slate-800 hover:text-orange-600 transition cursor-pointer">
+            <span class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-lg bg-orange-100 text-orange-700 text-xs font-black flex items-center justify-center shrink-0">12</span>
+              <span class="text-xs sm:text-sm">Apakah peserta boleh menggunakan perangkat yang berbeda untuk mendaftar dan membuat proyek?</span>
+            </span>
+            <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0"></i>
+          </button>
+          <div class="faq-answer hidden px-5 pb-5 pt-2 text-xs text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/50">
+            Perangkat untuk mengakses website pendaftaran atau pengumpulan tidak harus sama dengan perangkat yang digunakan untuk membuat proyek. Namun, perangkat yang digunakan untuk membuat proyek tetap harus mengikuti ketentuan perangkat dari panitia, khususnya untuk kategori robotik.
+          </div>
+        </div>
+        <div class="faq-item border border-slate-200 rounded-2xl overflow-hidden transition-all duration-200 hover:border-orange-300 bg-white" data-category="C">
+          <button type="button" class="faq-toggle w-full px-5 py-3.5 text-left flex items-center justify-between gap-3 font-bold text-slate-800 hover:text-orange-600 transition cursor-pointer">
+            <span class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-lg bg-orange-100 text-orange-700 text-xs font-black flex items-center justify-center shrink-0">13</span>
+              <span class="text-xs sm:text-sm">Apakah ada batas maksimal ukuran file proyek yang dikumpulkan?</span>
+            </span>
+            <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0"></i>
+          </button>
+          <div class="faq-answer hidden px-5 pb-5 pt-2 text-xs text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/50">
+            Ya. Seluruh file proyek yang dikumpulkan memiliki batas maksimal ukuran <strong>100 MB</strong>. Pastikan file yang diunggah sesuai dengan format yang ditentukan, tidak rusak (corrupt), dapat dibuka, dan dapat dijalankan dengan baik oleh dewan juri.
+          </div>
+        </div>
+        <div class="faq-item border border-slate-200 rounded-2xl overflow-hidden transition-all duration-200 hover:border-orange-300 bg-white" data-category="C">
+          <button type="button" class="faq-toggle w-full px-5 py-3.5 text-left flex items-center justify-between gap-3 font-bold text-slate-800 hover:text-orange-600 transition cursor-pointer">
+            <span class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-lg bg-orange-100 text-orange-700 text-xs font-black flex items-center justify-center shrink-0">14</span>
+              <span class="text-xs sm:text-sm">Bagaimana ketentuan format file untuk kategori Coding Scratch?</span>
+            </span>
+            <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0"></i>
+          </button>
+          <div class="faq-answer hidden px-5 pb-5 pt-2 text-xs text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/50">
+            Peserta kategori Coding Scratch mengumpulkan file proyek dengan format <code>.sb3</code> (Scratch 3.0 / PictoBlox) atau tautan proyek yang dapat diakses publik. Pastikan file proyek merupakan hasil karya final yang akan dinilai dan dapat dibuka dengan baik tanpa kata sandi.
+          </div>
+        </div>
+        <div class="faq-item border border-slate-200 rounded-2xl overflow-hidden transition-all duration-200 hover:border-orange-300 bg-white" data-category="C">
+          <button type="button" class="faq-toggle w-full px-5 py-3.5 text-left flex items-center justify-between gap-3 font-bold text-slate-800 hover:text-orange-600 transition cursor-pointer">
+            <span class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-lg bg-orange-100 text-orange-700 text-xs font-black flex items-center justify-center shrink-0">15</span>
+              <span class="text-xs sm:text-sm">Apakah peserta wajib membeli perangkat Micro:Bit atau robot Erboblox sendiri?</span>
+            </span>
+            <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0"></i>
+          </button>
+          <div class="faq-answer hidden px-5 pb-5 pt-2 text-xs text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/50">
+            Peserta wajib mengikuti ketentuan perangkat yang telah ditetapkan panitia. Tidak diperkenankan mengganti perangkat robotik dengan perangkat lain di luar ketentuan kompetisi. Untuk informasi mengenai fasilitas dan ketersediaan perangkat di sekolah, peserta dapat mengikuti arahan guru pembina atau panitia penyelenggara.
+          </div>
+        </div>
+        <div class="faq-item border border-slate-200 rounded-2xl overflow-hidden transition-all duration-200 hover:border-orange-300 bg-white" data-category="D">
+          <button type="button" class="faq-toggle w-full px-5 py-3.5 text-left flex items-center justify-between gap-3 font-bold text-slate-800 hover:text-orange-600 transition cursor-pointer">
+            <span class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-lg bg-orange-100 text-orange-700 text-xs font-black flex items-center justify-center shrink-0">16</span>
+              <span class="text-xs sm:text-sm">Berapa durasi video presentasi yang harus dikumpulkan?</span>
+            </span>
+            <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0"></i>
+          </button>
+          <div class="faq-answer hidden px-5 pb-5 pt-2 text-xs text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/50">
+            Video presentasi berdurasi <strong>1–5 menit</strong>, mencakup penjelasan konsep dan demonstrasi proyek secara utuh. Peserta disarankan menyampaikan informasi secara ringkas, jelas, terstruktur, dan mudah dipahami.
+          </div>
+        </div>
+        <div class="faq-item border border-slate-200 rounded-2xl overflow-hidden transition-all duration-200 hover:border-orange-300 bg-white" data-category="D">
+          <button type="button" class="faq-toggle w-full px-5 py-3.5 text-left flex items-center justify-between gap-3 font-bold text-slate-800 hover:text-orange-600 transition cursor-pointer">
+            <span class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-lg bg-orange-100 text-orange-700 text-xs font-black flex items-center justify-center shrink-0">17</span>
+              <span class="text-xs sm:text-sm">Apa saja yang harus ditampilkan dalam video presentasi?</span>
+            </span>
+            <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0"></i>
+          </button>
+          <div class="faq-answer hidden px-5 pb-5 pt-2 text-xs text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/50">
+            <p>Video presentasi setidaknya memuat 4 poin utama:</p><ol class='list-decimal pl-5 mt-2 space-y-1 font-medium'><li>Ide latar belakang dan tujuan pembuatan proyek;</li><li>Penjelasan alur logika dan cara kerja proyek;</li><li>Demonstrasi langsung fungsi utama dan fitur interaktif proyek;</li><li>Penjelasan bagian kode/mekanisme yang dikembangkan sendiri oleh peserta.</li></ol><p class='mt-2'>Peserta tidak diwajibkan merekam seluruh proses pengerjaan dari awal sampai selesai, melainkan intisari presentasi dan demonstrasi alat.</p>
+          </div>
+        </div>
+        <div class="faq-item border border-slate-200 rounded-2xl overflow-hidden transition-all duration-200 hover:border-orange-300 bg-white" data-category="D">
+          <button type="button" class="faq-toggle w-full px-5 py-3.5 text-left flex items-center justify-between gap-3 font-bold text-slate-800 hover:text-orange-600 transition cursor-pointer">
+            <span class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-lg bg-orange-100 text-orange-700 text-xs font-black flex items-center justify-center shrink-0">18</span>
+              <span class="text-xs sm:text-sm">Apakah wajah peserta wajib terlihat dalam video presentasi?</span>
+            </span>
+            <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0"></i>
+          </button>
+          <div class="faq-answer hidden px-5 pb-5 pt-2 text-xs text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/50">
+            Tidak wajib. Peserta boleh menampilkan wajah di depan kamera atau hanya menggunakan rekaman layar dengan suara penjelasan (voice-over). Peserta dapat memilih cara presentasi yang paling nyaman dan percaya diri, selama proyek terlihat jelas serta suara penjelasan terdengar jernih.
+          </div>
+        </div>
+        <div class="faq-item border border-slate-200 rounded-2xl overflow-hidden transition-all duration-200 hover:border-orange-300 bg-white" data-category="D">
+          <button type="button" class="faq-toggle w-full px-5 py-3.5 text-left flex items-center justify-between gap-3 font-bold text-slate-800 hover:text-orange-600 transition cursor-pointer">
+            <span class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-lg bg-orange-100 text-orange-700 text-xs font-black flex items-center justify-center shrink-0">19</span>
+              <span class="text-xs sm:text-sm">Apakah video presentasi wajib diunggah ke media sosial?</span>
+            </span>
+            <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0"></i>
+          </button>
+          <div class="faq-answer hidden px-5 pb-5 pt-2 text-xs text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/50">
+            Tidak wajib. Peserta yang tidak mengikuti Kategori Favorit dapat mengumpulkan video presentasi melalui Google Drive dengan memastikan akses tautan disetel publik (<em>“Siapa saja yang memiliki link dapat melihat”</em>). Namun, peserta yang ingin mengikuti <strong>Kategori Favorit</strong> wajib mengunggah video ke YouTube atau Instagram sesuai ketentuan panitia karena pemenang favorit dihitung berdasarkan view dan like terbanyak.
+          </div>
+        </div>
+        <div class="faq-item border border-slate-200 rounded-2xl overflow-hidden transition-all duration-200 hover:border-orange-300 bg-white" data-category="E">
+          <button type="button" class="faq-toggle w-full px-5 py-3.5 text-left flex items-center justify-between gap-3 font-bold text-slate-800 hover:text-orange-600 transition cursor-pointer">
+            <span class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-lg bg-orange-100 text-orange-700 text-xs font-black flex items-center justify-center shrink-0">20</span>
+              <span class="text-xs sm:text-sm">Di mana peserta mengumpulkan proyek kompetisi?</span>
+            </span>
+            <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0"></i>
+          </button>
+          <div class="faq-answer hidden px-5 pb-5 pt-2 text-xs text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/50">
+            Pengumpulan proyek dilakukan secara online melalui website resmi Erlass Competition pada halaman pengumpulan: <code>https://erlasscompetition.erlass.academy/kumpul-proyek.html</code>. Peserta menggunakan ID Peserta resmi (contoh: E-1026-XXXX) untuk membuka formulir pengumpulan.
+          </div>
+        </div>
+        <div class="faq-item border border-slate-200 rounded-2xl overflow-hidden transition-all duration-200 hover:border-orange-300 bg-white" data-category="E">
+          <button type="button" class="faq-toggle w-full px-5 py-3.5 text-left flex items-center justify-between gap-3 font-bold text-slate-800 hover:text-orange-600 transition cursor-pointer">
+            <span class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-lg bg-orange-100 text-orange-700 text-xs font-black flex items-center justify-center shrink-0">21</span>
+              <span class="text-xs sm:text-sm">Bagaimana jika peserta kehilangan ID atau nama peserta tidak ditemukan di website?</span>
+            </span>
+            <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0"></i>
+          </button>
+          <div class="faq-answer hidden px-5 pb-5 pt-2 text-xs text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/50">
+            <p>Peserta dapat menggunakan fitur <strong>“Lupa ID Peserta?”</strong> yang tersedia tepat di samping kolom pencarian:</p><ol class='list-decimal pl-5 mt-2 space-y-1 font-medium'><li>Buka halaman <code>kumpul-proyek.html</code>.</li><li>Klik tombol <em>“Lupa ID Peserta?”</em>.</li><li>Masukkan Nama Lengkap, Tanggal Lahir, dan Nomor WhatsApp sesuai data pendaftaran.</li><li>Klik <em>“Verifikasi Identitas & Cari ID”</em>.</li><li>Jika data cocok, sistem menampilkan ID resmi Anda. Klik konfirmasi untuk langsung membuka formulir pengumpulan secara otomatis.</li></ol><p class='mt-2'>Jika data tetap tidak cocok, segera hubungi panitia melalui kanal WhatsApp resmi dengan menyertakan nama lengkap, asal sekolah, dan bukti registrasi.</p>
+          </div>
+        </div>
+        <div class="faq-item border border-slate-200 rounded-2xl overflow-hidden transition-all duration-200 hover:border-orange-300 bg-white" data-category="E">
+          <button type="button" class="faq-toggle w-full px-5 py-3.5 text-left flex items-center justify-between gap-3 font-bold text-slate-800 hover:text-orange-600 transition cursor-pointer">
+            <span class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-lg bg-orange-100 text-orange-700 text-xs font-black flex items-center justify-center shrink-0">22</span>
+              <span class="text-xs sm:text-sm">Apakah peserta boleh memperbaiki atau mengunggah ulang proyek yang sudah dikumpulkan?</span>
+            </span>
+            <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0"></i>
+          </button>
+          <div class="faq-answer hidden px-5 pb-5 pt-2 text-xs text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/50">
+            Boleh. Peserta diperbolehkan melakukan revisi, perbaikan data, atau mengunggah ulang berkas proyek selama periode pengumpulan masih berlangsung (hingga 21 November 2026 pukul 23:59 WIB). Versi berkas terbaru yang berhasil dikumpulkan sebelum batas akhir akan menjadi berkas final yang dinilai oleh dewan juri.
+          </div>
+        </div>
+        <div class="faq-item border border-slate-200 rounded-2xl overflow-hidden transition-all duration-200 hover:border-orange-300 bg-white" data-category="E">
+          <button type="button" class="faq-toggle w-full px-5 py-3.5 text-left flex items-center justify-between gap-3 font-bold text-slate-800 hover:text-orange-600 transition cursor-pointer">
+            <span class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-lg bg-orange-100 text-orange-700 text-xs font-black flex items-center justify-center shrink-0">23</span>
+              <span class="text-xs sm:text-sm">Bagaimana jika peserta mengalami kendala ketika mengunggah proyek atau file tidak dapat dibuka?</span>
+            </span>
+            <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0"></i>
+          </button>
+          <div class="faq-answer hidden px-5 pb-5 pt-2 text-xs text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/50">
+            <p>Peserta atau orang tua dapat segera menghubungi panitia resmi. Sebelum mengunggah, pastikan:</p><ul class='list-disc pl-5 mt-2 space-y-1 font-medium'><li>Koneksi internet stabil dan lancar;</li><li>Format file sesuai ketentuan (<code>.sb3</code> untuk Scratch, <code>.hex</code> untuk Micro:bit);</li><li>Ukuran file tidak melebihi batas 100 MB;</li><li>File dapat dibuka dan dimainkan secara normal di aplikasi masing-masing;</li><li>Pengumpulan dilakukan jauh sebelum batas waktu terakhir untuk menghindari antrean server.</li></ul>
+          </div>
+        </div>
+        <div class="faq-item border border-slate-200 rounded-2xl overflow-hidden transition-all duration-200 hover:border-orange-300 bg-white" data-category="F">
+          <button type="button" class="faq-toggle w-full px-5 py-3.5 text-left flex items-center justify-between gap-3 font-bold text-slate-800 hover:text-orange-600 transition cursor-pointer">
+            <span class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-lg bg-orange-100 text-orange-700 text-xs font-black flex items-center justify-center shrink-0">24</span>
+              <span class="text-xs sm:text-sm">Bagaimana sistem penilaian dan apakah peserta dinilai berdasarkan jenjang pendidikan?</span>
+            </span>
+            <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0"></i>
+          </button>
+          <div class="faq-answer hidden px-5 pb-5 pt-2 text-xs text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/50">
+            Penilaian dilakukan secara objektif oleh Dewan Juri independen menggunakan metode Blind Review (tanpa identitas nama sekolah/wilayah) berdasarkan rubrik resmi: Presentasi & Pemahaman (40%), Logika & Algoritma (20%), Kreativitas (15%), Fungsionalitas Karya (15%), dan Kesesuaian Tema (10%). Penilaian dikelompokkan secara adil per jenjang: SD 1–3, SD 4–6, dan SMP 7–9 dengan nilai maksimal 100.
+          </div>
+        </div>
+        <div class="faq-item border border-slate-200 rounded-2xl overflow-hidden transition-all duration-200 hover:border-orange-300 bg-white" data-category="F">
+          <button type="button" class="faq-toggle w-full px-5 py-3.5 text-left flex items-center justify-between gap-3 font-bold text-slate-800 hover:text-orange-600 transition cursor-pointer">
+            <span class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-lg bg-orange-100 text-orange-700 text-xs font-black flex items-center justify-center shrink-0">25</span>
+              <span class="text-xs sm:text-sm">Apa saja penghargaan yang diberikan dan kapan pemenang diumumkan?</span>
+            </span>
+            <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0"></i>
+          </button>
+          <div class="faq-answer hidden px-5 pb-5 pt-2 text-xs text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/50">
+            Penghargaan diberikan kepada pemenang berupa piala, sertifikat, dan dana apresiasi untuk <strong>Juara 1, Juara 2, dan Juara 3</strong> pada setiap divisi jenjang. Selain itu, terdapat <strong>Kategori Favorit</strong> berdasarkan akumulasi view dan like terbanyak di media sosial. Pengumuman pemenang resmi dijadwalkan pada tanggal <strong>5 Desember 2026</strong> melalui kanal resmi Erlass Academy.
+          </div>
+        </div>
+        <div class="faq-item border border-slate-200 rounded-2xl overflow-hidden transition-all duration-200 hover:border-orange-300 bg-white" data-category="F">
+          <button type="button" class="faq-toggle w-full px-5 py-3.5 text-left flex items-center justify-between gap-3 font-bold text-slate-800 hover:text-orange-600 transition cursor-pointer">
+            <span class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-lg bg-orange-100 text-orange-700 text-xs font-black flex items-center justify-center shrink-0">26</span>
+              <span class="text-xs sm:text-sm">Apakah selain Juara 1, 2, dan 3 terdapat Finalis Unggulan?</span>
+            </span>
+            <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0"></i>
+          </button>
+          <div class="faq-answer hidden px-5 pb-5 pt-2 text-xs text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/50">
+            Ya, panitia menyediakan alokasi penghargaan untuk Finalis Unggulan 1, 2, dan 3 pada divisi kategori tertentu untuk mengapresiasi pencapaian siswa berprestasi. Pembagian resmi akan diumumkan pada saat siaran pengumuman hasil penilaian juri.
+          </div>
+        </div>
+        <div class="faq-item border border-slate-200 rounded-2xl overflow-hidden transition-all duration-200 hover:border-orange-300 bg-white" data-category="F">
+          <button type="button" class="faq-toggle w-full px-5 py-3.5 text-left flex items-center justify-between gap-3 font-bold text-slate-800 hover:text-orange-600 transition cursor-pointer">
+            <span class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-lg bg-orange-100 text-orange-700 text-xs font-black flex items-center justify-center shrink-0">27</span>
+              <span class="text-xs sm:text-sm">Bagaimana cara mengikuti Kategori Favorit?</span>
+            </span>
+            <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0"></i>
+          </button>
+          <div class="faq-answer hidden px-5 pb-5 pt-2 text-xs text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/50">
+            Peserta yang ingin berpartisipasi dalam Kategori Favorit wajib mengunggah video presentasi ke YouTube atau Instagram dengan menyertakan tagar resmi, menandai akun <code>@komunitaserlass</code>, serta mencantumkan nama dan nomor registrasi peserta. Pemenang ditentukan murni dari total view dan like terbanyak pada saat penutupan penjurian.
+          </div>
+        </div>
+        <div class="faq-item border border-slate-200 rounded-2xl overflow-hidden transition-all duration-200 hover:border-orange-300 bg-white" data-category="F">
+          <button type="button" class="faq-toggle w-full px-5 py-3.5 text-left flex items-center justify-between gap-3 font-bold text-slate-800 hover:text-orange-600 transition cursor-pointer">
+            <span class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-lg bg-orange-100 text-orange-700 text-xs font-black flex items-center justify-center shrink-0">28</span>
+              <span class="text-xs sm:text-sm">Apakah pemenang Kategori Favorit masih berpeluang menjadi Juara 1, 2, atau 3?</span>
+            </span>
+            <i data-lucide="chevron-down" class="faq-chevron w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0"></i>
+          </button>
+          <div class="faq-answer hidden px-5 pb-5 pt-2 text-xs text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/50">
+            Penilaian Juara 1–3 murni ditentukan oleh skor rubrik dewan juri, sedangkan Kategori Favorit dihitung berdasarkan interaksi publik media sosial. Ketentuan mengenai peraih gelar ganda mengikuti keputusan akhir pleno panitia dan dewan juri.
+          </div>
+        </div>
+      </div>
+      <div id="faq-empty-state" class="hidden p-8 text-center rounded-2xl bg-slate-50 border border-slate-200 text-slate-500 space-y-2">
+        <i data-lucide="search-x" class="w-8 h-8 mx-auto text-slate-400"></i>
+        <p class="text-xs font-bold">Tidak ada pertanyaan yang sesuai dengan kata kunci pencarian Anda.</p>
+        <button type="button" id="btn-reset-faq-search" class="text-xs font-bold text-orange-600 underline cursor-pointer">Tampilkan semua pertanyaan</button>
+      </div>
+      <!-- Panduan Khusus Fitur Lupa ID Peserta -->
+      <div class="mt-6 p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-amber-200/60 pb-3">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-orange-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+              <i data-lucide="key-round" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <h4 class="font-bold text-slate-900 text-sm sm:text-base">Panduan Menggunakan Fitur Lupa ID Peserta</h4>
+              <p class="text-[11px] text-slate-500 font-medium">Ikuti 6 langkah verifikasi identitas privat berikut:</p>
+            </div>
+          </div>
+          <button type="button" onclick="openForgotIdModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-white bg-orange-600 hover:bg-orange-700 transition shadow-sm shrink-0 flex items-center justify-center gap-1.5 cursor-pointer">
+            <i data-lucide="shield-check" class="w-4 h-4"></i>
+            <span>Buka Fitur Lupa ID</span>
+          </button>
+        </div>
+        <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs text-slate-700">
+          <div class="p-3 bg-white/80 rounded-xl border border-amber-200/60 space-y-1">
+            <span class="w-5 h-5 rounded-full bg-orange-100 text-orange-700 font-black text-[10px] inline-flex items-center justify-center">1</span>
+            <p class="font-bold text-slate-800">Buka Halaman Web</p>
+            <p class="text-[11px] text-slate-500 leading-snug">Akses halaman <code>kumpul-proyek.html</code> di perangkat Anda.</p>
+          </div>
+          <div class="p-3 bg-white/80 rounded-xl border border-amber-200/60 space-y-1">
+            <span class="w-5 h-5 rounded-full bg-orange-100 text-orange-700 font-black text-[10px] inline-flex items-center justify-center">2</span>
+            <p class="font-bold text-slate-800">Klik Lupa ID Peserta</p>
+            <p class="text-[11px] text-slate-500 leading-snug">Klik tombol tautan <em>“Lupa ID Peserta?”</em> di dekat kolom pencarian.</p>
+          </div>
+          <div class="p-3 bg-white/80 rounded-xl border border-amber-200/60 space-y-1">
+            <span class="w-5 h-5 rounded-full bg-orange-100 text-orange-700 font-black text-[10px] inline-flex items-center justify-center">3</span>
+            <p class="font-bold text-slate-800">Masukkan 3 Data Validasi</p>
+            <p class="text-[11px] text-slate-500 leading-snug">Isi Nama Peserta, Tanggal Lahir, dan No WhatsApp sesuai pendaftaran.</p>
+          </div>
+          <div class="p-3 bg-white/80 rounded-xl border border-amber-200/60 space-y-1">
+            <span class="w-5 h-5 rounded-full bg-orange-100 text-orange-700 font-black text-[10px] inline-flex items-center justify-center">4</span>
+            <p class="font-bold text-slate-800">Verifikasi Identitas</p>
+            <p class="text-[11px] text-slate-500 leading-snug">Klik tombol <em>“Verifikasi Identitas & Cari ID”</em>.</p>
+          </div>
+          <div class="p-3 bg-white/80 rounded-xl border border-amber-200/60 space-y-1">
+            <span class="w-5 h-5 rounded-full bg-orange-100 text-orange-700 font-black text-[10px] inline-flex items-center justify-center">5</span>
+            <p class="font-bold text-slate-800">Periksa ID Peserta</p>
+            <p class="text-[11px] text-slate-500 leading-snug">Sistem akan menampilkan ID resmi. Klik tombol konfirmasi.</p>
+          </div>
+          <div class="p-3 bg-white/80 rounded-xl border border-amber-200/60 space-y-1">
+            <span class="w-5 h-5 rounded-full bg-orange-100 text-orange-700 font-black text-[10px] inline-flex items-center justify-center">6</span>
+            <p class="font-bold text-slate-800">Formulir Terbuka</p>
+            <p class="text-[11px] text-slate-500 leading-snug">Formulir pengumpulan proyek terbuka otomatis dan siap diisi.</p>
+          </div>
+        </div>
+      </div>
+    </section>
 
   </main>
 

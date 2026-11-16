@@ -75,3 +75,21 @@ Untuk mencegah perubahan berkas tanpa izin di tengah proses penjurian:
        try_files $uri =404;
    }
    ```
+
+---
+
+## 6. Pusat Bantuan & FAQ Resmi Kompetisi 2026
+
+Pada bagian bawah halaman pengumpulan (`kumpul-proyek.html#faq-section`), telah diintegrasikan **28 Tanya Jawab Resmi** yang disusun berdasarkan dokumen resmi panitia (*FAQ Erlass Coding & Robotics Competition 2026: Panduan untuk Peserta, Orang Tua, dan Guru Pendamping*).
+
+Fitur-fitur modul FAQ interaktif meliputi:
+1. **Pencarian Real-Time**: Peserta dapat mencari pertanyaan spesifik melalui kata kunci (misal: *ukuran berkas*, *video*, *revisi*, *AI*, *Scratch*, *juri*).
+2. **Kategori Filter Tab**:
+   - Bagian A: Informasi Umum & Kategori Lomba (5 Pertanyaan)
+   - Bagian B: Pembuatan Proyek, Referensi, dan AI (5 Pertanyaan)
+   - Bagian C: Perangkat & Persyaratan Teknis (5 Pertanyaan)
+   - Bagian D: Video Presentasi & Privasi Peserta (4 Pertanyaan)
+   - Bagian E: Pendaftaran & Pengumpulan Proyek (4 Pertanyaan)
+   - Bagian F: Penilaian & Penghargaan (5 Pertanyaan)
+3. **Kartu Khusus Panduan Lupa ID**: Alur 6 langkah verifikasi identitas privat multi-faktor.
+4. **Tautan Unduh PDF Resmi**: Tombol unduh langsung berkas `FAQ_Erlass_Coding_Robotics_Competition_2026_Lengkap.pdf`.
