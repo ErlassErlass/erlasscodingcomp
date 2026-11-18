@@ -275,6 +275,12 @@ function initUploadHandlers() {
 
   if (!dropzone || !fileInput) return;
 
+  // Prevent browser default behavior when files are dragged anywhere on the window
+  ['dragover', 'drop'].forEach((eventName) => {
+    window.addEventListener(eventName, (e) => e.preventDefault());
+    document.addEventListener(eventName, (e) => e.preventDefault());
+  });
+
   dropzone.addEventListener('click', (e) => {
     // Hindari membuka dialog jika yang diklik adalah tombol remove
     if (e.target.closest('#btn-remove-selected-file')) return;
@@ -284,55 +290,77 @@ function initUploadHandlers() {
   if (btnRemove) {
     btnRemove.addEventListener('click', (e) => {
       e.stopPropagation();
+      e.preventDefault();
       fileInput.value = '';
-      if (fileInfo) fileInfo.classList.add('hidden');
-      if (idleContent) idleContent.classList.remove('hidden');
+      if (fileInfo) {
+        fileInfo.classList.add('hidden');
+        fileInfo.style.display = 'none';
+      }
+      if (idleContent) {
+        idleContent.classList.remove('hidden');
+        idleContent.style.display = 'flex';
+      }
       if (errorBox) errorBox.classList.add('hidden');
     });
   }
 
-  let dragCounter = 0;
+  function setDropzoneActive(isActive) {
+    if (isActive) {
+      if (dragOverlay) {
+        dragOverlay.classList.remove('hidden');
+        dragOverlay.style.display = 'flex';
+      }
+      dropzone.classList.add('scale-[1.02]', 'border-orange-500', 'ring-4', 'ring-orange-300', 'bg-orange-50/90');
+      dropzone.classList.remove('border-orange-300', 'bg-orange-50/40');
+    } else {
+      if (dragOverlay) {
+        dragOverlay.classList.add('hidden');
+        dragOverlay.style.display = 'none';
+      }
+      dropzone.classList.remove('scale-[1.02]', 'border-orange-500', 'ring-4', 'ring-orange-300', 'bg-orange-50/90');
+      dropzone.classList.add('border-orange-300', 'bg-orange-50/40');
+    }
+  }
 
-  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach((eventName) => {
-    dropzone.addEventListener(eventName, (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-    });
-  });
+  function flashDropzoneSuccess() {
+    dropzone.classList.add('border-emerald-500', 'bg-emerald-50/80', 'ring-4', 'ring-emerald-300');
+    setTimeout(() => {
+      dropzone.classList.remove('border-emerald-500', 'bg-emerald-50/80', 'ring-4', 'ring-emerald-300');
+      dropzone.classList.add('border-orange-300', 'bg-orange-50/40');
+    }, 800);
+  }
 
   dropzone.addEventListener('dragenter', (e) => {
-    dragCounter++;
-    if (dragOverlay) dragOverlay.classList.remove('hidden');
-    dropzone.classList.add('scale-[1.02]', 'border-orange-500', 'ring-4', 'ring-orange-200/60', 'bg-orange-50/90');
-    dropzone.classList.remove('border-orange-300', 'bg-orange-50/40');
+    e.preventDefault();
+    e.stopPropagation();
+    setDropzoneActive(true);
   });
 
   dropzone.addEventListener('dragover', (e) => {
-    if (dragOverlay && dragOverlay.classList.contains('hidden')) {
-      dragOverlay.classList.remove('hidden');
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.dataTransfer) {
+      e.dataTransfer.dropEffect = 'copy';
     }
+    setDropzoneActive(true);
   });
 
   dropzone.addEventListener('dragleave', (e) => {
-    dragCounter--;
-    if (dragCounter <= 0) {
-      dragCounter = 0;
-      if (dragOverlay) dragOverlay.classList.add('hidden');
-      dropzone.classList.remove('scale-[1.02]', 'border-orange-500', 'ring-4', 'ring-orange-200/60', 'bg-orange-50/90');
-      dropzone.classList.add('border-orange-300', 'bg-orange-50/40');
+    e.preventDefault();
+    e.stopPropagation();
+    const rect = dropzone.getBoundingClientRect();
+    const x = e.clientX;
+    const y = e.clientY;
+    if (x <= rect.left || x >= rect.right || y <= rect.top || y >= rect.bottom) {
+      setDropzoneActive(false);
     }
   });
 
   dropzone.addEventListener('drop', (e) => {
-    dragCounter = 0;
-    if (dragOverlay) dragOverlay.classList.add('hidden');
-    dropzone.classList.remove('scale-[1.02]', 'border-orange-500', 'ring-4', 'ring-orange-200/60', 'bg-orange-50/90');
-    dropzone.classList.add('border-emerald-500', 'bg-emerald-50/70', 'ring-4', 'ring-emerald-200/50');
-
-    setTimeout(() => {
-      dropzone.classList.remove('border-emerald-500', 'bg-emerald-50/70', 'ring-4', 'ring-emerald-200/50');
-      dropzone.classList.add('border-orange-300', 'bg-orange-50/40');
-    }, 700);
+    e.preventDefault();
+    e.stopPropagation();
+    setDropzoneActive(false);
+    flashDropzoneSuccess();
 
     const dt = e.dataTransfer;
     if (dt && dt.files && dt.files.length > 0) {
@@ -364,7 +392,14 @@ function initUploadHandlers() {
     if (fileSize) fileSize.textContent = formattedSize;
 
     // Deteksi kesesuaian cabang lomba
-    const branch = currentParticipant ? (currentParticipant.branch || '') : '';
+    let branch = '';
+    if (typeof activeParticipant !== 'undefined' && activeParticipant && activeParticipant.branch) {
+      branch = activeParticipant.branch;
+    } else {
+      const dispBranchEl = document.getElementById('disp-branch');
+      if (dispBranchEl) branch = dispBranchEl.textContent || '';
+    }
+
     const isScratch = branch.toLowerCase().includes('scratch');
     const isMicrobit = branch.toLowerCase().includes('micro');
 
@@ -381,8 +416,12 @@ function initUploadHandlers() {
 
     if (sizeBytes > maxMb * 1024 * 1024) {
       // Melebihi 100 MB
-      if (idleContent) idleContent.classList.remove('hidden');
-      fileInfo.className = 'mt-3 w-full max-w-md p-3.5 bg-red-50 border-2 border-red-300 rounded-2xl shadow-sm flex items-center justify-between gap-3 text-left animate-in fade-in duration-200';
+      if (idleContent) {
+        idleContent.classList.remove('hidden');
+        idleContent.style.display = 'flex';
+      }
+      fileInfo.className = 'mt-3 w-full max-w-md p-3.5 bg-red-50 border-2 border-red-300 rounded-2xl shadow-sm flex items-center justify-between gap-3 text-left';
+      fileInfo.style.display = 'flex';
       if (fileIcon) fileIcon.className = 'w-11 h-11 rounded-xl bg-red-100 text-red-600 flex items-center justify-center shrink-0';
       if (fileBadge) {
         fileBadge.className = 'px-2 py-0.5 rounded-md text-[10px] font-bold bg-red-200 text-red-800';
@@ -394,8 +433,12 @@ function initUploadHandlers() {
       }
     } else if (!isValidExt) {
       // Ekstensi tidak sesuai
-      if (idleContent) idleContent.classList.remove('hidden');
-      fileInfo.className = 'mt-3 w-full max-w-md p-3.5 bg-amber-50 border-2 border-amber-300 rounded-2xl shadow-sm flex items-center justify-between gap-3 text-left animate-in fade-in duration-200';
+      if (idleContent) {
+        idleContent.classList.remove('hidden');
+        idleContent.style.display = 'flex';
+      }
+      fileInfo.className = 'mt-3 w-full max-w-md p-3.5 bg-amber-50 border-2 border-amber-300 rounded-2xl shadow-sm flex items-center justify-between gap-3 text-left';
+      fileInfo.style.display = 'flex';
       if (fileIcon) fileIcon.className = 'w-11 h-11 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0';
       if (fileBadge) {
         fileBadge.className = 'px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-200 text-amber-900';
@@ -403,9 +446,13 @@ function initUploadHandlers() {
       }
     } else {
       // Valid & Siap Unggah
-      if (idleContent) idleContent.classList.add('hidden');
+      if (idleContent) {
+        idleContent.classList.add('hidden');
+        idleContent.style.display = 'none';
+      }
       fileInfo.className = 'mt-2 w-full max-w-md p-3.5 bg-white border-2 border-emerald-400 rounded-2xl shadow-md flex items-center justify-between gap-3 text-left transition-all duration-300 scale-100';
-      if (fileIcon) fileIcon.className = 'w-11 h-11 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 shadow-2xs';
+      fileInfo.style.display = 'flex';
+      if (fileIcon) fileIcon.className = 'w-11 h-11 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 shadow-sm';
       if (fileBadge) {
         fileBadge.className = 'px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800 flex items-center gap-1';
         fileBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span><span>Siap Diunggah</span>';
