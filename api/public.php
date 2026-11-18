@@ -682,6 +682,10 @@ if ($action === 'lookup_project_participant') {
     $stmtSub->execute([$reg_code]);
     $submission = $stmtSub->fetch();
 
+    $deadline = strtotime('2026-11-21 23:59:59');
+    $is_before_deadline = (time() <= $deadline);
+    $can_revise = $is_before_deadline || ($submission && (int)$submission['allow_revision'] === 1);
+
     send_json([
         'status' => 'ok',
         'participant' => [
@@ -695,7 +699,9 @@ if ($action === 'lookup_project_participant') {
         ],
         'has_submitted' => !empty($submission),
         'submission' => $submission ?: null,
-        'allow_revision' => $submission ? (int)$submission['allow_revision'] : 0
+        'can_revise' => $can_revise,
+        'is_deadline_passed' => !$is_before_deadline,
+        'allow_revision' => $can_revise ? 1 : 0
     ]);
 }
 
@@ -746,16 +752,14 @@ if ($action === 'submit_project') {
     $stmtSub->execute([$reg_code]);
     $existing = $stmtSub->fetch();
 
-    if ($existing) {
-        // Jika sudah pernah submit, periksa apakah izin revisi aktif
-        if ((int)$existing['allow_revision'] !== 1) {
-            send_json(['status' => 'error', 'message' => 'Proyek Anda sudah berhasil dikumpulkan dan terkunci. Untuk melakukan perbaikan/revisi, silakan hubungi panitia untuk mengaktifkan izin revisi.'], 403);
-        }
-    } else {
-        // Jika submission baru dan sudah lewat deadline
-        if ($now > $deadline) {
-            send_json(['status' => 'error', 'message' => 'Batas waktu pengumpulan proyek telah berakhir pada 21 November 2026.'], 403);
-        }
+    $is_before_deadline = ($now <= $deadline);
+    $has_admin_override = $existing && ((int)$existing['allow_revision'] === 1);
+
+    if (!$is_before_deadline && !$has_admin_override) {
+        send_json([
+            'status' => 'error',
+            'message' => 'Batas waktu pengumpulan dan revisi proyek resmi telah berakhir pada 21 November 2026 pukul 23:59 WIB.'
+        ], 403);
     }
 
     $branch = $participant['branch'];

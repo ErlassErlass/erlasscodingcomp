@@ -53,6 +53,7 @@ function initCountdown() {
 // Global active participant & submission data
 let activeParticipant = null;
 let activeSubmission = null;
+let activeCanRevise = false;
 
 // 2. URL Parameters Auto-fill & Lookup
 function checkUrlParams() {
@@ -99,14 +100,14 @@ function initLookup() {
       if (data.status === 'ok') {
         activeParticipant = data.participant;
         activeSubmission = data.submission;
+        activeCanRevise = Boolean(data.can_revise);
 
-        // Cek status pengumpulan
-        if (data.has_submitted && !data.allow_revision) {
-          // Sudah mengumpulkan dan terkunci
-          renderReceipt(data.participant, data.submission);
+        // Cek status pengumpulan: jika sudah pernah mengumpulkan, tampilkan tanda terima resmi
+        if (data.has_submitted) {
+          renderReceipt(data.participant, data.submission, activeCanRevise);
         } else {
-          // Belum mengumpulkan ATAU mode revisi aktif
-          renderSubmissionForm(data.participant, data.submission, Boolean(data.allow_revision));
+          // Belum pernah mengumpulkan, buka formulir pengisian awal
+          renderSubmissionForm(data.participant, null, false);
         }
       } else {
         showLookupError(data.message || 'Terjadi kesalahan saat memverifikasi data.');
@@ -127,8 +128,12 @@ function initLookup() {
   }
 }
 
-// 4. Render Bukti / Tanda Terima (Jika sudah mengumpulkan & terkunci)
-function renderReceipt(participant, submission) {
+// 4. Render Bukti / Tanda Terima (Menampilkan Tanda Terima & Opsi Revisi Mandiri)
+function renderReceipt(participant, submission, canRevise = false) {
+  activeParticipant = participant;
+  activeSubmission = submission;
+  activeCanRevise = canRevise;
+
   document.getElementById('lookup-card').classList.add('hidden');
   document.getElementById('submission-card').classList.add('hidden');
   const receiptCard = document.getElementById('receipt-card');
@@ -163,12 +168,33 @@ function renderReceipt(participant, submission) {
     fileBtn.classList.add('hidden');
   }
 
+  // Tampilkan Banner Revisi Mandiri Aktif atau Terkunci
+  const activeRevBanner = document.getElementById('receipt-revision-banner-active');
+  const lockedRevBanner = document.getElementById('receipt-revision-banner-locked');
+  const btnStartRev = document.getElementById('btn-start-revision');
+
+  if (canRevise) {
+    if (activeRevBanner) activeRevBanner.classList.remove('hidden');
+    if (lockedRevBanner) lockedRevBanner.classList.add('hidden');
+    if (btnStartRev) {
+      btnStartRev.onclick = () => {
+        renderSubmissionForm(activeParticipant, activeSubmission, true);
+      };
+    }
+  } else {
+    if (activeRevBanner) activeRevBanner.classList.add('hidden');
+    if (lockedRevBanner) lockedRevBanner.classList.remove('hidden');
+  }
+
   receiptCard.scrollIntoView({ behavior: 'smooth' });
   if (window.lucide) lucide.createIcons();
 }
 
-// 5. Render Formulir Pengumpulan (Baru atau Mode Revisi)
+// 5. Render Formulir Pengumpulan (Baru atau Mode Revisi Mandiri)
 function renderSubmissionForm(participant, existingSubmission, isRevision) {
+  activeParticipant = participant;
+  activeSubmission = existingSubmission;
+
   document.getElementById('lookup-card').classList.add('hidden');
   document.getElementById('receipt-card').classList.add('hidden');
   const submissionCard = document.getElementById('submission-card');
@@ -210,12 +236,12 @@ function renderSubmissionForm(participant, existingSubmission, isRevision) {
 
     if (isScratch) {
       uploadLabel.textContent = 'Upload File Proyek Scratch (.sb3)';
-      formatHint.textContent = 'Format berkas wajib .sb3 (Maksimal 50 MB)';
+      formatHint.textContent = existingSubmission ? 'Format berkas .sb3 (Biarkan kosong jika tidak ingin mengganti berkas sebelumnya)' : 'Format berkas wajib .sb3 (Maksimal 100 MB)';
       fileInput.accept = '.sb3';
-      fileInput.required = !existingSubmission; // wajib jika baru
+      fileInput.required = !existingSubmission;
     } else if (isMicrobit) {
       uploadLabel.textContent = 'Upload File Proyek Micro:bit (.hex)';
-      formatHint.textContent = 'Format berkas wajib .hex (Maksimal 15 MB)';
+      formatHint.textContent = existingSubmission ? 'Format berkas .hex (Biarkan kosong jika tidak ingin mengganti berkas sebelumnya)' : 'Format berkas wajib .hex (Maksimal 100 MB)';
       fileInput.accept = '.hex';
       fileInput.required = !existingSubmission;
     }
@@ -224,10 +250,17 @@ function renderSubmissionForm(participant, existingSubmission, isRevision) {
   // Handle Revision Mode
   const revisionBanner = document.getElementById('revision-notice-banner');
   const submitBtnText = document.getElementById('btn-submit-text');
+  const btnCancelRev = document.getElementById('btn-cancel-revision');
+
+  if (btnCancelRev) {
+    btnCancelRev.onclick = () => {
+      renderReceipt(activeParticipant, activeSubmission, activeCanRevise);
+    };
+  }
 
   if (isRevision && existingSubmission) {
-    revisionBanner.classList.remove('hidden');
-    submitBtnText.textContent = `Kirim Revisi Proyek (Versi ${(existingSubmission.version || 1) + 1})`;
+    if (revisionBanner) revisionBanner.classList.remove('hidden');
+    if (submitBtnText) submitBtnText.textContent = `Kirim Revisi Proyek (Versi ${(existingSubmission.version || 1) + 1})`;
 
     // Pre-fill fields
     document.getElementById('project_title').value = existingSubmission.project_title || '';
@@ -240,19 +273,22 @@ function renderSubmissionForm(participant, existingSubmission, isRevision) {
       const fileName = document.getElementById('selected-file-name');
       const fileSize = document.getElementById('selected-file-size');
       const fileBadge = document.getElementById('selected-file-badge');
-      if (fileInfo) fileInfo.classList.remove('hidden');
-      if (fileName) fileName.textContent = `File Tersimpan: ${existingSubmission.project_file_name}`;
+      if (fileInfo) {
+        fileInfo.classList.remove('hidden');
+        fileInfo.style.display = 'flex';
+      }
+      if (fileName) fileName.textContent = `Berkas Sebelumnya: ${existingSubmission.project_file_name}`;
       if (fileSize && existingSubmission.project_file_size) {
         fileSize.textContent = `${(existingSubmission.project_file_size / (1024 * 1024)).toFixed(2)} MB`;
       }
       if (fileBadge) {
-        fileBadge.textContent = 'Tersimpan di Server';
-        fileBadge.className = 'px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700';
+        fileBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span><span>Tersimpan di Server</span>';
+        fileBadge.className = 'px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-100 text-blue-800 flex items-center gap-1';
       }
     }
   } else {
-    revisionBanner.classList.add('hidden');
-    submitBtnText.textContent = 'Kirim Proyek Sekarang';
+    if (revisionBanner) revisionBanner.classList.add('hidden');
+    if (submitBtnText) submitBtnText.textContent = 'Kirim Proyek Sekarang';
   }
 
   submissionCard.scrollIntoView({ behavior: 'smooth' });
@@ -560,7 +596,7 @@ function launchConfetti(durationMs = 3500) {
 }
 
 // Menampilkan Modal Selebrasi Sukses Pengumpulan Proyek
-function showUploadSuccessModal(participant, submission) {
+function showUploadSuccessModal(participant, submission, canRevise = false) {
   const modal = document.getElementById('upload-success-modal');
   const card = document.getElementById('upload-success-card');
   const btnClose = document.getElementById('btn-close-success-modal');
@@ -576,7 +612,7 @@ function showUploadSuccessModal(participant, submission) {
   if (timeEl) timeEl.textContent = submission.submitted_at || new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) + ' WIB';
 
   if (!modal) {
-    renderReceipt(participant, submission);
+    renderReceipt(participant, submission, canRevise);
     return;
   }
 
@@ -600,7 +636,7 @@ function showUploadSuccessModal(participant, submission) {
     }
     setTimeout(() => {
       modal.classList.add('hidden');
-      renderReceipt(participant, submission);
+      renderReceipt(participant, submission, canRevise);
     }, 250);
   };
 
@@ -773,8 +809,11 @@ function initSubmissionForm() {
             submitted_at: new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) + ' WIB'
           };
 
+          const canRevise = (refData && refData.status === 'ok') ? Boolean(refData.can_revise) : true;
+          activeCanRevise = canRevise;
+
           // Tampilkan Animasi & Modal Selebrasi Sukses
-          showUploadSuccessModal(participantData, submissionData);
+          showUploadSuccessModal(participantData, submissionData, canRevise);
         } else {
           showSubmitError(data.message || `Gagal mengirim proyek (Status: ${xhr.status}).`);
           if (progressContainer) progressContainer.classList.add('hidden');

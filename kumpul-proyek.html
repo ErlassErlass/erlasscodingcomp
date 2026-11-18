@@ -365,12 +365,39 @@
         </div>
       </div>
 
-      <!-- Informasi Revisi -->
-      <div class="mt-5 p-4 rounded-2xl bg-amber-50 border border-amber-200 flex items-start gap-3 text-xs text-amber-900">
-        <i data-lucide="lock" class="w-4 h-4 text-amber-600 shrink-0 mt-0.5"></i>
+      <!-- Informasi Revisi Mandiri -->
+      <div id="receipt-revision-banner-active" class="mt-6 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs text-blue-950 shadow-xs">
+        <div class="flex items-start gap-3">
+          <div class="w-10 h-10 rounded-xl bg-blue-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+            <i data-lucide="edit-3" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <strong class="font-extrabold text-sm block text-blue-900 mb-0.5">Revisi Mandiri Tersedia (s/d 21 Nov 2026 23:59 WIB)</strong>
+            <span class="text-blue-800 leading-relaxed block">
+              Sesuai ketentuan juknis resmi kompetisi, Anda diperbolehkan memperbarui berkas proyek atau tautan video kapan saja secara mandiri sebelum batas akhir pengumpulan. Versi terbaru yang tersimpan sebelum batas akhir akan menjadi berkas final yang dinilai oleh dewan juri.
+            </span>
+          </div>
+        </div>
+        <button
+          type="button"
+          id="btn-start-revision"
+          class="w-full sm:w-auto px-5 py-3 rounded-xl font-extrabold text-xs text-white bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-700 hover:to-amber-600 shadow-md transition-all active:scale-98 flex items-center justify-center gap-2 cursor-pointer shrink-0"
+        >
+          <i data-lucide="file-pen" class="w-4 h-4"></i>
+          <span>Edit / Revisi Proyek Ini</span>
+        </button>
+      </div>
+
+      <!-- Informasi Jika Deadline Sudah Lewat -->
+      <div id="receipt-revision-banner-locked" class="hidden mt-6 p-4 sm:p-5 rounded-2xl bg-amber-50 border-2 border-amber-200 flex items-start gap-3.5 text-xs text-amber-950">
+        <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0">
+          <i data-lucide="lock" class="w-4 h-4 text-amber-600"></i>
+        </div>
         <div>
-          <strong class="font-bold block">Status Formulir: Terkunci (Final)</strong>
-          <span>Sesuai ketentuan juknis, setelah pengiriman berhasil, proyek Anda berstatus final. Jika terdapat kekeliruan tautan atau berkas sebelum tanggal 21 November 2026, silakan hubungi panitia melalui grup WhatsApp resmi untuk dibukakan <strong>Izin Revisi</strong>.</span>
+          <strong class="font-extrabold text-sm block text-amber-950 mb-0.5">Status Formulir: Terkunci Permanen (Final)</strong>
+          <span class="text-amber-900 leading-relaxed block">
+            Batas waktu pengumpulan dan revisi proyek resmi telah berakhir pada 21 November 2026 pukul 23:59 WIB. Seluruh data karya telah berstatus final dan siap dinilai secara komprehensif oleh dewan juri.
+          </span>
         </div>
       </div>
     </div>
@@ -379,12 +406,26 @@
     <div id="submission-card" class="hidden bg-white rounded-3xl border-2 border-orange-200 shadow-xl p-6 sm:p-8 cartoon-card mb-6">
       
       <!-- Revision Mode Notice (jika ada izin revisi aktif) -->
-      <div id="revision-notice-banner" class="hidden mb-6 p-4 rounded-2xl bg-blue-50 border-2 border-blue-200 text-blue-900 flex items-start gap-3 text-xs">
-        <i data-lucide="info" class="w-5 h-5 text-blue-600 shrink-0 mt-0.5"></i>
-        <div>
-          <strong class="font-bold text-sm block">Mode Revisi Proyek Aktif (Versi Baru)</strong>
-          <span>Panitia telah memberikan izin revisi untuk Anda. Anda dapat memperbarui informasi, mengganti tautan video, atau mengunggah ulang berkas proyek. Setelah dikirim ulang, sistem akan mencatat versi terbaru dan mengunci kembali formulir Anda.</span>
+      <div id="revision-notice-banner" class="hidden mb-6 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 text-blue-950 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs">
+        <div class="flex items-start gap-3">
+          <div class="w-10 h-10 rounded-xl bg-blue-500 text-white flex items-center justify-center shrink-0">
+            <i data-lucide="sparkles" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <strong class="font-extrabold text-sm block text-blue-900 mb-0.5">Mode Revisi / Pembaruan Proyek Aktif</strong>
+            <span class="text-blue-800 leading-relaxed block">
+              Silakan perbarui judul, deskripsi, tautan video, atau unggah berkas baru. Jika Anda tidak memilih berkas baru, berkas proyek sebelumnya akan tetap aman tersimpan. Revisi mandiri berlaku hingga 21 November 2026 pukul 23:59 WIB.
+            </span>
+          </div>
         </div>
+        <button
+          type="button"
+          id="btn-cancel-revision"
+          class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs border border-slate-300 transition shrink-0 flex items-center justify-center gap-1.5 cursor-pointer"
+        >
+          <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+          <span>Batal & Kembali ke Tanda Terima</span>
+        </button>
       </div>
 
       <form id="submission-form" class="space-y-8" enctype="multipart/form-data">
@@ -1437,6 +1478,6 @@
   </footer>
 
   <!-- Script Khusus Pengumpulan Proyek -->
-  <script src="js/kumpul-proyek.js?v=20261118_2"></script>
+  <script src="js/kumpul-proyek.js?v=20261118_3"></script>
 </body>
 </html>
