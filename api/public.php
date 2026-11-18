@@ -713,9 +713,9 @@ if ($action === 'submit_project') {
 
     $reg_code = strtoupper(trim($_POST['reg_code'] ?? ''));
     $nama = trim($_POST['participant_name'] ?? '');
-    $grade_category = trim($_POST['grade_category'] ?? '');
-    $project_title = trim($_POST['project_title'] ?? '');
-    $project_description = trim($_POST['project_description'] ?? '');
+    $grade_category = trim(strip_tags($_POST['grade_category'] ?? ''));
+    $project_title = trim(strip_tags($_POST['project_title'] ?? ''));
+    $project_description = trim(strip_tags($_POST['project_description'] ?? ''));
     $video_url = trim($_POST['video_url'] ?? '');
     $backup_video_url = trim($_POST['backup_video_url'] ?? '');
 
@@ -727,6 +727,17 @@ if ($action === 'submit_project') {
 
     if (empty($reg_code) || empty($project_title) || empty($project_description) || empty($video_url) || empty($grade_category)) {
         send_json(['status' => 'error', 'message' => 'Mohon lengkapi seluruh field wajib pengumpulan proyek.'], 422);
+    }
+
+    // Validasi format URL untuk mencegah skrip berbahaya (XSS / JavaScript URI)
+    if (!filter_var($video_url, FILTER_VALIDATE_URL) || (!str_starts_with(strtolower($video_url), 'http://') && !str_starts_with(strtolower($video_url), 'https://'))) {
+        send_json(['status' => 'error', 'message' => 'Tautan video utama tidak valid. Mohon masukkan URL lengkap dengan awalan https:// atau http://.'], 422);
+    }
+
+    if (!empty($backup_video_url)) {
+        if (!filter_var($backup_video_url, FILTER_VALIDATE_URL) || (!str_starts_with(strtolower($backup_video_url), 'http://') && !str_starts_with(strtolower($backup_video_url), 'https://'))) {
+            send_json(['status' => 'error', 'message' => 'Tautan video cadangan tidak valid. Mohon masukkan URL lengkap dengan awalan https:// atau http://.'], 422);
+        }
     }
 
     // Validasi 5 checkbox wajib
@@ -741,6 +752,17 @@ if ($action === 'submit_project') {
 
     if (!$participant) {
         send_json(['status' => 'error', 'message' => 'Data pendaftar tidak ditemukan.'], 404);
+    }
+
+    // Keamanan: Validasi kecocokan nama agar nomor ID tidak dapat disalahgunakan pihak lain
+    if (empty($nama)) {
+        send_json(['status' => 'error', 'message' => 'Nama lengkap peserta wajib disertakan.'], 422);
+    }
+
+    $cleanInput = preg_replace('/[^a-zA-Z0-9]/', '', strtolower($nama));
+    $cleanDb = preg_replace('/[^a-zA-Z0-9]/', '', strtolower($participant['participant_name']));
+    if (strpos($cleanDb, $cleanInput) === false && strpos($cleanInput, $cleanDb) === false) {
+        send_json(['status' => 'error', 'message' => 'Nama peserta tidak cocok dengan nomor ID registrasi tersebut.'], 403);
     }
 
     if ($participant['payment_status'] !== 'verified' && (int)$participant['is_partner'] !== 1) {
@@ -760,6 +782,14 @@ if ($action === 'submit_project') {
             'status' => 'error',
             'message' => 'Batas waktu pengumpulan dan revisi proyek resmi telah berakhir pada 21 November 2026 pukul 23:59 WIB.'
         ], 403);
+    }
+
+    // Perlindungan anti-spam / double submit (cooldown 3 detik)
+    if ($existing && !empty($existing['last_revised_at'])) {
+        $lastSubTime = strtotime($existing['last_revised_at']);
+        if (($now - $lastSubTime) < 3) {
+            send_json(['status' => 'error', 'message' => 'Pengiriman terlalu cepat. Mohon tunggu beberapa detik sebelum mengirim pembaruan kembali.'], 429);
+        }
     }
 
     $branch = $participant['branch'];
@@ -803,6 +833,20 @@ if ($action === 'submit_project') {
             $maxBytes = 100 * 1024 * 1024; // 100MB
             if ($file['size'] > $maxBytes) {
                 send_json(['status' => 'error', 'message' => 'Ukuran berkas melebihi batas maksimal 100 MB.'], 422);
+            }
+
+            // Validasi integritas header berkas (magic bytes)
+            $handle = fopen($file['tmp_name'], 'rb');
+            if ($handle) {
+                $header = fread($handle, 16);
+                fclose($handle);
+
+                if ($isScratch && strncmp($header, "PK\x03\x04", 4) !== 0) {
+                    send_json(['status' => 'error', 'message' => 'Berkas Scratch tidak valid atau rusak (format berkas bukan arsip ZIP/SB3 asli).'], 422);
+                }
+                if ($isMicrobit && (empty($header) || $header[0] !== ':')) {
+                    send_json(['status' => 'error', 'message' => 'Berkas Micro:bit tidak valid atau rusak (format berkas bukan Intel HEX asli).'], 422);
+                }
             }
 
             // Standar penamaan proyek otomatis: [Kategori]_[IDPeserta]_[NamaPeserta].[ext]
