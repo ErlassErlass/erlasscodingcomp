@@ -491,7 +491,7 @@
               
               <div
                 id="project-dropzone"
-                class="border-2 border-dashed border-orange-300 hover:border-orange-500 bg-orange-50/40 hover:bg-orange-50/80 rounded-2xl p-6 text-center cursor-pointer transition flex flex-col items-center justify-center gap-2"
+                class="relative border-2 border-dashed border-orange-300 hover:border-orange-500 bg-orange-50/40 hover:bg-orange-50/80 rounded-2xl p-6 text-center cursor-pointer transition-all duration-200 flex flex-col items-center justify-center gap-2 overflow-hidden select-none"
               >
                 <input
                   type="file"
@@ -499,33 +499,50 @@
                   name="project_file"
                   class="hidden"
                 >
-                <div class="w-12 h-12 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center">
-                  <i data-lucide="upload" class="w-6 h-6"></i>
+
+                <!-- Normal Prompt View -->
+                <div id="dropzone-idle-content" class="flex flex-col items-center justify-center gap-2 transition-all duration-200 pointer-events-none">
+                  <div id="dropzone-icon-box" class="w-12 h-12 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center transition-transform duration-300">
+                    <i data-lucide="upload-cloud" class="w-6 h-6"></i>
+                  </div>
+                  <div class="text-xs sm:text-sm font-bold text-slate-800">
+                    <span class="text-orange-600 underline">Klik untuk memilih file</span> atau seret berkas ke sini
+                  </div>
+                  <p id="upload-format-hint" class="text-[11px] text-slate-500">
+                    Format berkas yang didukung (Maksimal 100 MB).
+                  </p>
                 </div>
-                <div class="text-xs sm:text-sm font-bold text-slate-800">
-                  <span class="text-orange-600 underline">Klik untuk memilih file</span> atau seret file ke sini
+
+                <!-- Drag-Over Visual Overlay (Muncul saat berkas diseret di atas kotak) -->
+                <div id="dropzone-drag-overlay" class="hidden absolute inset-0 bg-gradient-to-br from-orange-500/90 to-amber-500/90 text-white rounded-2xl flex flex-col items-center justify-center gap-2 p-4 pointer-events-none z-10 backdrop-blur-xs transition-all duration-200">
+                  <div class="w-14 h-14 rounded-2xl bg-white/20 border-2 border-white/40 flex items-center justify-center shadow-lg animate-bounce">
+                    <i data-lucide="download" class="w-8 h-8 text-white"></i>
+                  </div>
+                  <span class="text-sm sm:text-base font-extrabold tracking-tight drop-shadow-sm">Lepaskan Berkas di Sini!</span>
+                  <span class="text-[11px] font-semibold text-orange-100">Berkas proyek Anda akan otomatis dimuat</span>
                 </div>
-                <p id="upload-format-hint" class="text-[11px] text-slate-500">
-                  Format berkas yang didukung (Maksimal 100 MB).
-                </p>
-                <!-- Preview Berkas Terpilih -->
-                <div id="selected-file-info" class="hidden mt-3 w-full max-w-md p-3.5 bg-white border-2 border-emerald-300 rounded-2xl shadow-sm flex items-center justify-between gap-3 text-left">
+
+                <!-- Preview Berkas Terpilih (Pop-In) -->
+                <div id="selected-file-info" class="hidden mt-3 w-full max-w-md p-3.5 bg-white border-2 border-emerald-400 rounded-2xl shadow-md flex items-center justify-between gap-3 text-left transition-all duration-300">
                   <div class="flex items-center gap-3 overflow-hidden">
-                    <div id="selected-file-icon" class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
-                      <i data-lucide="file-code" class="w-5 h-5"></i>
+                    <div id="selected-file-icon" class="w-11 h-11 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 shadow-2xs">
+                      <i data-lucide="file-check-2" class="w-5 h-5"></i>
                     </div>
                     <div class="overflow-hidden">
                       <div id="selected-file-name" class="text-xs sm:text-sm font-bold text-slate-900 truncate"></div>
                       <div class="flex items-center gap-2 mt-0.5">
                         <span id="selected-file-size" class="text-[11px] font-mono text-slate-500 font-semibold"></span>
-                        <span id="selected-file-badge" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800">Siap Diunggah</span>
+                        <span id="selected-file-badge" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800 flex items-center gap-1">
+                          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                          <span>Siap Diunggah</span>
+                        </span>
                       </div>
                     </div>
                   </div>
                   <button
                     type="button"
                     id="btn-remove-selected-file"
-                    class="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition shrink-0"
+                    class="p-2 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 transition shrink-0"
                     title="Hapus / Pilih berkas lain"
                   >
                     <i data-lucide="x" class="w-4 h-4"></i>
@@ -1193,6 +1210,76 @@
   </main>
 
   <!-- ============================================================== -->
+  <!-- MODAL SUKSES PENGUMPULAN PROYEK & ANIMASI SELEBRASI            -->
+  <!-- ============================================================== -->
+  <canvas id="confetti-canvas" class="hidden fixed inset-0 pointer-events-none z-60 w-full h-full"></canvas>
+
+  <div id="upload-success-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 backdrop-blur-sm p-4 overflow-y-auto transition-opacity duration-300">
+    <div id="upload-success-card" class="bg-white text-slate-800 rounded-3xl p-6 sm:p-8 max-w-lg w-full border border-emerald-200 shadow-2xl relative my-auto text-center transform transition-all duration-300 scale-95 opacity-0">
+      
+      <!-- Animated Check Icon Circle -->
+      <div class="mx-auto w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-400 text-white flex items-center justify-center shadow-lg shadow-emerald-500/30 mb-5 relative">
+        <div class="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-25"></div>
+        <div class="relative w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center">
+          <svg class="w-12 h-12 sm:w-14 sm:h-14 stroke-white stroke-2 fill-none" viewBox="0 0 52 52">
+            <circle class="stroke-white/30" cx="26" cy="26" r="23" stroke-width="3"/>
+            <path class="stroke-white stroke-[3.5] stroke-linecap-round stroke-linejoin-round" d="M14 27l8 8 16-16" stroke-dasharray="48" stroke-dashoffset="0"/>
+          </svg>
+        </div>
+      </div>
+
+      <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800 mb-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span>Pengumpulan Berhasil Final</span>
+      </span>
+
+      <h3 class="display-font text-xl sm:text-2xl font-black text-slate-900 tracking-tight mb-2">
+        Karya Proyek Anda Berhasil Dikirim!
+      </h3>
+      
+      <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6">
+        Selamat! Seluruh berkas kode dan tautan video presentasi Anda telah tersimpan dan diverifikasi secara resmi di server panitia kompetisi.
+      </p>
+
+      <!-- Ringkasan Singkat Proyek -->
+      <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 text-left text-xs space-y-2 mb-6">
+        <div class="flex justify-between items-center border-b border-slate-200/60 pb-2">
+          <span class="text-slate-500 font-medium">Nomor ID Peserta:</span>
+          <span id="success-modal-reg-code" class="font-mono font-black text-orange-600 bg-orange-50 px-2 py-0.5 rounded-lg border border-orange-200">-</span>
+        </div>
+        <div class="flex justify-between items-center border-b border-slate-200/60 pb-2">
+          <span class="text-slate-500 font-medium">Nama Peserta:</span>
+          <span id="success-modal-name" class="font-bold text-slate-900">-</span>
+        </div>
+        <div class="flex justify-between items-center border-b border-slate-200/60 pb-2">
+          <span class="text-slate-500 font-medium">Judul Proyek:</span>
+          <span id="success-modal-title" class="font-semibold text-slate-800 truncate max-w-[200px] sm:max-w-[240px] text-right">-</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-slate-500 font-medium">Waktu Penerimaan:</span>
+          <span id="success-modal-time" class="font-mono text-slate-700 font-medium">-</span>
+        </div>
+      </div>
+
+      <!-- Action Button -->
+      <div class="space-y-2">
+        <button
+          type="button"
+          id="btn-close-success-modal"
+          class="w-full py-3.5 px-5 rounded-2xl font-extrabold text-xs sm:text-sm text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-lg shadow-emerald-600/25 transition-all duration-200 active:scale-98 flex items-center justify-center gap-2 cursor-pointer"
+        >
+          <i data-lucide="file-badge" class="w-4 h-4"></i>
+          <span>Buka & Cetak Tanda Terima Resmi</span>
+        </button>
+        <p class="text-[11px] text-slate-400">
+          Simpan atau cetak nomor tanda terima sebagai bukti registrasi final.
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
   <!-- MODAL BANTUAN LUPA ID PESERTA (VERIFIKASI IDENTITAS PRIVAT)   -->
   <!-- ============================================================== -->
   <div id="forgot-id-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 overflow-y-auto">
@@ -1350,6 +1437,6 @@
   </footer>
 
   <!-- Script Khusus Pengumpulan Proyek -->
-  <script src="js/kumpul-proyek.js?v=20261021_1"></script>
+  <script src="js/kumpul-proyek.js?v=20261118_1"></script>
 </body>
 </html>

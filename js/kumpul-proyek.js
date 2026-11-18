@@ -262,6 +262,8 @@ function renderSubmissionForm(participant, existingSubmission, isRevision) {
 // 6. File Upload Handlers (Drag & Drop & Rich Preview)
 function initUploadHandlers() {
   const dropzone = document.getElementById('project-dropzone');
+  const dragOverlay = document.getElementById('dropzone-drag-overlay');
+  const idleContent = document.getElementById('dropzone-idle-content');
   const fileInput = document.getElementById('project_file');
   const fileInfo = document.getElementById('selected-file-info');
   const fileName = document.getElementById('selected-file-name');
@@ -284,24 +286,57 @@ function initUploadHandlers() {
       e.stopPropagation();
       fileInput.value = '';
       if (fileInfo) fileInfo.classList.add('hidden');
+      if (idleContent) idleContent.classList.remove('hidden');
       if (errorBox) errorBox.classList.add('hidden');
     });
   }
 
-  dropzone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    dropzone.classList.add('border-orange-500', 'bg-orange-100/60');
+  let dragCounter = 0;
+
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach((eventName) => {
+    dropzone.addEventListener(eventName, (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    });
   });
 
-  dropzone.addEventListener('dragleave', () => {
-    dropzone.classList.remove('border-orange-500', 'bg-orange-100/60');
+  dropzone.addEventListener('dragenter', (e) => {
+    dragCounter++;
+    if (dragOverlay) dragOverlay.classList.remove('hidden');
+    dropzone.classList.add('scale-[1.02]', 'border-orange-500', 'ring-4', 'ring-orange-200/60', 'bg-orange-50/90');
+    dropzone.classList.remove('border-orange-300', 'bg-orange-50/40');
+  });
+
+  dropzone.addEventListener('dragover', (e) => {
+    if (dragOverlay && dragOverlay.classList.contains('hidden')) {
+      dragOverlay.classList.remove('hidden');
+    }
+  });
+
+  dropzone.addEventListener('dragleave', (e) => {
+    dragCounter--;
+    if (dragCounter <= 0) {
+      dragCounter = 0;
+      if (dragOverlay) dragOverlay.classList.add('hidden');
+      dropzone.classList.remove('scale-[1.02]', 'border-orange-500', 'ring-4', 'ring-orange-200/60', 'bg-orange-50/90');
+      dropzone.classList.add('border-orange-300', 'bg-orange-50/40');
+    }
   });
 
   dropzone.addEventListener('drop', (e) => {
-    e.preventDefault();
-    dropzone.classList.remove('border-orange-500', 'bg-orange-100/60');
-    if (e.dataTransfer.files.length) {
-      fileInput.files = e.dataTransfer.files;
+    dragCounter = 0;
+    if (dragOverlay) dragOverlay.classList.add('hidden');
+    dropzone.classList.remove('scale-[1.02]', 'border-orange-500', 'ring-4', 'ring-orange-200/60', 'bg-orange-50/90');
+    dropzone.classList.add('border-emerald-500', 'bg-emerald-50/70', 'ring-4', 'ring-emerald-200/50');
+
+    setTimeout(() => {
+      dropzone.classList.remove('border-emerald-500', 'bg-emerald-50/70', 'ring-4', 'ring-emerald-200/50');
+      dropzone.classList.add('border-orange-300', 'bg-orange-50/40');
+    }, 700);
+
+    const dt = e.dataTransfer;
+    if (dt && dt.files && dt.files.length > 0) {
+      fileInput.files = dt.files;
       handleSelectedFile(fileInput.files[0]);
     }
   });
@@ -346,8 +381,9 @@ function initUploadHandlers() {
 
     if (sizeBytes > maxMb * 1024 * 1024) {
       // Melebihi 100 MB
-      fileInfo.className = 'mt-3 w-full max-w-md p-3.5 bg-red-50 border-2 border-red-300 rounded-2xl shadow-sm flex items-center justify-between gap-3 text-left';
-      if (fileIcon) fileIcon.className = 'w-10 h-10 rounded-xl bg-red-100 text-red-600 flex items-center justify-center shrink-0';
+      if (idleContent) idleContent.classList.remove('hidden');
+      fileInfo.className = 'mt-3 w-full max-w-md p-3.5 bg-red-50 border-2 border-red-300 rounded-2xl shadow-sm flex items-center justify-between gap-3 text-left animate-in fade-in duration-200';
+      if (fileIcon) fileIcon.className = 'w-11 h-11 rounded-xl bg-red-100 text-red-600 flex items-center justify-center shrink-0';
       if (fileBadge) {
         fileBadge.className = 'px-2 py-0.5 rounded-md text-[10px] font-bold bg-red-200 text-red-800';
         fileBadge.textContent = `Melebihi Batas 100 MB (${sizeMb} MB)`;
@@ -358,25 +394,171 @@ function initUploadHandlers() {
       }
     } else if (!isValidExt) {
       // Ekstensi tidak sesuai
-      fileInfo.className = 'mt-3 w-full max-w-md p-3.5 bg-amber-50 border-2 border-amber-300 rounded-2xl shadow-sm flex items-center justify-between gap-3 text-left';
-      if (fileIcon) fileIcon.className = 'w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0';
+      if (idleContent) idleContent.classList.remove('hidden');
+      fileInfo.className = 'mt-3 w-full max-w-md p-3.5 bg-amber-50 border-2 border-amber-300 rounded-2xl shadow-sm flex items-center justify-between gap-3 text-left animate-in fade-in duration-200';
+      if (fileIcon) fileIcon.className = 'w-11 h-11 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0';
       if (fileBadge) {
         fileBadge.className = 'px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-200 text-amber-900';
         fileBadge.textContent = extError;
       }
     } else {
       // Valid & Siap Unggah
-      fileInfo.className = 'mt-3 w-full max-w-md p-3.5 bg-white border-2 border-emerald-300 rounded-2xl shadow-sm flex items-center justify-between gap-3 text-left';
-      if (fileIcon) fileIcon.className = 'w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0';
+      if (idleContent) idleContent.classList.add('hidden');
+      fileInfo.className = 'mt-2 w-full max-w-md p-3.5 bg-white border-2 border-emerald-400 rounded-2xl shadow-md flex items-center justify-between gap-3 text-left transition-all duration-300 scale-100';
+      if (fileIcon) fileIcon.className = 'w-11 h-11 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 shadow-2xs';
       if (fileBadge) {
-        fileBadge.className = 'px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800';
-        fileBadge.textContent = 'Siap Diunggah';
+        fileBadge.className = 'px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800 flex items-center gap-1';
+        fileBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span><span>Siap Diunggah</span>';
       }
       if (errorBox) errorBox.classList.add('hidden');
     }
 
     fileInfo.classList.remove('hidden');
     if (window.lucide) lucide.createIcons();
+  }
+}
+
+// Confetti Animation Controller
+let confettiAnimationId = null;
+
+function stopConfetti() {
+  if (confettiAnimationId) {
+    cancelAnimationFrame(confettiAnimationId);
+    confettiAnimationId = null;
+  }
+  const canvas = document.getElementById('confetti-canvas');
+  if (canvas) {
+    const ctx = canvas.getContext('2d');
+    if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+    canvas.classList.add('hidden');
+  }
+}
+
+function launchConfetti(durationMs = 3500) {
+  const canvas = document.getElementById('confetti-canvas');
+  if (!canvas) return;
+
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  stopConfetti();
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  canvas.classList.remove('hidden');
+
+  const colors = ['#f97316', '#fbbf24', '#10b981', '#06b6d4', '#6366f1', '#ec4899', '#3b82f6'];
+  const particleCount = 140;
+  const particles = [];
+
+  for (let i = 0; i < particleCount; i++) {
+    particles.push({
+      x: canvas.width * 0.5 + (Math.random() - 0.5) * 220,
+      y: canvas.height * 0.35 + (Math.random() - 0.5) * 80,
+      vx: (Math.random() - 0.5) * 14,
+      vy: Math.random() * -12 - 4,
+      size: Math.random() * 8 + 4,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      rotation: Math.random() * 360,
+      rotationSpeed: (Math.random() - 0.5) * 12,
+      opacity: 1,
+      shape: Math.random() > 0.4 ? 'rect' : 'circle'
+    });
+  }
+
+  const startTime = Date.now();
+
+  function render() {
+    const elapsed = Date.now() - startTime;
+    if (elapsed > durationMs) {
+      stopConfetti();
+      return;
+    }
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const fadeFactor = elapsed > durationMs * 0.7 
+      ? Math.max(0, 1 - (elapsed - durationMs * 0.7) / (durationMs * 0.3)) 
+      : 1;
+
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.32; // Gravity
+      p.vx *= 0.985; // Air resistance
+      p.rotation += p.rotationSpeed;
+
+      ctx.save();
+      ctx.globalAlpha = p.opacity * fadeFactor;
+      ctx.translate(p.x, p.y);
+      ctx.rotate((p.rotation * Math.PI) / 180);
+      ctx.fillStyle = p.color;
+
+      if (p.shape === 'rect') {
+        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 1.4);
+      } else {
+        ctx.beginPath();
+        ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.restore();
+    }
+
+    confettiAnimationId = requestAnimationFrame(render);
+  }
+
+  confettiAnimationId = requestAnimationFrame(render);
+}
+
+// Menampilkan Modal Selebrasi Sukses Pengumpulan Proyek
+function showUploadSuccessModal(participant, submission) {
+  const modal = document.getElementById('upload-success-modal');
+  const card = document.getElementById('upload-success-card');
+  const btnClose = document.getElementById('btn-close-success-modal');
+
+  const regCodeEl = document.getElementById('success-modal-reg-code');
+  const nameEl = document.getElementById('success-modal-name');
+  const titleEl = document.getElementById('success-modal-title');
+  const timeEl = document.getElementById('success-modal-time');
+
+  if (regCodeEl) regCodeEl.textContent = participant.reg_code || '-';
+  if (nameEl) nameEl.textContent = participant.participant_name || '-';
+  if (titleEl) titleEl.textContent = submission.project_title || '-';
+  if (timeEl) timeEl.textContent = submission.submitted_at || new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) + ' WIB';
+
+  if (!modal) {
+    renderReceipt(participant, submission);
+    return;
+  }
+
+  modal.classList.remove('hidden');
+  if (window.lucide) lucide.createIcons();
+
+  requestAnimationFrame(() => {
+    if (card) {
+      card.classList.remove('scale-95', 'opacity-0');
+      card.classList.add('scale-100', 'opacity-100');
+    }
+  });
+
+  launchConfetti(3500);
+
+  const handleClose = () => {
+    stopConfetti();
+    if (card) {
+      card.classList.remove('scale-100', 'opacity-100');
+      card.classList.add('scale-95', 'opacity-0');
+    }
+    setTimeout(() => {
+      modal.classList.add('hidden');
+      renderReceipt(participant, submission);
+    }, 250);
+  };
+
+  if (btnClose) {
+    btnClose.onclick = handleClose;
   }
 }
 
@@ -517,19 +699,35 @@ function initSubmissionForm() {
           if (progressBar) progressBar.style.width = '100%';
           if (progressPercent) progressPercent.textContent = '100%';
           if (progressStatus) progressStatus.textContent = 'Pengumpulan sukses!';
-          
-          alert(data.message || 'Proyek Anda berhasil dikumpulkan!');
 
-          // Refresh data dan tampilkan bukti tanda terima resmi
+          // Ambil referensi data terkini dari server
           const regCode = document.getElementById('sub-reg-code').value;
           const name = document.getElementById('sub-participant-name').value;
-          const refRes = await fetch(`api/public.php?action=lookup_project_participant&reg_code=${encodeURIComponent(regCode)}&participant_name=${encodeURIComponent(name)}`);
-          const refData = await refRes.json();
-          if (refData.status === 'ok') {
-            renderReceipt(refData.participant, refData.submission);
-          } else {
-            window.location.reload();
+          
+          let refData = null;
+          try {
+            const refRes = await fetch(`api/public.php?action=lookup_project_participant&reg_code=${encodeURIComponent(regCode)}&participant_name=${encodeURIComponent(name)}`);
+            refData = await refRes.json();
+          } catch (fetchErr) {
+            console.error('Lookup refresh error:', fetchErr);
           }
+
+          const participantData = (refData && refData.status === 'ok' && refData.participant) ? refData.participant : {
+            reg_code: regCode,
+            participant_name: name,
+            school_name: document.getElementById('disp-school') ? document.getElementById('disp-school').textContent : '',
+            branch: document.getElementById('disp-branch') ? document.getElementById('disp-branch').textContent : ''
+          };
+
+          const submissionData = (refData && refData.status === 'ok' && refData.submission) ? refData.submission : {
+            project_title: title,
+            project_description: desc,
+            video_url: videoUrl,
+            submitted_at: new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) + ' WIB'
+          };
+
+          // Tampilkan Animasi & Modal Selebrasi Sukses
+          showUploadSuccessModal(participantData, submissionData);
         } else {
           showSubmitError(data.message || `Gagal mengirim proyek (Status: ${xhr.status}).`);
           if (progressContainer) progressContainer.classList.add('hidden');
